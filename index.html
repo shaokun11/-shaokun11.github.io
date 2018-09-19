@@ -323,7 +323,7 @@
 <h5 id="ERC998接口分析"><a href="#ERC998接口分析" class="headerlink" title="ERC998接口分析"></a>ERC998接口分析</h5><p>原作者已经写得非常详细了，具体就不在具体分析了。这里结合Bitizen简单的看看ComposableTopDown的实现吧。（ComposableBottonUp的原理也类似）  </p>
 <p><em>interface ERC998ERC721TopDown</em></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">event ReceivedChild(address indexed _from, uint256 indexed _tokenId, address indexed _childContract, uint256 _childTokenId)</span><br></pre></td></tr></table></figure>
-<p>当avatar接收到一件clothes会触发的一个事件<br> _from : clothes的原始owner address<br> _tokenId : 哪一个avatar来穿这件衣服，即avatar id<br> _childContract: clothes contract address<br>_childTokenId:  哪一件衣服，即clothes id</p>
+<p>当avatar接收到一件clothes会触发的一个事件<br> _from : clothes的原始owner address<br> _tokenId : 哪一个avatar来穿这件衣服，即avatar id<br> _childContract: clothes contract address<br>_childTokenId:  哪一件衣服，即clothes id  </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">event TransferChild(uint256 indexed tokenId, address indexed _to, address indexed _childContract, uint256 _childTokenId);</span><br></pre></td></tr></table></figure>
 <p>当avatar脱下一件clothes时会发出的一个事件<br>tokenId : 将要脱下clothes的avatar id<br>_to : 接收clothes address,在项目中<br>_childContract： clothes 合约地址<br>_childTokenId： clothes id</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function rootOwnerOf(uint256 _tokenId) external view returns (bytes32 rootOwner);</span><br></pre></td></tr></table></figure>

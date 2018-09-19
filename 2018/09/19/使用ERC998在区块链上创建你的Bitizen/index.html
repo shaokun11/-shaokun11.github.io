@@ -92,7 +92,7 @@
 <meta property="og:image" content="https://www.bitguild.com/static/images/games/bitizens/presale/pioneer_of_the_skies/banner.jpg">
 <meta property="og:image" content="https://www.bitguild.com/static/images/games/bitizens/presale/pioneer_of_the_seas/banner.jpg">
 <meta property="og:image" content="https://www.bitguild.com/static/images/games/bitizens/presale/pioneer_of_the_cyberscape/banner.jpg">
-<meta property="og:updated_time" content="2018-09-19T15:10:53.000Z">
+<meta property="og:updated_time" content="2018-09-19T15:20:13.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用ERC998在区块链上打造属于你的Bitizen">
 <meta name="twitter:description" content="概念须知 ERC ERC20 ERC721 ERC998  ERC应用程序级标准和约定，包括令牌标准等合同标准 我的理解就是token的统一约定的一种代号前缀 ERC20目前状态final。具体信息可访问ERC20 特性：每一个ERC20 token有同样的价值。假设你有2枚ERC20 token，可类比你有两枚一元钱的硬币，它们实际的价值都是一元钱的价值 ERC721目前状态final,NFT(">
@@ -325,7 +325,7 @@
 <h5 id="ERC998接口分析"><a href="#ERC998接口分析" class="headerlink" title="ERC998接口分析"></a>ERC998接口分析</h5><p>原作者已经写得非常详细了，具体就不在具体分析了。这里结合Bitizen简单的看看ComposableTopDown的实现吧。（ComposableBottonUp的原理也类似）  </p>
 <p><em>interface ERC998ERC721TopDown</em></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">event ReceivedChild(address indexed _from, uint256 indexed _tokenId, address indexed _childContract, uint256 _childTokenId)</span><br></pre></td></tr></table></figure>
-<p>当avatar接收到一件clothes会触发的一个事件<br> _from : clothes的原始owner address<br> _tokenId : 哪一个avatar来穿这件衣服，即avatar id<br> _childContract: clothes contract address<br>_childTokenId:  哪一件衣服，即clothes id</p>
+<p>当avatar接收到一件clothes会触发的一个事件<br> _from : clothes的原始owner address<br> _tokenId : 哪一个avatar来穿这件衣服，即avatar id<br> _childContract: clothes contract address<br>_childTokenId:  哪一件衣服，即clothes id  </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">event TransferChild(uint256 indexed tokenId, address indexed _to, address indexed _childContract, uint256 _childTokenId);</span><br></pre></td></tr></table></figure>
 <p>当avatar脱下一件clothes时会发出的一个事件<br>tokenId : 将要脱下clothes的avatar id<br>_to : 接收clothes address,在项目中<br>_childContract： clothes 合约地址<br>_childTokenId： clothes id</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">function rootOwnerOf(uint256 _tokenId) external view returns (bytes32 rootOwner);</span><br></pre></td></tr></table></figure>
