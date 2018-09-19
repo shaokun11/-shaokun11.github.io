@@ -320,7 +320,6 @@
 <p>特性：可组合（composable）。ERC20和ERC721仅仅是单一的物品的应用，而ERC998可以组合不同的ERC721和ERC20，使之产生更丰富的应用。可以类比主机（ERC721） +  显示器（ERC20）+ 外设（ERC721）= 电脑（ERC998）；通过这样的组合我们就能够创建出更加复杂，高级的功能。</p>
 <h5 id="ERC998的两种实现"><a href="#ERC998的两种实现" class="headerlink" title="ERC998的两种实现"></a>ERC998的两种实现</h5><p>ComposableTopDown和ComposableBottonUp，本次结合我实际的应用只讲介绍前者，具体的不同可以参考官网，当然这里有一篇作者更详细的介绍</p>
 <p><a href="https://hackernoon.com/top-down-and-bottom-up-composables-whats-the-difference-and-which-one-should-you-use-db939f6acf1d" target="_blank" rel="noopener">Top-Down and Bottom-Up Composables, What’s the Difference and Which One Should You Use?</a></p>
-<h5 id="Bitizen在998上面的应用"><a href="#Bitizen在998上面的应用" class="headerlink" title="Bitizen在998上面的应用"></a>Bitizen在998上面的应用</h5><p>在bitizens的区块链世界中，每一个avatar(ERC998)都代表着你自己，且是独一无二的。在里面，你可以通过1co获得不同的clothes(ERC721)。每个avatar可以穿着5件衣服或者带一些宠物进行挖矿，这样可以进一步获取一些其他的奖励，这些奖励包括但不局限于clothes,例如car。你如果想进一步了解这个游戏索要表达的未来，这里推荐一看一部电影<a href="https://baike.baidu.com/item/%E5%A4%B4%E5%8F%B7%E7%8E%A9%E5%AE%B6/22040855?fromtitle=%E4%B8%80%E7%BA%A7%E7%8E%A9%E5%AE%B6&amp;fromid=16985875" target="_blank" rel="noopener">头号玩家</a></p>
 <h5 id="ERC998接口分析"><a href="#ERC998接口分析" class="headerlink" title="ERC998接口分析"></a>ERC998接口分析</h5><p>原作者已经写得非常详细了，具体就不在具体分析了。这里结合Bitizen简单的看看ComposableTopDown的实现吧。（ComposableBottonUp的原理也类似）  </p>
 <p><em>interface ERC998ERC721TopDown</em></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">event ReceivedChild(address indexed _from, uint256 indexed _tokenId, address indexed _childContract, uint256 _childTokenId)</span><br></pre></td></tr></table></figure>
@@ -343,8 +342,7 @@
 <p>interface ERC20AndERC223 {<br>    function transferFrom(address _from, address _to, uint _value) external returns (bool success);<br>    function transfer(address to, uint value) external returns (bool success);<br>    function transfer(address to, uint value, bytes data) external returns (bool success);<br>    function allowance(address _owner, address _spender) external view returns (uint256 remaining);<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">ERC20集成到ERC998的interface，可按照ERC721的理解，就不一一讲解了</span><br></pre></td></tr></table></figure></p>
 <p>interface ERC998ERC721BottomUp {<br>    function transferToParent(address _from, address _toContract, uint256 _toTokenId, uint256 _tokenId, bytes _data) external;<br>}<br><code>`</code><br>声明ComposableBottonUp的接口，用于<em>transferChildToParent</em>  </p>
 <p>到此为止，ComposableTopDown的对外开放的接口已经分析完毕了。</p>
-<h5 id="ERC998实际运用"><a href="#ERC998实际运用" class="headerlink" title="ERC998实际运用"></a>ERC998实际运用</h5><p>根据项目的需求，我们还需要添加ERC721另外两个标准的接口<em>ERC721TokenReceiver</em> 和<em>ERC721Metadata</em>，因为ERC998是ERC721的一个扩展，所以avatar也是属于ERC721的，在ERC998中并没有为我们实现，这部分得我们自己实现。<br>同时，产品组需求目前每个用户只能创建一个avatar，且当前不能交易avatar。在设计中，如果交易avatar,那么穿在身上的clothes也将会一起交易给其他avatar,而放在衣柜的衣服是不受影响的，还有增加冻结，默认权限，数据与逻辑层的分离操作，批量穿脱衣服等等。  </p>
-<p>说了这么多，就是想说根据产品的需求合理的根据998的特点进行运用吧。</p>
+<h5 id="ERC998实际运用"><a href="#ERC998实际运用" class="headerlink" title="ERC998实际运用"></a>ERC998实际运用</h5><p>在bitizens的区块链世界中，每一个avatar(ERC998)都代表着你自己，且是独一无二的。在里面，你可以通过1co获得不同的clothes(ERC721)。每个avatar可以穿着5件衣服或者带一些宠物进行挖矿，这样可以进一步获取一些其他的奖励，这些奖励包括但不局限于clothes,例如car。你如果想进一步了解这个游戏索要表达的未来，这里推荐一看一部电影<a href="https://baike.baidu.com/item/%E5%A4%B4%E5%8F%B7%E7%8E%A9%E5%AE%B6/22040855?fromtitle=%E4%B8%80%E7%BA%A7%E7%8E%A9%E5%AE%B6&amp;fromid=16985875" target="_blank" rel="noopener">头号玩家</a><br>根据需求，我们还需要添加ERC721另外两个标准的接口<em>ERC721TokenReceiver</em> 和<em>ERC721Metadata</em>，因为ERC998是ERC721的一个扩展，所以avatar也是属于ERC721的，在ERC998中并没有为我们实现，这部分得我们自己实现。<br>同时，产品组需求目前每个用户只能创建一个avatar，且当前不能交易avatar。在设计中，如果交易avatar,那么穿在身上的clothes也将会一起交易给其他avatar,而放在衣柜的衣服是不受影响的，还有增加冻结，默认权限，数据与逻辑层的分离操作，批量穿脱衣服等等。  </p>
 <p>来看看我们项目中实际的clothes吧，应该是区块链上第一个3D的ERC998的应用。<a href="https://www.bitguild.com/" target="_blank" rel="noopener">Bitizens</a>,大家可以去这里体验玩一下。<br>这里借用一下公司的宣传图片，如果有副作用，请告知马上删除！  </p>
 <ul>
 <li>荒野开拓者套装（在我们的项目中，套装是由多个部分组成的，分为上衣，头饰，裤子，和鞋子）</li>
@@ -363,7 +361,7 @@
 <li>网络空间开拓者套装</li>
 </ul>
 <p><img src="https://www.bitguild.com/static/images/games/bitizens/presale/pioneer_of_the_cyberscape/banner.jpg" alt="网络空间开拓者"> </p>
-<h5 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h5><p>这就是我对ERC998的理解，相信他还有更大的潜在空间等待我们去发现。这篇文章仅仅分析了ERC998的标准接口，当然其中也涉及到ERC721和ERC20的一些知识，如果你感兴趣，可以联系我，希望能够给将要进入dapp的开发者提供一点点帮助。</p>
+<h5 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h5><p>这就是我对ERC998的理解，相信他还有更大的潜在空间等待我们去发现。这篇文章仅仅分析了ERC998的标准接口，当然其中也涉及到ERC721和ERC20的一些知识，如果你感兴趣，可以联系我，我将继续分享关于dapp开发的经验给大家，希望能够给将要进入dapp的开发者提供一点点帮助。</p>
 <h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，目前在深圳从事DAPP开发。目前主要工作方向为基于Ethereum,Tron,Eos 进行dapp和钱包开发。技术方面能够使用 java,c++,JavaScript,python,go写出hello world，但是每天的我也在不停的进步，努力充实自己。欢迎通过以下联系方式共同探讨，共同进步。<br>文章允许转载，但请注明出处，谢谢</p>
 <p>email_1: <a href="mailto:**shaokuning@gmail.com" target="_blank" rel="noopener">**shaokuning@gmail.com</a><strong><br>email_2: </strong><a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a>**</p>
 
