@@ -79,23 +79,34 @@
 
 
 
-<meta name="description" content="eos安装eos1.3建议使用docker进行环境的配置，所以先下载docker吧。dokcer下载地址（目前eos不支持Windows平台）完成安装后按照官网的教程一步一步配置就好。如果使用docker安装满足eos的最低硬件需求，应该一路过去还是很顺畅的  1.2还躺在旁边的，因为后续官方说会在新版中移除之前的生成wasm和abi的方式，建议使用新的方式吧,这里展示一下它们的目录信息   这里">
+<meta name="description" content="eos安装这里安装最新的eoscdt,eosio.cdt安装地址  $ brew tap eosio/eosio.cdt $ brew install eosio.cdt      按照图示输入命令即可，这个过程很漫长的，耐心等待吧， eos智能合约开发 资料收集个人体会安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eo">
 <meta name="keywords" content="eos,eth,tron,区块链">
 <meta property="og:type" content="article">
 <meta property="og:title" content="shaokun land">
 <meta property="og:url" content="http://yoursite.com/2018/10/13/基于eos连接scatter开发dapp/index.html">
 <meta property="og:site_name" content="shaokun land">
-<meta property="og:description" content="eos安装eos1.3建议使用docker进行环境的配置，所以先下载docker吧。dokcer下载地址（目前eos不支持Windows平台）完成安装后按照官网的教程一步一步配置就好。如果使用docker安装满足eos的最低硬件需求，应该一路过去还是很顺畅的  1.2还躺在旁边的，因为后续官方说会在新版中移除之前的生成wasm和abi的方式，建议使用新的方式吧,这里展示一下它们的目录信息   这里">
+<meta property="og:description" content="eos安装这里安装最新的eoscdt,eosio.cdt安装地址  $ brew tap eosio/eosio.cdt $ brew install eosio.cdt      按照图示输入命令即可，这个过程很漫长的，耐心等待吧， eos智能合约开发 资料收集个人体会安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eo">
 <meta property="og:locale" content="zn">
-<meta property="og:image" content="http://yoursite.com/images/eosio.png">
-<meta property="og:image" content="http://yoursite.com/images/eoscdt.png">
-<meta property="og:image" content="http://yoursite.com/images/eosbuild_success.png">
-<meta property="og:image" content="http://yoursite.com/images/scatter_install">
-<meta property="og:updated_time" content="2018-10-13T04:47:32.000Z">
+<meta property="og:image" content="http://yoursite.com/images/eosio1.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter00.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter0.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter1.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter2.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter3.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter4.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter5.png">
+<meta property="og:image" content="http://yoursite.com/images/eosio2.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter6.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter7.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter8.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter9.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter10.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter11.png">
+<meta property="og:updated_time" content="2018-10-13T06:06:55.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="shaokun land">
-<meta name="twitter:description" content="eos安装eos1.3建议使用docker进行环境的配置，所以先下载docker吧。dokcer下载地址（目前eos不支持Windows平台）完成安装后按照官网的教程一步一步配置就好。如果使用docker安装满足eos的最低硬件需求，应该一路过去还是很顺畅的  1.2还躺在旁边的，因为后续官方说会在新版中移除之前的生成wasm和abi的方式，建议使用新的方式吧,这里展示一下它们的目录信息   这里">
-<meta name="twitter:image" content="http://yoursite.com/images/eosio.png">
+<meta name="twitter:description" content="eos安装这里安装最新的eoscdt,eosio.cdt安装地址  $ brew tap eosio/eosio.cdt $ brew install eosio.cdt      按照图示输入命令即可，这个过程很漫长的，耐心等待吧， eos智能合约开发 资料收集个人体会安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eo">
+<meta name="twitter:image" content="http://yoursite.com/images/eosio1.png">
 
 
 
@@ -310,23 +321,34 @@
       
 
       
-        <h4 id="eos安装"><a href="#eos安装" class="headerlink" title="eos安装"></a>eos安装</h4><p>eos1.3建议使用docker进行环境的配置，所以先下载docker吧。<br><a href="https://www.docker.com" target="_blank" rel="noopener">dokcer下载地址</a>（目前eos不支持Windows平台）<br>完成安装后按照官网的教程一步一步配置就好。<br>如果使用docker安装满足eos的最低硬件需求，应该一路过去还是很顺畅的</p>
-<blockquote>
-<p>1.2还躺在旁边的，因为后续官方说会在新版中移除之前的生成wasm和abi的方式，建议使用新的方式吧,这里展示一下它们的目录信息<br><img src="/images/eosio.png" alt="eos"><br><img src="/images/eoscdt.png" alt="eos.cdt"> </p>
-</blockquote>
-<p>这里我使用源码进行编译eosio.cdt吧 </p>
-<pre><code>git clone --recursive https://github.com/eosio/eosio.cdt
-cd eosio.cdt 
-./build.sh eos
-sudo ./install.sh
-</code></pre><p><img src="/images/eosbuild_success.png" alt="eosio build success"><br>当你看到上面的图片内容时，代表你已经安装成功了</p>
-<h4 id="eos智能合约开发前言"><a href="#eos智能合约开发前言" class="headerlink" title="eos智能合约开发前言"></a>eos智能合约开发前言</h4><p>安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eos的测试网或者主网进行dapp的开发。  </p>
+        <h4 id="eos安装"><a href="#eos安装" class="headerlink" title="eos安装"></a>eos安装</h4><p>这里安装最新的eoscdt,<br><a href="https://github.com/EOSIO/eosio.cdt" target="_blank" rel="noopener">eosio.cdt安装地址</a> </p>
+<pre><code>$ brew tap eosio/eosio.cdt
+$ brew install eosio.cdt  
+</code></pre><p><img src="/images/eosio1.png" alt="eosio build success">  </p>
+<p>按照图示输入命令即可，这个过程很漫长的，耐心等待吧，</p>
+<h4 id="eos智能合约开发-资料收集个人体会"><a href="#eos智能合约开发-资料收集个人体会" class="headerlink" title="eos智能合约开发 资料收集个人体会"></a>eos智能合约开发 资料收集个人体会</h4><p>安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eos的测试网或者主网进行dapp的开发。  </p>
 <p>上面的环境安装了可以启动本地的节点来进行测试，官网也是如此，而现在我能够搜索到的文章基本上也是基于本地节点使用命令行来进行开发，这样只能保证你学习开发eos的流程，但是具体怎样开发dapp你可能还是不清楚，因为你不知道如何连接scatter，如何与智能合约进行交互，所以这篇文章重点解决的问题是在这里。</p>
 <p>这里再区分一下钱包开发和dapp的开发。钱包开发需要用户提供他的私钥给你，而我们此处所要使用的是官方的钱包scatter来进行开发</p>
-<h4 id="eos智能合约开发准备"><a href="#eos智能合约开发准备" class="headerlink" title="eos智能合约开发准备"></a>eos智能合约开发准备</h4><ol>
+<h4 id="eos智能合约开发-准备"><a href="#eos智能合约开发-准备" class="headerlink" title="eos智能合约开发 准备"></a>eos智能合约开发 准备</h4><ol>
 <li>这里选择scatter，官方提供的eos钱包，这样用户才会放心把他们的密钥放进去，所以先安装它吧<ul>
 <li>scatter是chrome的插件，所以你先得安装它<a href="https://www.google.com/chrome/" target="_blank" rel="noopener">chrome浏览器下载</a></li>
-<li><a href="https://chrome.google.com/webstore/search/scatter?hl=zh-CN" target="_blank" rel="noopener">scatter Chrome插件</a><br><img src="/images/scatter_install" alt="scatter"><br>搜索scatter安装就好，我这里是安装好的界面</li>
+<li><a href="https://chrome.google.com/webstore/search/scatter?hl=zh-CN" target="_blank" rel="noopener">scatter Chrome插件</a><br><img src="/images/scatter00.png" alt="scatter"><br>搜索scatter安装就好，我这里是安装好的界面</li>
+<li><img src="/images/scatter0.png" alt="scatter"><br>点击插件的scatter图标弹出如图界面，输入你的钱包密码然后点击生成钱包就好 </li>
+<li><img src="/images/scatter1.png" alt="scatter"><br>助记词，抄写下来吧，以后恢复钱包用的 </li>
+<li><img src="/images/scatter2.png" alt="scatter"><br>这里我选择skip basic setup，后续再来设置也是可行的  </li>
+<li><img src="/images/scatter3.png" alt="scatter"><br>这个界面，点击右上角的⚙图标</li>
+<li><img src="/images/scatter4.png" alt="scatter"><br>这个界面，选择language，设置语言</li>
+<li><img src="/images/scatter5.png" alt="scatter"><br>设置好后，切换回来，成功了</li>
+</ul>
+</li>
+<li>经过以上的步骤，scatter已经安装好了，也就是我们创建了钱包，但是我们的钱包还没有内容的，为什么呢？这里我还是看看官网的这张图吧<br><img src="/images/eosio2.png" alt="eos钱包关系"></li>
+<li>基于上张图的方式，我们得创建一对密匙，那就按照接下来的方式做吧<ul>
+<li><img src="/images/scatter6.png" alt="scatter"><br>点击密匙对，点击新建</li>
+<li><img src="/images/scatter7.png" alt="scatter"><br>点击生成密匙对  </li>
+<li><img src="/images/scatter8.png" alt="scatter"><br>重点，记住这里的步骤不能省略<br>重点，记住这里的步骤不能省略<br>重点，记住这里的步骤不能省略<br>点击   复制  </li>
+<li><img src="/images/scatter9.png" alt="scatter"><br>新开一个文本文档，点击粘贴，这样就把生成好的密匙对保存下来了，待会要用的  </li>
+<li><img src="/images/scatter10.png" alt="scatter"><br>为这个密匙对取个名字，随便取一个，没有要求，点击保存  </li>
+<li><img src="/images/scatter11.png" alt="scatter"><br>完成了这些步骤，你应该能够看到上面的信息，如果没有，就再从头来一遍了。<br>这样我们的密匙对就创建好了，但是只是在本地创建好了的啊，怎么连接到测试网络和主网络呢？ </li>
 </ul>
 </li>
 </ol>
@@ -476,7 +498,7 @@ sudo ./install.sh
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装"><span class="nav-number">1.</span> <span class="nav-text">eos安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发前言"><span class="nav-number">2.</span> <span class="nav-text">eos智能合约开发前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发准备"><span class="nav-number">3.</span> <span class="nav-text">eos智能合约开发准备</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装"><span class="nav-number">1.</span> <span class="nav-text">eos安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-资料收集个人体会"><span class="nav-number">2.</span> <span class="nav-text">eos智能合约开发 资料收集个人体会</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-准备"><span class="nav-number">3.</span> <span class="nav-text">eos智能合约开发 准备</span></a></li></ol></div>
             
 
           </div>
