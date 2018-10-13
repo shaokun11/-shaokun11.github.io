@@ -233,6 +233,145 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/13/基于eos连接scatter开发dapp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="shaokun land">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/13/基于eos连接scatter开发dapp/" itemprop="url">Untitled</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-13T11:27:20+08:00">
+                2018-10-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="eos安装"><a href="#eos安装" class="headerlink" title="eos安装"></a>eos安装</h4><p>eos1.3建议使用docker进行环境的配置，所以先下载docker吧。<br><a href="https://www.docker.com" target="_blank" rel="noopener">dokcer下载地址</a>（目前eos不支持Windows平台）<br>完成安装后按照官网的教程一步一步配置就好。<br>如果使用docker安装满足eos的最低硬件需求，应该一路过去还是很顺畅的</p>
+<blockquote>
+<p>1.2还躺在旁边的，因为后续官方说会在新版中移除之前的生成wasm和abi的方式，建议使用新的方式吧,这里展示一下它们的目录信息<br><img src="images/eos1.2.png" alt="eos"><br><img src="images/eos.cdt.png" alt="eos.cdt"> </p>
+</blockquote>
+<p>这里我使用源码进行编译eosio.cdt吧 </p>
+<pre><code>git clone --recursive https://github.com/eosio/eosio.cdt
+cd eosio.cdt 
+./build.sh eos
+sudo ./install.sh
+</code></pre><p><img src="/images/eosbuild_success.png" alt="eosio build success"><br>当你看到上面的图片内容时，代表你已经安装成功了</p>
+<h4 id="eos智能合约开发前言"><a href="#eos智能合约开发前言" class="headerlink" title="eos智能合约开发前言"></a>eos智能合约开发前言</h4><p>安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eos的测试网或者主网进行dapp的开发。  </p>
+<p>上面的环境安装了可以启动本地的节点来进行测试，官网也是如此，而现在我能够搜索到的文章基本上也是基于本地节点使用命令行来进行开发，这样只能保证你学习开发eos的流程，但是具体怎样开发dapp你可能还是不清楚，因为你不知道如何连接scatter，如何与智能合约进行交互，所以这篇文章重点解决的问题是在这里。</p>
+<p>这里再区分一下钱包开发和dapp的开发。钱包开发需要用户提供他的私钥给你，而我们此处所要使用的是官方的钱包scatter来进行开发</p>
+<h4 id="eos智能合约开发准备"><a href="#eos智能合约开发准备" class="headerlink" title="eos智能合约开发准备"></a>eos智能合约开发准备</h4><ol>
+<li>这里选择scatter，官方提供的eos钱包，这样用户才会放心把他们的密钥放进去，所以先安装它吧<ul>
+<li>scatter是chrome的插件，所以你先得安装它<a href="https://www.google.com/chrome/" target="_blank" rel="noopener">chrome浏览器下载</a></li>
+<li><a href="https://chrome.google.com/webstore/search/scatter?hl=zh-CN" target="_blank" rel="noopener">scatter Chrome插件</a><br><img src="images/scatter_install" alt="scatter"><br>搜索scatter安装就好，我这里是安装好的界面</li>
+</ul>
+</li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/02/关于bancor的理解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -421,7 +560,7 @@ cw=100%:price与supply的变化可理解为常数函数y = x的形式变化
 <blockquote>
 <p>文章允许转载，但请注明出处，谢谢</p>
 </blockquote>
-<p>email_1: <a href="mailto:&#115;&#x68;&#x61;&#111;&#x6b;&#x75;&#110;&#x69;&#x6e;&#103;&#64;&#103;&#x6d;&#97;&#105;&#x6c;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#111;&#x6b;&#x75;&#110;&#x69;&#x6e;&#103;&#64;&#103;&#x6d;&#97;&#105;&#x6c;&#46;&#99;&#111;&#109;</a>.<br>email_2: <a href="mailto:&#115;&#x6b;&#x75;&#110;&#x6e;&#121;&#64;&#49;&#54;&#x33;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#x6e;&#121;&#64;&#49;&#54;&#x33;&#x2e;&#99;&#x6f;&#x6d;</a></p>
+<p>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#x6b;&#x75;&#x6e;&#x69;&#x6e;&#x67;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#x6b;&#x75;&#x6e;&#x69;&#x6e;&#x67;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;</a>.<br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#109;</a></p>
 
           
         
@@ -595,7 +734,7 @@ function transferToParent(address _from, address _toContract, uint256 _toTokenId
 <blockquote>
 <p>文章允许转载，但请注明出处，谢谢</p>
 </blockquote>
-<p>email_1: <a href="mailto:&#115;&#x68;&#97;&#x6f;&#x6b;&#x75;&#x6e;&#x69;&#110;&#x67;&#64;&#x67;&#109;&#97;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#97;&#x6f;&#x6b;&#x75;&#x6e;&#x69;&#110;&#x67;&#64;&#x67;&#109;&#97;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#x6e;&#121;&#64;&#x31;&#54;&#x33;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#x6e;&#121;&#64;&#x31;&#54;&#x33;&#46;&#99;&#111;&#x6d;</a></p>
+<p>email_1: <a href="mailto:&#115;&#104;&#x61;&#111;&#107;&#117;&#x6e;&#105;&#x6e;&#x67;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#111;&#107;&#117;&#x6e;&#105;&#x6e;&#x67;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#107;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -677,7 +816,7 @@ function transferToParent(address _from, address _toContract, uint256 _toTokenId
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
