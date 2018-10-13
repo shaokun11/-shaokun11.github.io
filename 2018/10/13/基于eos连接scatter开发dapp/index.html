@@ -82,7 +82,7 @@
 <meta name="description" content="eos安装 方式1eoscdt安装1这是eos官网最为推荐安装方式。 官网推荐docker，可以减少不必要的麻烦 ，而且步骤超级详细，超级详细，要是安装不成功的话，请确认是否使用mac电脑或者官网推荐的其他操作系统，千万不要使用Windows系统来玩eos,因为官方说过不支持的哈。 eos安装 方式2eoscdt 安装2  git clone --recursive https://github.">
 <meta name="keywords" content="eos,eth,tron,区块链">
 <meta property="og:type" content="article">
-<meta property="og:title" content="shaokun land">
+<meta property="og:title" content="学习eos dapp开发，看这篇就够了（上）">
 <meta property="og:url" content="http://yoursite.com/2018/10/13/基于eos连接scatter开发dapp/index.html">
 <meta property="og:site_name" content="shaokun land">
 <meta property="og:description" content="eos安装 方式1eoscdt安装1这是eos官网最为推荐安装方式。 官网推荐docker，可以减少不必要的麻烦 ，而且步骤超级详细，超级详细，要是安装不成功的话，请确认是否使用mac电脑或者官网推荐的其他操作系统，千万不要使用Windows系统来玩eos,因为官方说过不支持的哈。 eos安装 方式2eoscdt 安装2  git clone --recursive https://github.">
@@ -113,9 +113,9 @@
 <meta property="og:image" content="http://yoursite.com/images/jungle1.png">
 <meta property="og:image" content="http://yoursite.com/images/jungle2.png">
 <meta property="og:image" content="http://yoursite.com/images/jungle3.png">
-<meta property="og:updated_time" content="2018-10-13T07:07:33.000Z">
+<meta property="og:updated_time" content="2018-10-13T07:21:27.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="shaokun land">
+<meta name="twitter:title" content="学习eos dapp开发，看这篇就够了（上）">
 <meta name="twitter:description" content="eos安装 方式1eoscdt安装1这是eos官网最为推荐安装方式。 官网推荐docker，可以减少不必要的麻烦 ，而且步骤超级详细，超级详细，要是安装不成功的话，请确认是否使用mac电脑或者官网推荐的其他操作系统，千万不要使用Windows系统来玩eos,因为官方说过不支持的哈。 eos安装 方式2eoscdt 安装2  git clone --recursive https://github.">
 <meta name="twitter:image" content="http://yoursite.com/images/eosio1.png">
 
@@ -153,7 +153,7 @@
 
 
 
-  <title> | shaokun land</title>
+  <title>学习eos dapp开发，看这篇就够了（上） | shaokun land</title>
   
 
 
@@ -277,7 +277,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline"></h1>
+          <h1 class="post-title" itemprop="name headline">学习eos dapp开发，看这篇就够了（上）</h1>
         
 
         <div class="post-meta">
@@ -289,7 +289,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-13T11:27:20+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-13T15:14:24+08:00">
                 2018-10-13
               </time>
             
@@ -346,12 +346,11 @@ $ brew install eosio.cdt
 <blockquote>
 <p>为什么我要选择第三种呢？ 因为第一种我在Windows电脑使用虚拟机的方式安装成功了<br>第二种方式已经安装成功了，不过是1.2的版本<br>为了防止我骗自己在吹牛逼 还是得贴张图<br><img src="/images/eosio3.png" alt="eosio build success"> </p>
 </blockquote>
-<h4 id="eos智能合约开发-资料收集个人体会"><a href="#eos智能合约开发-资料收集个人体会" class="headerlink" title="eos智能合约开发 资料收集个人体会"></a>eos智能合约开发 资料收集个人体会</h4><p>安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eos的测试网或者主网进行dapp的开发。  </p>
+<h4 id="eos智能合约开发-开发体会"><a href="#eos智能合约开发-开发体会" class="headerlink" title="eos智能合约开发 开发体会"></a>eos智能合约开发 开发体会</h4><p>最好的学习资料就是官方提供的资料了，而且eos官方的资料具详细，在此送上<br><a href="https://developers.eos.io/" target="_blank" rel="noopener">eos官网</a></p>
+<p>安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eos的测试网或者主网进行dapp的开发。  </p>
 <p>上面的环境安装了可以启动本地的节点来进行测试，官网也是如此，而现在我能够搜索到的文章基本上也是基于本地节点使用命令行来进行开发，这样只能保证你学习开发eos的流程，但是具体怎样开发dapp你可能还是不清楚，因为你不知道如何连接scatter，如何与智能合约进行交互，所以这篇文章重点解决的问题是在这里。</p>
-<p>这里再区分一下钱包开发和dapp的开发。钱包开发需要用户提供他的私钥给你，而我们此处所要使用的是官方的钱包scatter来进行开发</p>
-<h4 id="eos智能合约开发-scatter安装"><a href="#eos智能合约开发-scatter安装" class="headerlink" title="eos智能合约开发 scatter安装"></a>eos智能合约开发 scatter安装</h4><p>scatter，官方提供的eos钱包，这样用户才会放心把他们的密钥放进去，所以先安装它吧</p>
-<pre><code>*     scatter是chrome的插件，所以你先得安装它[chrome浏览器下载](https://www.google.com/chrome/)  
-</code></pre><p><a href="https://chrome.google.com/webstore/search/scatter?hl=zh-CN" target="_blank" rel="noopener">scatter Chrome插件</a>  </p>
+<p>这里再区分一下钱包开发和dapp的开发。钱包开发需要用户提供他的私钥给你，或者你创建好给用户。而我们此处所要使用的是官方的钱包scatter来进行开发dapp，不需要用户提供私钥给我们，他只需要接入官方提供的scatter就好，如果你有以太坊的经验，这就是metamask</p>
+<h4 id="eos智能合约开发-scatter安装"><a href="#eos智能合约开发-scatter安装" class="headerlink" title="eos智能合约开发 scatter安装"></a>eos智能合约开发 scatter安装</h4><p>scatter，官方提供的eos钱包，这样用户才会放心把他们的密钥放进去，所以先安装它吧<br>scatter是chrome的插件，所以你先得安装它<a href="https://www.google.com/chrome/" target="_blank" rel="noopener">chrome浏览器下载</a><br>接下来把scatter 插件安装上 <a href="https://chrome.google.com/webstore/search/scatter?hl=zh-CN" target="_blank" rel="noopener">scatter Chrome插件</a>  </p>
 <p><img src="/images/scatter00.png" alt="scatter"><br>搜索scatter安装就好，我这里是安装好的界面  </p>
 <ul>
 <li><img src="/images/scatter0.png" alt="scatter"><br>点击插件的scatter图标弹出如图界面，输入你的钱包密码然后点击生成钱包就好   </li>
@@ -405,7 +404,12 @@ $ brew install eosio.cdt
 </li>
 <li><img src="/images/jungle3.png" alt="jungle net account "><br>这次我就这样填写，然后人机验证，通过后点击左下角的create,确保网络质量优良  </li>
 </ul>
-<p><strong>这里我的网络质量太差了。。。先写到这里，，， 后续补上</strong>  </p>
+<p><strong>这里我的网络质量太差了。。。先写到这里，，， 请继续关注第二篇</strong>  </p>
+<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，目前在深圳从事DAPP开发。主要工作方向为基于Ethereum,Tron,Eos 进行dapp和钱包开发。技术方面能够使用 java,c++,js,python,go完成“hello world”的编写。如果你对区块链dapp也感兴趣，欢迎通过以下联系方式共同探讨，共同进步。</p>
+<blockquote>
+<p>文章允许转载，但请注明出处，谢谢</p>
+</blockquote>
+<p>email_1: <a href="mailto:&#x73;&#x68;&#x61;&#x6f;&#x6b;&#117;&#110;&#x69;&#110;&#103;&#x40;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#x68;&#x61;&#x6f;&#x6b;&#117;&#110;&#x69;&#110;&#103;&#x40;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;</a></p>
 
       
     </div>
@@ -552,7 +556,7 @@ $ brew install eosio.cdt
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装-方式1"><span class="nav-number">1.</span> <span class="nav-text">eos安装 方式1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装-方式2"><span class="nav-number">2.</span> <span class="nav-text">eos安装 方式2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装-方式3"><span class="nav-number">3.</span> <span class="nav-text">eos安装 方式3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装-方式总结"><span class="nav-number">4.</span> <span class="nav-text">eos安装 方式总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-资料收集个人体会"><span class="nav-number">5.</span> <span class="nav-text">eos智能合约开发 资料收集个人体会</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-scatter安装"><span class="nav-number">6.</span> <span class="nav-text">eos智能合约开发 scatter安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-使用scatter生成密匙对"><span class="nav-number">7.</span> <span class="nav-text">eos智能合约开发 使用scatter生成密匙对</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-设置scatter连接-jungle-test-net"><span class="nav-number">8.</span> <span class="nav-text">eos智能合约开发 设置scatter连接 jungle test net</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-在jungle测试网络上创建account"><span class="nav-number">9.</span> <span class="nav-text">eos智能合约开发 在jungle测试网络上创建account</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装-方式1"><span class="nav-number">1.</span> <span class="nav-text">eos安装 方式1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装-方式2"><span class="nav-number">2.</span> <span class="nav-text">eos安装 方式2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装-方式3"><span class="nav-number">3.</span> <span class="nav-text">eos安装 方式3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装-方式总结"><span class="nav-number">4.</span> <span class="nav-text">eos安装 方式总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-开发体会"><span class="nav-number">5.</span> <span class="nav-text">eos智能合约开发 开发体会</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-scatter安装"><span class="nav-number">6.</span> <span class="nav-text">eos智能合约开发 scatter安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-使用scatter生成密匙对"><span class="nav-number">7.</span> <span class="nav-text">eos智能合约开发 使用scatter生成密匙对</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-设置scatter连接-jungle-test-net"><span class="nav-number">8.</span> <span class="nav-text">eos智能合约开发 设置scatter连接 jungle test net</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-在jungle测试网络上创建account"><span class="nav-number">9.</span> <span class="nav-text">eos智能合约开发 在jungle测试网络上创建account</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#关于我"><span class="nav-number">9.1.</span> <span class="nav-text">关于我</span></a></li></ol></li></ol></div>
             
 
           </div>
