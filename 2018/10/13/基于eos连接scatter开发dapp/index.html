@@ -102,7 +102,16 @@
 <meta property="og:image" content="http://yoursite.com/images/scatter9.png">
 <meta property="og:image" content="http://yoursite.com/images/scatter10.png">
 <meta property="og:image" content="http://yoursite.com/images/scatter11.png">
-<meta property="og:updated_time" content="2018-10-13T06:06:55.000Z">
+<meta property="og:image" content="http://yoursite.com/images/scatter5.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter12.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter13.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter14.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter15.png">
+<meta property="og:image" content="http://yoursite.com/images/scatter16.png">
+<meta property="og:image" content="http://yoursite.com/images/jungle1.png">
+<meta property="og:image" content="http://yoursite.com/images/jungle2.png">
+<meta property="og:image" content="http://yoursite.com/images/jungle3.png">
+<meta property="og:updated_time" content="2018-10-13T06:46:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="shaokun land">
 <meta name="twitter:description" content="eos安装这里安装最新的eoscdt,eosio.cdt安装地址  $ brew tap eosio/eosio.cdt $ brew install eosio.cdt      按照图示输入命令即可，这个过程很漫长的，耐心等待吧， eos智能合约开发 资料收集个人体会安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eo">
@@ -329,18 +338,19 @@ $ brew install eosio.cdt
 <h4 id="eos智能合约开发-资料收集个人体会"><a href="#eos智能合约开发-资料收集个人体会" class="headerlink" title="eos智能合约开发 资料收集个人体会"></a>eos智能合约开发 资料收集个人体会</h4><p>安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eos的测试网或者主网进行dapp的开发。  </p>
 <p>上面的环境安装了可以启动本地的节点来进行测试，官网也是如此，而现在我能够搜索到的文章基本上也是基于本地节点使用命令行来进行开发，这样只能保证你学习开发eos的流程，但是具体怎样开发dapp你可能还是不清楚，因为你不知道如何连接scatter，如何与智能合约进行交互，所以这篇文章重点解决的问题是在这里。</p>
 <p>这里再区分一下钱包开发和dapp的开发。钱包开发需要用户提供他的私钥给你，而我们此处所要使用的是官方的钱包scatter来进行开发</p>
-<h4 id="eos智能合约开发-准备"><a href="#eos智能合约开发-准备" class="headerlink" title="eos智能合约开发 准备"></a>eos智能合约开发 准备</h4><ol>
-<li>这里选择scatter，官方提供的eos钱包，这样用户才会放心把他们的密钥放进去，所以先安装它吧<ul>
-<li>scatter是chrome的插件，所以你先得安装它<a href="https://www.google.com/chrome/" target="_blank" rel="noopener">chrome浏览器下载</a></li>
-<li><a href="https://chrome.google.com/webstore/search/scatter?hl=zh-CN" target="_blank" rel="noopener">scatter Chrome插件</a><br><img src="/images/scatter00.png" alt="scatter"><br>搜索scatter安装就好，我这里是安装好的界面</li>
-<li><img src="/images/scatter0.png" alt="scatter"><br>点击插件的scatter图标弹出如图界面，输入你的钱包密码然后点击生成钱包就好 </li>
-<li><img src="/images/scatter1.png" alt="scatter"><br>助记词，抄写下来吧，以后恢复钱包用的 </li>
+<h4 id="eos智能合约开发-scatter安装"><a href="#eos智能合约开发-scatter安装" class="headerlink" title="eos智能合约开发 scatter安装"></a>eos智能合约开发 scatter安装</h4><p>scatter，官方提供的eos钱包，这样用户才会放心把他们的密钥放进去，所以先安装它吧</p>
+<pre><code>*     scatter是chrome的插件，所以你先得安装它[chrome浏览器下载](https://www.google.com/chrome/)  
+</code></pre><p><a href="https://chrome.google.com/webstore/search/scatter?hl=zh-CN" target="_blank" rel="noopener">scatter Chrome插件</a>  </p>
+<p><img src="/images/scatter00.png" alt="scatter"><br>搜索scatter安装就好，我这里是安装好的界面  </p>
+<ul>
+<li><img src="/images/scatter0.png" alt="scatter"><br>点击插件的scatter图标弹出如图界面，输入你的钱包密码然后点击生成钱包就好   </li>
+<li><img src="/images/scatter1.png" alt="scatter"><br>助记词，抄写下来吧，以后恢复钱包用的   </li>
 <li><img src="/images/scatter2.png" alt="scatter"><br>这里我选择skip basic setup，后续再来设置也是可行的  </li>
-<li><img src="/images/scatter3.png" alt="scatter"><br>这个界面，点击右上角的⚙图标</li>
-<li><img src="/images/scatter4.png" alt="scatter"><br>这个界面，选择language，设置语言</li>
-<li><img src="/images/scatter5.png" alt="scatter"><br>设置好后，切换回来，成功了</li>
+<li><img src="/images/scatter3.png" alt="scatter"><br>这个界面，点击右上角的⚙图标  </li>
+<li><img src="/images/scatter4.png" alt="scatter"><br>这个界面，选择language，设置语言  </li>
+<li><img src="/images/scatter5.png" alt="scatter"><br>设置好后，切换回来，成功了  <h4 id="eos智能合约开发-使用scatter生成密匙对"><a href="#eos智能合约开发-使用scatter生成密匙对" class="headerlink" title="eos智能合约开发 使用scatter生成密匙对"></a>eos智能合约开发 使用scatter生成密匙对</h4></li>
 </ul>
-</li>
+<ol>
 <li>经过以上的步骤，scatter已经安装好了，也就是我们创建了钱包，但是我们的钱包还没有内容的，为什么呢？这里我还是看看官网的这张图吧<br><img src="/images/eosio2.png" alt="eos钱包关系"></li>
 <li>基于上张图的方式，我们得创建一对密匙，那就按照接下来的方式做吧<ul>
 <li><img src="/images/scatter6.png" alt="scatter"><br>点击密匙对，点击新建</li>
@@ -348,10 +358,43 @@ $ brew install eosio.cdt
 <li><img src="/images/scatter8.png" alt="scatter"><br>重点，记住这里的步骤不能省略<br>重点，记住这里的步骤不能省略<br>重点，记住这里的步骤不能省略<br>点击   复制  </li>
 <li><img src="/images/scatter9.png" alt="scatter"><br>新开一个文本文档，点击粘贴，这样就把生成好的密匙对保存下来了，待会要用的  </li>
 <li><img src="/images/scatter10.png" alt="scatter"><br>为这个密匙对取个名字，随便取一个，没有要求，点击保存  </li>
-<li><img src="/images/scatter11.png" alt="scatter"><br>完成了这些步骤，你应该能够看到上面的信息，如果没有，就再从头来一遍了。<br>这样我们的密匙对就创建好了，但是只是在本地创建好了的啊，怎么连接到测试网络和主网络呢？ </li>
+<li><img src="/images/scatter11.png" alt="scatter"><br>完成了这些步骤，你应该能够看到上面的信息，如果没有，就再从头来一遍了。<br>这样我们的密匙对就创建好了，但是只是在本地创建好了的啊，怎么连接到测试网络和主网络呢？  </li>
 </ul>
 </li>
 </ol>
+<h4 id="eos智能合约开发-设置scatter连接-jungle-test-net"><a href="#eos智能合约开发-设置scatter连接-jungle-test-net" class="headerlink" title="eos智能合约开发 设置scatter连接 jungle test net"></a>eos智能合约开发 设置scatter连接 jungle test net</h4><ul>
+<li><img src="/images/scatter5.png" alt="scatter net setting"><br>回到这个界面，选择设置图标，选择</li>
+<li><img src="/images/scatter12.png" alt="scatter net setting"><br>这个界面选择网络  </li>
+<li><img src="/images/scatter13.png" alt="scatter net setting"><br>这里可以看到已经有一个eos和eth的主网的网络节点，那么我们来把我们的测试网络的节点加入进去，点击右上角的新建  </li>
+<li><img src="/images/scatter14.png" alt="scatter net setting"><br>这个界面就是设置网络所需要的一些必要信息，我们一个一个来填  <ol>
+<li>由于我们是连接eos网络，所以这里第一项默认不变，下拉框可以选择eth,以后还可以支持tron</li>
+<li>名称： 随便写一个，你自己记得住就好  </li>
+<li>改成http,因为我们测试网络的endpoint就是用的这个协议，照改就好。</li>
+<li>域名或ip地址：jungle.cryptolions.io    </li>
+<li>端口 ：18888</li>
+<li>chaninId:  038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca</li>
+<li>如果你对以上填入的这些信息想知道为什么，那么可以补一下rpc协议，不想了解直接填入就好，以后就懂了  </li>
+</ol>
+</li>
+<li><img src="/images/scatter15.png" alt="scatter net setting"><br>按照上述的步骤填完后，信息如上，点击右上角保存  </li>
+<li><img src="/images/scatter16.png" alt="scatter net setting"><br>没有问题的话，会看到如上红框的显示内容，代表我们得测试网络已经设置好了</li>
+</ul>
+<h4 id="eos智能合约开发-在jungle测试网络上创建account"><a href="#eos智能合约开发-在jungle测试网络上创建account" class="headerlink" title="eos智能合约开发 在jungle测试网络上创建account"></a>eos智能合约开发 在jungle测试网络上创建account</h4><blockquote>
+<p>为什么要创建账户呢？这就是eos的一大特点。BM说，你创建了一个密匙对，谁记得住呢，所以就设计了一个这样的账户系统，这个账户 长12位，只能由a-z12345这些字符组成。简而言之，方便记忆。</p>
+</blockquote>
+<ul>
+<li><a href="http://jungle.cryptolions.io/#home" target="_blank" rel="noopener">jungle net account </a><br>打开jungle测试网络地址</li>
+<li><img src="/images/jungle1.png" alt="jungle net account "><br>来到jungle的主页，点击 Create Account  </li>
+<li><img src="/images/jungle2.png" alt="jungle net account ">  <ol>
+<li>Account name : 记住，小写字母 加上12345，总共12个字符</li>
+<li>owner public key : 将我们用scatter生成的那个密匙对的公钥填入这里</li>
+<li>active public key: 将我们用scatter生成的那个密匙对的公钥填入这里</li>
+<li>我这里用一对就好，在主网申请账号的时候建议使用两对密匙对。想要知道为什么？可以看看eos第二版的白皮书</li>
+</ol>
+</li>
+<li><img src="/images/jungle3.png" alt="jungle net account "><br>这次我就这样填写，然后人机验证，通过后点击左下角的create,确保网络质量优良  </li>
+</ul>
+<p><strong>这里我的网络质量太差了。。。先写到这里，，， 后续补上</strong>  </p>
 
       
     </div>
@@ -498,7 +541,7 @@ $ brew install eosio.cdt
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装"><span class="nav-number">1.</span> <span class="nav-text">eos安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-资料收集个人体会"><span class="nav-number">2.</span> <span class="nav-text">eos智能合约开发 资料收集个人体会</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-准备"><span class="nav-number">3.</span> <span class="nav-text">eos智能合约开发 准备</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#eos安装"><span class="nav-number">1.</span> <span class="nav-text">eos安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-资料收集个人体会"><span class="nav-number">2.</span> <span class="nav-text">eos智能合约开发 资料收集个人体会</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-scatter安装"><span class="nav-number">3.</span> <span class="nav-text">eos智能合约开发 scatter安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-使用scatter生成密匙对"><span class="nav-number">4.</span> <span class="nav-text">eos智能合约开发 使用scatter生成密匙对</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-设置scatter连接-jungle-test-net"><span class="nav-number">5.</span> <span class="nav-text">eos智能合约开发 设置scatter连接 jungle test net</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-在jungle测试网络上创建account"><span class="nav-number">6.</span> <span class="nav-text">eos智能合约开发 在jungle测试网络上创建account</span></a></li></ol></div>
             
 
           </div>
