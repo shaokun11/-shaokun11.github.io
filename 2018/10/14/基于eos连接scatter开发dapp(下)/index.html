@@ -108,7 +108,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/10/14/基于eos连接scatter开发dapp(下)/images/eos.gif">
 <meta property="og:image" content="http://yoursite.com/common/wx.png">
 <meta property="og:image" content="http://yoursite.com/common/wx_pay.png">
-<meta property="og:updated_time" content="2018-10-14T06:58:21.000Z">
+<meta property="og:updated_time" content="2018-10-14T07:03:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="学习eos dapp开发，看这篇就够了（下）">
 <meta name="twitter:description" content="eos智能合约开发 c++合约编写 这里需要说明的一下，这个例子和官网提供的hello没有多大的区别,仅仅是带你多了解一下如何编写。其中遇到有些概念难以理解，建议还是参考官网的hello 从头看起  #include &amp;lt;eosiolib/eosio.hpp&amp;gt;   #include &amp;lt;eosiolib/print.hpp&amp;gt; #include&amp;lt;string&amp;gt;  us">
@@ -426,8 +426,8 @@ EOSIO_ABI(todolist, (create)(complete)(destroy))
 <ol>
 <li><img src="images/contract1.png" alt="contract"><br>新建一个todolist文件夹，将上面写好的todolist.cpp放进去    </li>
 <li><p><img src="images/contract2.png" alt="contract"><br>打开终端，进入文件夹，输入   </p>
-<p>eosio-cpp -o todolist.wasm todolist.cpp –abigen</p>
-</li>
+<pre><code>eosio-cpp -o todolist.wasm todolist.cpp --abigen
+</code></pre></li>
 </ol>
 <ol start="3">
 <li><img src="images/contract3.png" alt="contract"><br>成功后会在当前文件夹目录下生成 todolist.wasm 和 todolist.abi</li>
@@ -629,7 +629,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
 <p>文章允许转载，但请注明出处，谢谢</p>
 </blockquote>
 <p><img src="/common/wx.png" alt="jungle"><br>微信账号，添加时请备注 dapp开发.<br><img src="/common/wx_pay.png" alt="jungle"><br>如果你觉得我的文章对你有帮助，可以小小的打赏一下我，毕竟码字不容易，感谢。</p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#x61;&#x6f;&#107;&#117;&#x6e;&#x69;&#110;&#x67;&#x40;&#x67;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#x6f;&#107;&#117;&#x6e;&#x69;&#110;&#x67;&#x40;&#x67;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#111;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#x61;&#111;&#107;&#117;&#x6e;&#x69;&#x6e;&#x67;&#x40;&#103;&#109;&#x61;&#105;&#x6c;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#104;&#x61;&#111;&#107;&#117;&#x6e;&#x69;&#x6e;&#x67;&#x40;&#103;&#109;&#x61;&#105;&#x6c;&#x2e;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#99;&#111;&#109;</a></p>
 
       
     </div>
