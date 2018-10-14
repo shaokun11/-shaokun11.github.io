@@ -98,9 +98,10 @@
 <meta property="og:image" content="http://yoursite.com/2018/10/14/基于eos连接scatter开发dapp(下)/images/contract8.png">
 <meta property="og:image" content="http://yoursite.com/2018/10/14/基于eos连接scatter开发dapp(下)/images/contract9.png">
 <meta property="og:image" content="http://yoursite.com/2018/10/14/基于eos连接scatter开发dapp(下)/images/contract10.png">
+<meta property="og:image" content="http://yoursite.com/2018/10/14/基于eos连接scatter开发dapp(下)/images/contract11.png">
 <meta property="og:image" content="http://yoursite.com/common/wx.png">
 <meta property="og:image" content="http://yoursite.com/common/wx_pay.png">
-<meta property="og:updated_time" content="2018-10-14T02:57:23.000Z">
+<meta property="og:updated_time" content="2018-10-14T04:38:26.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="学习eos dapp开发，看这篇就够了（下）">
 <meta name="twitter:description" content="智能合约 合约c++文档编写 这里需要说明的一下，这个例子和官网提供的hello没有多大的区别,仅仅是带你多了解一下如何编写。其中遇到有些概念难以理解，建议还是参考官网的hello 从头看起  #include &amp;lt;eosiolib/eosio.hpp&amp;gt;   #include &amp;lt;eosiolib/print.hpp&amp;gt; #include&amp;lt;string&amp;gt;  using">
@@ -465,10 +466,10 @@ cleos -u http://jungle.cryptolions.io:18888 set contract shaokun11113 /Users/sha
 <pre><code>// 购买RAM
 // -u 去哪里买
 // system buyram  购买ram的命令
-// shaokun11113  谁去买，即谁付钱，买得RAM 给谁
-// eosio 从哪里买，RAM 只能够从系统 eosio那里买 RAM使用了bancor协议进行价格的控制
+// shaokun11113  谁去买，谁付钱
+// shaokun11113  谁受益 买来的ram 给谁
 // -k 买多少 kbytes 
-cleos -u http://jungle.cryptolions.io:18888 system buyram shaokun11113 eosio -k 1024
+cleos -u http://jungle.cryptolions.io:18888 system buyram shaokun11113 shaokun11113 -k 1024
 </code></pre></li>
 <li><p><img src="images/contract9.png" alt="contract"><br>  有时候你也许会遇到这种情况 ，那就需要之前创建钱包时的密匙进行解锁钱包</p>
 </li>
@@ -476,13 +477,17 @@ cleos -u http://jungle.cryptolions.io:18888 system buyram shaokun11113 eosio -k 
 <pre><code>// 解锁默认钱包，输入钱包秘钥就好， 可以使用-n 指定解锁的钱包名字
 cleos unlock wallet
 </code></pre></li>
+<li><p><img src="images/contract11.png" alt="contract">  </p>
+<pre><code>// 再次部署合约，可以看到结果eosio::setcode eosio::sebabi说明部署成功
+cleos -u http://jungle.cryptolions.io:18888 set contract shaokun11113 /Users/shaokun/Documents/todolist -p shaokun11113@active
+</code></pre></li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，目前在深圳从事DAPP开发。主要工作方向为基于Ethereum,Tron,Eos 进行dapp和钱包开发。技术方面能够使用 java,c++,js,python,go完成“hello world”的编写。如果你对区块链dapp也感兴趣，欢迎通过以下联系方式共同探讨，共同进步。</p>
+<h4 id="智能合约-使用scatter-js进行交互"><a href="#智能合约-使用scatter-js进行交互" class="headerlink" title="智能合约 使用scatter.js进行交互"></a>智能合约 使用scatter.js进行交互</h4><h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，目前在深圳从事DAPP开发。主要工作方向为基于Ethereum,Tron,Eos 进行dapp和钱包开发。技术方面能够使用 java,c++,js,python,go完成“hello world”的编写。如果你对区块链dapp也感兴趣，欢迎通过以下联系方式共同探讨，共同进步。</p>
 <blockquote>
 <p>文章允许转载，但请注明出处，谢谢</p>
 </blockquote>
 <p><img src="/common/wx.png" alt="jungle"><br>微信账号，添加时请备注 dapp开发.<br><img src="/common/wx_pay.png" alt="jungle"><br>如果你觉得我的文章对你有帮助，可以小小的打赏一下我，毕竟码字不容易，感谢。</p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#x61;&#111;&#x6b;&#117;&#110;&#105;&#110;&#103;&#x40;&#x67;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#111;&#x6b;&#117;&#110;&#105;&#110;&#103;&#x40;&#x67;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x63;&#111;&#109;</a><br>email_2: <a href="mailto:&#x73;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#x61;&#111;&#x6b;&#x75;&#110;&#x69;&#x6e;&#103;&#64;&#x67;&#109;&#97;&#105;&#108;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#x61;&#111;&#x6b;&#x75;&#110;&#x69;&#x6e;&#103;&#64;&#x67;&#109;&#97;&#105;&#108;&#46;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#117;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
 
       
     </div>
@@ -629,7 +634,7 @@ cleos unlock wallet
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#智能合约-合约c-文档编写"><span class="nav-number">1.</span> <span class="nav-text">智能合约 合约c++文档编写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#智能合约-编译智能合约"><span class="nav-number">2.</span> <span class="nav-text">智能合约 编译智能合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#智能合约-部署智能合约"><span class="nav-number">3.</span> <span class="nav-text">智能合约 部署智能合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">4.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#智能合约-合约c-文档编写"><span class="nav-number">1.</span> <span class="nav-text">智能合约 合约c++文档编写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#智能合约-编译智能合约"><span class="nav-number">2.</span> <span class="nav-text">智能合约 编译智能合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#智能合约-部署智能合约"><span class="nav-number">3.</span> <span class="nav-text">智能合约 部署智能合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#智能合约-使用scatter-js进行交互"><span class="nav-number">4.</span> <span class="nav-text">智能合约 使用scatter.js进行交互</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">5.</span> <span class="nav-text">关于我</span></a></li></ol></div>
             
 
           </div>
