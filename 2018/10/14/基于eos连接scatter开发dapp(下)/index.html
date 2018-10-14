@@ -79,13 +79,13 @@
 
 
 
-<meta name="description" content="EOS智能合约 合约c++文档编写 这里需要说明的一下，这个例子和官网提供的hello没有多大的区别,仅仅是带你多了解一下如何编写。其中遇到有些概念难以理解，建议还是参考官网的hello 从头看起  #include &amp;lt;eosiolib/eosio.hpp&amp;gt;   #include &amp;lt;eosiolib/print.hpp&amp;gt; #include&amp;lt;string&amp;gt;  us">
+<meta name="description" content="eos智能合约开发 c++合约编写 这里需要说明的一下，这个例子和官网提供的hello没有多大的区别,仅仅是带你多了解一下如何编写。其中遇到有些概念难以理解，建议还是参考官网的hello 从头看起  #include &amp;lt;eosiolib/eosio.hpp&amp;gt;   #include &amp;lt;eosiolib/print.hpp&amp;gt; #include&amp;lt;string&amp;gt;  us">
 <meta name="keywords" content="eos,eth,tron,区块链">
 <meta property="og:type" content="article">
 <meta property="og:title" content="学习eos dapp开发，看这篇就够了（下）">
 <meta property="og:url" content="http://yoursite.com/2018/10/14/基于eos连接scatter开发dapp(下)/index.html">
 <meta property="og:site_name" content="shaokun land">
-<meta property="og:description" content="EOS智能合约 合约c++文档编写 这里需要说明的一下，这个例子和官网提供的hello没有多大的区别,仅仅是带你多了解一下如何编写。其中遇到有些概念难以理解，建议还是参考官网的hello 从头看起  #include &amp;lt;eosiolib/eosio.hpp&amp;gt;   #include &amp;lt;eosiolib/print.hpp&amp;gt; #include&amp;lt;string&amp;gt;  us">
+<meta property="og:description" content="eos智能合约开发 c++合约编写 这里需要说明的一下，这个例子和官网提供的hello没有多大的区别,仅仅是带你多了解一下如何编写。其中遇到有些概念难以理解，建议还是参考官网的hello 从头看起  #include &amp;lt;eosiolib/eosio.hpp&amp;gt;   #include &amp;lt;eosiolib/print.hpp&amp;gt; #include&amp;lt;string&amp;gt;  us">
 <meta property="og:locale" content="zn">
 <meta property="og:image" content="http://yoursite.com/2018/10/14/基于eos连接scatter开发dapp(下)/images/contract1.png">
 <meta property="og:image" content="http://yoursite.com/2018/10/14/基于eos连接scatter开发dapp(下)/images/contract2.png">
@@ -108,10 +108,10 @@
 <meta property="og:image" content="http://yoursite.com/2018/10/14/基于eos连接scatter开发dapp(下)/images/eos.gif">
 <meta property="og:image" content="http://yoursite.com/common/wx.png">
 <meta property="og:image" content="http://yoursite.com/common/wx_pay.png">
-<meta property="og:updated_time" content="2018-10-14T06:53:59.000Z">
+<meta property="og:updated_time" content="2018-10-14T06:58:21.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="学习eos dapp开发，看这篇就够了（下）">
-<meta name="twitter:description" content="EOS智能合约 合约c++文档编写 这里需要说明的一下，这个例子和官网提供的hello没有多大的区别,仅仅是带你多了解一下如何编写。其中遇到有些概念难以理解，建议还是参考官网的hello 从头看起  #include &amp;lt;eosiolib/eosio.hpp&amp;gt;   #include &amp;lt;eosiolib/print.hpp&amp;gt; #include&amp;lt;string&amp;gt;  us">
+<meta name="twitter:description" content="eos智能合约开发 c++合约编写 这里需要说明的一下，这个例子和官网提供的hello没有多大的区别,仅仅是带你多了解一下如何编写。其中遇到有些概念难以理解，建议还是参考官网的hello 从头看起  #include &amp;lt;eosiolib/eosio.hpp&amp;gt;   #include &amp;lt;eosiolib/print.hpp&amp;gt; #include&amp;lt;string&amp;gt;  us">
 <meta name="twitter:image" content="http://yoursite.com/2018/10/14/基于eos连接scatter开发dapp(下)/images/contract1.png">
 
 
@@ -327,7 +327,7 @@
       
 
       
-        <h4 id="EOS智能合约-合约c-文档编写"><a href="#EOS智能合约-合约c-文档编写" class="headerlink" title="EOS智能合约 合约c++文档编写"></a>EOS智能合约 合约c++文档编写</h4><blockquote>
+        <h4 id="eos智能合约开发-c-合约编写"><a href="#eos智能合约开发-c-合约编写" class="headerlink" title="eos智能合约开发 c++合约编写"></a>eos智能合约开发 c++合约编写</h4><blockquote>
 <p>这里需要说明的一下，这个例子和官网提供的hello没有多大的区别,仅仅是带你多了解一下如何编写。其中遇到有些概念难以理解，建议还是参考官网的hello 从头看起</p>
 </blockquote>
 <pre><code>#include &lt;eosiolib/eosio.hpp&gt;  
@@ -419,7 +419,7 @@ class todolist : public contract {  //继承 contract
 };
 
 EOSIO_ABI(todolist, (create)(complete)(destroy))
-</code></pre><h4 id="EOS智能合约-编译智能合约"><a href="#EOS智能合约-编译智能合约" class="headerlink" title="EOS智能合约 编译智能合约"></a>EOS智能合约 编译智能合约</h4><blockquote>
+</code></pre><h4 id="eos智能合约开发-编译智能合约"><a href="#eos智能合约开发-编译智能合约" class="headerlink" title="eos智能合约开发  编译智能合约"></a>eos智能合约开发  编译智能合约</h4><blockquote>
 <p>经过以上的步骤，我们编写好了智能合约，这个合约是一个todolist，可以增加todo,可以将todo变为完成的状态，还可以删除todo,只能删除自己的todo</p>
 </blockquote>
 <p>这里编译智能合约，需要下载好eoscdt,如果没有下载好，建议完整安装好eoscdt再继续往下走了  </p>
@@ -432,7 +432,7 @@ EOSIO_ABI(todolist, (create)(complete)(destroy))
 <ol start="3">
 <li><img src="images/contract3.png" alt="contract"><br>成功后会在当前文件夹目录下生成 todolist.wasm 和 todolist.abi</li>
 </ol>
-<h4 id="EOS智能合约-部署智能合约"><a href="#EOS智能合约-部署智能合约" class="headerlink" title="EOS智能合约 部署智能合约"></a>EOS智能合约 部署智能合约</h4><blockquote>
+<h4 id="eos智能合约开发-部署智能合约"><a href="#eos智能合约开发-部署智能合约" class="headerlink" title="eos智能合约开发 部署智能合约"></a>eos智能合约开发 部署智能合约</h4><blockquote>
 <p>这里部署智能合约我暂时只找到使用 命令行的方式部署，如果哪位同学知道其他的方式部署，请告诉我，谢谢</p>
 </blockquote>
 <blockquote>
@@ -489,7 +489,7 @@ cleos unlock wallet
 cleos -u http://jungle.cryptolions.io:18888 set contract shaokun11113 /Users/shaokun/Documents/todolist -p shaokun11113@active
 </code></pre></li>
 </ul>
-<h4 id="EOS智能合约-使用scatter-js进行交互"><a href="#EOS智能合约-使用scatter-js进行交互" class="headerlink" title="EOS智能合约 使用scatter.js进行交互"></a>EOS智能合约 使用scatter.js进行交互</h4><blockquote>
+<h4 id="eos智能合约开发-使用scatter-js进行交互"><a href="#eos智能合约开发-使用scatter-js进行交互" class="headerlink" title="eos智能合约开发 使用scatter.js进行交互"></a>eos智能合约开发 使用scatter.js进行交互</h4><blockquote>
 <p>这里使用 create-react-app 脚手架创建项目，删除无用的文件，启动项目。这里有疑问的请百度</p>
 </blockquote>
 <ul>
@@ -610,7 +610,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
 </li>
 </ul>
 <p>启动项目，看看演示效果</p>
-<h4 id="EOS智能合约-结尾"><a href="#EOS智能合约-结尾" class="headerlink" title="EOS智能合约 结尾"></a>EOS智能合约 结尾</h4><blockquote>
+<h4 id="eos智能合约开发-总结"><a href="#eos智能合约开发-总结" class="headerlink" title="eos智能合约开发 总结"></a>eos智能合约开发 总结</h4><blockquote>
 <p>本打算下周更新此篇文章，恰好今天原来的计划取消了，还好今天把所有的需要分享给大家的录完了。<br>这里有几点需要大家注意：</p>
 </blockquote>
 <ul>
@@ -629,7 +629,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
 <p>文章允许转载，但请注明出处，谢谢</p>
 </blockquote>
 <p><img src="/common/wx.png" alt="jungle"><br>微信账号，添加时请备注 dapp开发.<br><img src="/common/wx_pay.png" alt="jungle"><br>如果你觉得我的文章对你有帮助，可以小小的打赏一下我，毕竟码字不容易，感谢。</p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#111;&#x6b;&#x75;&#x6e;&#x69;&#x6e;&#x67;&#64;&#x67;&#109;&#x61;&#x69;&#x6c;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#111;&#x6b;&#x75;&#x6e;&#x69;&#x6e;&#x67;&#64;&#x67;&#109;&#x61;&#x69;&#x6c;&#46;&#99;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#107;&#117;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#x33;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#x33;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#x61;&#x6f;&#107;&#117;&#x6e;&#x69;&#110;&#x67;&#x40;&#x67;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#x6f;&#107;&#117;&#x6e;&#x69;&#110;&#x67;&#x40;&#x67;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#111;&#109;</a></p>
 
       
     </div>
@@ -776,7 +776,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#EOS智能合约-合约c-文档编写"><span class="nav-number">1.</span> <span class="nav-text">EOS智能合约 合约c++文档编写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EOS智能合约-编译智能合约"><span class="nav-number">2.</span> <span class="nav-text">EOS智能合约 编译智能合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EOS智能合约-部署智能合约"><span class="nav-number">3.</span> <span class="nav-text">EOS智能合约 部署智能合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EOS智能合约-使用scatter-js进行交互"><span class="nav-number">4.</span> <span class="nav-text">EOS智能合约 使用scatter.js进行交互</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EOS智能合约-结尾"><span class="nav-number">5.</span> <span class="nav-text">EOS智能合约 结尾</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#接下来的计划"><span class="nav-number">6.</span> <span class="nav-text">接下来的计划</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">7.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-c-合约编写"><span class="nav-number">1.</span> <span class="nav-text">eos智能合约开发 c++合约编写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-编译智能合约"><span class="nav-number">2.</span> <span class="nav-text">eos智能合约开发  编译智能合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-部署智能合约"><span class="nav-number">3.</span> <span class="nav-text">eos智能合约开发 部署智能合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-使用scatter-js进行交互"><span class="nav-number">4.</span> <span class="nav-text">eos智能合约开发 使用scatter.js进行交互</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos智能合约开发-总结"><span class="nav-number">5.</span> <span class="nav-text">eos智能合约开发 总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#接下来的计划"><span class="nav-number">6.</span> <span class="nav-text">接下来的计划</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">7.</span> <span class="nav-text">关于我</span></a></li></ol></div>
             
 
           </div>
