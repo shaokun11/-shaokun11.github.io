@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言 上一篇文章登录的时候，你如果做了，虽然也未报错，按照结论貌似登录上了，但是，其实是没有登录上的，这里给大家说一声对不起，因为其中的某些参数未完全按照官方的例子敲，所以造成了参数不对。既然上篇文章登录错了，那么这篇文章还是得纠正过来，并且找到错在哪里  教程内容 在本课中，我们将学习如何从区块链中获取数据。数据通过来自前端的交易进入区块链，我们在第2.2课和第2.3课中查看了这一点。调用操作可">
+<meta name="keywords" content="eos,eth,tron,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="eos dapp开发学习 第三课">
+<meta property="og:url" content="http://yoursite.com/2018/10/27/eos dapp开发 官方教程学习4/index.html">
+<meta property="og:site_name" content="hello shaokun">
+<meta property="og:description" content="前言 上一篇文章登录的时候，你如果做了，虽然也未报错，按照结论貌似登录上了，但是，其实是没有登录上的，这里给大家说一声对不起，因为其中的某些参数未完全按照官方的例子敲，所以造成了参数不对。既然上篇文章登录错了，那么这篇文章还是得纠正过来，并且找到错在哪里  教程内容 在本课中，我们将学习如何从区块链中获取数据。数据通过来自前端的交易进入区块链，我们在第2.2课和第2.3课中查看了这一点。调用操作可">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/img_eos1/eos10.png">
+<meta property="og:image" content="http://yoursite.com/common/wx.png">
+<meta property="og:updated_time" content="2018-10-27T06:23:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="eos dapp开发学习 第三课">
+<meta name="twitter:description" content="前言 上一篇文章登录的时候，你如果做了，虽然也未报错，按照结论貌似登录上了，但是，其实是没有登录上的，这里给大家说一声对不起，因为其中的某些参数未完全按照官方的例子敲，所以造成了参数不对。既然上篇文章登录错了，那么这篇文章还是得纠正过来，并且找到错在哪里  教程内容 在本课中，我们将学习如何从区块链中获取数据。数据通过来自前端的交易进入区块链，我们在第2.2课和第2.3课中查看了这一点。调用操作可">
+<meta name="twitter:image" content="http://yoursite.com/img_eos1/eos10.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/10/27/eos dapp开发 官方教程学习4/"/>
+
+
+
+
+
+  <title>eos dapp开发学习 第三课 | hello shaokun</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">hello shaokun</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">hello friend, let us go to the world together</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/27/eos dapp开发 官方教程学习4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">eos dapp开发学习 第三课</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-27T13:12:11+08:00">
+                2018-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 浏览
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>上一篇文章登录的时候，你如果做了，虽然也未报错，按照结论貌似登录上了，但是，其实是没有登录上的，这里给大家说一声对不起，因为其中的某些参数未完全按照官方的例子敲，所以造成了参数不对。<br>既然上篇文章登录错了，那么这篇文章还是得纠正过来，并且找到错在哪里</p>
+</blockquote>
+<h4 id="教程内容"><a href="#教程内容" class="headerlink" title="教程内容"></a>教程内容</h4><blockquote>
+<p>在本课中，我们将学习如何从区块链中获取数据。数据通过来自前端的交易进入区块链，我们在第2.2课和第2.3课中查看了这一点。调用操作可以更改状态，该状态存储在多索引表中。此外，此操作记录在区块链中。</p>
+</blockquote>
+<h4 id="教程结果"><a href="#教程结果" class="headerlink" title="教程结果"></a>教程结果</h4><blockquote>
+<p>首先声明，所有的结果均未完全百分之百按照官方教程走，省略了其中的ui，而只涉及了其中正常开发所必须掌握的内容，如果觉得页面不够美丽，建议你可以按照官方的例子去学，这是地址<a href="https://battles.eos.io/" target="_blank" rel="noopener">elemental battles</a><br>本次调整了部分逻辑，方便我操作，如果你觉得不合适，可以修改<br>再来强调一下你需要哪些知识才能看懂：</p>
+<blockquote>
+<ul>
+<li>区块链共识算法，这是区块链的核心</li>
+<li>eos 账户和权限的知识</li>
+<li>eos 本地环境，得安装在电脑上，安装方式自行查找（也就是部署合约用，如果你没有而又想走捷径，这里有个好东西，拿去不谢，<a href="https://github.com/itleaks/js4eos" target="_blank" rel="noopener">eos4js</a>，这个库开源出来才2天，也许后面还有更多类似的优秀的库，你都可以使用）</li>
+<li>eoscdt 得安装，去下载，然后下一步就好。（这个东西是用来编译成wasm和abi的，单独抽出来的，建议使用，当前时间我使用的eoscdt1.2，语法是旧的，如果你后续用了高版本，按照这篇文章敲语法会有问题的，但是思想是不变的）</li>
+<li>react 这是一个前端的库，为什么要用这个？因为第一，我会，第二，官方也是用的他，第三，用起来很爽，你如果用的别的如vue活着原生来写，只要你把流程搞懂了，也是一样的</li>
+<li>react-redux 这东西有点难懂，可能会看得你一脸蒙蔽，和上面一点是配套使用的，数据流的管理方式。简单理解就是数据的传递方式，写起来很复杂，理解起来还是很烧脑。我一时半会也说不完，来这里去看看吧<a href="https://cn.redux.js.org/docs/react-redux/" target="_blank" rel="noopener">react-redux</a>。（我也考虑过不用这个写，这样简单很多，对大家的理解也会有帮助，但是考虑到官方用了，我也就顺便用了） </li>
+<li>c++ 这个东西我也是为了写eos智能合约才开始学的，还好我之前有java的基础，学点基础够我们用了，难点的在它的指针上面，（话说，写合约貌似不怎么用指针了，eos已经帮我们封装的够多了，用得多的是引用），这个就看自己了  </li>
+<li>node 基础 够用就好  </li>
+<li>当然 js基础  同样够用就好</li>
+<li>梯子</li>
+<li>系统，反正不能是Windows系统</li>
+</ul>
+</blockquote>
+</blockquote>
+<p>为了避免上一篇文章犯错，这次先把结果展示了<br><a href="https://github.com/shaokun11/eoslearning/tree/eos-dev03" target="_blank" rel="noopener">eos第三课源码</a></p>
+<blockquote>
+<p>这里尽量放git图片了，先看图后看文字解释。</p>
+</blockquote>
+<h4 id="布局更新"><a href="#布局更新" class="headerlink" title="布局更新"></a>布局更新</h4><ul>
+<li>更改了采取内置账号和秘钥的方式，直接点击不用输入了</li>
+<li>当登录成功，去区块链上拿到用户的信息，刷新ui</li>
+<li><p>下面的代码已经有注释了</p>
+<pre><code>import {Api, JsonRpc, JsSignatureProvider} from &apos;eosjs&apos;;
+
+async function takeAction(action, account, pk, dataValue) {
+    console.log(&quot;takeAction&quot;, action, dataValue)
+    const rpc = new JsonRpc(process.env.REACT_APP_EOS_HTTP_ENDPOINT);
+    const signatureProvider = new JsSignatureProvider([pk]);
+    const api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()});
+    try {
+        return await api.transact({
+            actions: [{
+                account: &quot;shaokun11113&quot;,  // 合约的拥有者
+                name: action,             // 执行的合约方法
+                authorization: [{
+                    actor: account,       // 执行合约的账户
+                    permission: &apos;active&apos;, // 执行合约的账户所需要的权限
+                }],
+                data: dataValue,          // 所需要的参数,以json字符串进行传递，注意key为合约中定义的参数的名字，也可以通过abi进行查看
+
+        }]
+    }, {
+        blocksBehind: 3,              // 多少个块后确认
+        expireSeconds: 30,            // 超时时间
+    });
+} catch (err) {
+    throw(err)
+}
+}
+
+class ApiService {
+
+static async getUserByName(username) {
+    const rpc = new JsonRpc(process.env.REACT_APP_EOS_HTTP_ENDPOINT);
+    const res = await rpc.get_table_rows({
+        code: process.env.REACT_APP_EOS_CONTRACT_NAME,             //由于在合约中写死了，这里也可以写死
+        scope: process.env.REACT_APP_EOS_CONTRACT_NAME,             //由于在合约中写死了，这里也可以写死
+        table: &quot;userinfo&quot;,                                           //由于在合约中写死了，这里也可以写死
+        json: true,                                                // 默认值 ，可以不填
+        lower_bound: username,                                      // 匹配规则，不填默认返回全部
+    })
+    return res.rows[0];
+}
+
+static login({name, key}) {
+    return new Promise((resolve, reject) =&gt; {
+        takeAction(&quot;login&quot;, name, key, {user: name}).then(res =&gt; {
+            // 执行成功会返回默认的交易hash
+            console.log(&quot;login success&quot;, res);
+            resolve();
+        }).catch(err =&gt; {
+            console.log(err)
+            reject(err);
+        })
+    });
+}
+}
+
+export default ApiService;
+</code></pre></li>
+<li><p>当登录成功显示的组件,这是当跳转后立即获取最新数据。结合上面的代码，就知道了。</p>
+<p>  <img src="/img_eos1/eos10.png" alt="eos"> </p>
+</li>
+<li><p>上面最后，我使用postman拿取了合约中所有的数据，可以看到，目前的数据储存是两条，当然，你在代码中也可以实现，至于怎么实现，我想你应该知道的。至于上一篇文章错在哪里，你仔细看了上面的代码就知道了。</p>
+</li>
+</ul>
+<p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
+<h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><blockquote>
+<p>对个人的总结：<br>目前分享的经验不是很足，严格算起来，就一个多月而已,还是经过一个外国老哥的建议才开始写的，目前文章也比较粗糙。<br>但我还是会尽力来记录这些。一来这样记录下来可以让自己对知识把握得更牢靠，二来也可以帮助到他人。<br>从零开始搭博客，学习markdown语法，搜集图片，上传图片，传动图或者视频，都是一步一步摸索出来，中间坑很多，但是乐趣也在此.</p>
+</blockquote>
+<p>至于后续的文章，尽量跟着官方的教程走，所以到这里，第三课结束了。<br>小小的总结一下前三课的内容    </p>
+<ul>
+<li>第一课  搭环境  </li>
+<li>第二课  搭ui与合约的编写</li>
+<li>第二课续 部署，测试合约（合约部署成功，连接合约是失败的）</li>
+<li>第三课  更改上课的错误，连接合约，增加新的展示界面</li>
+</ul>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#111;&#x6b;&#117;&#x6e;&#x69;&#110;&#103;&#64;&#103;&#x6d;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#111;&#x6b;&#117;&#x6e;&#x69;&#110;&#103;&#64;&#103;&#x6d;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#111;&#x6d;</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/21/eos dapp开发 官方教程学习3/" rel="next" title="eos dapp开发学习 第二课 续">
+                <i class="fa fa-chevron-left"></i> eos dapp开发学习 第二课 续
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">shaokun</p>
+              <p class="site-description motion-element" itemprop="description">记录自己对相关技术的点点滴滴和一些思考，希望能够帮助来到这里的你，如果你喜欢我的文章，可以加个微信共同进步</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#教程内容"><span class="nav-number">2.</span> <span class="nav-text">教程内容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#教程结果"><span class="nav-number">3.</span> <span class="nav-text">教程结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#布局更新"><span class="nav-number">4.</span> <span class="nav-text">布局更新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结尾"><span class="nav-number">5.</span> <span class="nav-text">结尾</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">6.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">shaokun</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+ <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 访问总量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
