@@ -233,6 +233,310 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/09/eos dapp开发 官方教程学习6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/09/eos dapp开发 官方教程学习6/" itemprop="url">eos dapp开发学习 第四课 续</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-09T21:48:45+08:00">
+                2018-11-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>很幸运，总算摸索出来了eos新版语法，踩过了很多坑，这里给大家分享一下  </p>
+<ul>
+<li>首先，目前本地我的环境eos1.4 eosio.cdt1.3.2 所以你按照接下来的教程走，那么请核对你的版本</li>
+<li>坑1 ==&gt; 如果在原来的账号上部署过类似的table的合约，再次更新合约如果在table中增加修改了字段，能够部署，但是不能够得到得到table的内容和执行action，建议用新的账号进行部署解决</li>
+<li>坑2 ==&gt; <a href="https://developers.eos.io/eosio-home/docs/your-first-contract" target="_blank" rel="noopener">helloworld</a>很流畅，一路走下去完美。<a href="https://developers.eos.io/eosio-home/docs/data-persistence" target="_blank" rel="noopener">table数据储存</a>这里不知道知道是我的操作不对还是怎么回事，跟着官网的教程，abi和wasm都能够正常生成，这里合约能够部署上去。但是来了，无法get table，也无法push action。</li>
+<li>坑3 ==&gt; 语法变了哈，这里强调一下，支持vector，enume，map 和任何自定义的类型哈，剩下的这个就大家自行琢磨了</li>
+<li>坑4 ==&gt; 目前来看，尽量把合code在一个cpp中，不然有想不到的意外等着的哈</li>
+</ul>
+</blockquote>
+<h4 id="合约代码"><a href="#合约代码" class="headerlink" title="合约代码"></a>合约代码</h4><p><code>cardgame.hpp</code></p>
+<pre><code>#pragma once
+#include &lt;eosiolib/eosio.hpp&gt;
+using namespace std;
+
+class [[eosio::contract]]cardgame : public eosio::contract {
+  public:
+    cardgame(eosio::name reciever,eosio::name code,eosio::datastream&lt;const char*&gt; ds )
+                                :contract(reciever,code,ds),
+                                _users(reciever,code.value),
+                                _seed(reciever,code.value){};
+
+    [[eosio::action]] void login(eosio::name user);
+    [[eosio::action]] void startgame(eosio::name user);
+    [[eosio::action]] void playcard(eosio::name user,uint8_t player_card_index);
+
+  private:
+    enum game_status:int8_t
+    {
+      ONGOING = 0,      // 游戏正在进行中
+      PLAYER_WON = 1,   // 游戏已经结束，玩家获得胜利
+      PLAYER_LOST = -1 // 游戏结束， 完结失败
+    };
+    enum card_type : uint8_t  // 卡片的类型 总共五种属性类型,总共17张卡牌
+    {
+      EMPTY = 0,    // 不存在的卡片
+      FIRE = 1,     // 火属性， 克木  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
+      WOOD = 2,     // 木属性， 克水  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
+      WATER = 3,    // 水属性   克火  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
+      NEUTRAL = 4,  // 中立属性       攻击力为3 总共1张 
+      VOID = 5      // 平局属性       共计力为0 总共1张
+    };
+
+    struct card
+    {
+      uint8_t type;   // 卡片类型
+      uint8_t attack_point; // 卡片的攻击力
+    };
+
+    const  map&lt;uint8_t,card&gt; card_dict = {
+        {0 , {EMPTY , 0}},
+        {1 , {EMPTY , 1}},
+        {2 , {EMPTY , 1}},
+        {3 , {EMPTY , 2}},
+        {4 , {EMPTY , 2}},
+        {5 , {EMPTY , 3}},
+        {6 , {EMPTY , 1}},
+        {7 , {EMPTY , 1}},
+        {8 , {EMPTY , 2}},
+        {9 , {EMPTY , 2}},
+        {10 , {EMPTY , 3}},
+        {11 , {EMPTY , 1}},
+        {12 , {EMPTY , 1}},
+        {13 , {EMPTY , 2}},
+        {14 , {EMPTY , 2}},
+        {15 , {EMPTY , 3}},
+        {16 , {EMPTY , 3}},
+        {17 , {EMPTY , 0}},
+    };
+    struct game
+    {
+     int8_t status = ONGOING;   // 只要登录 默认游戏正在进行
+     int8_t life_player = 5;    // 游戏玩家 5条生命
+     int8_t ai_player = 5;      // 游戏玩家 5条生命
+     vector&lt;uint8_t&gt;  deck_player = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17}; // 玩家待选的卡牌id
+     vector&lt;uint8_t&gt; deck_ai = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};     // ai待选的卡牌id
+     vector&lt;uint8_t&gt; hand_player = {0,0,0,0}; // 玩家的手里牌
+     vector&lt;uint8_t&gt; hand_ai = {0,0,0,0};     // ai的手里牌
+     uint8_t selected_card_player = 0;          // 从待选牌中选中的牌
+     uint8_t selected_card_ai = 0;              // 从待选牌中选中的牌
+    };
+
+
+      struct [[eosio::table]] userinfo
+      {
+          eosio::name  name;            
+          uint16_t win_count = 0;        
+          uint16_t lost_count = 0;
+      game game_data;         
+
+          auto primary_key() const {return name.value;}  
+      };
+
+    struct [[eosio::table]] seed 
+    {
+      uint64_t key = 1;
+      uint32_t seed_value = 1;
+
+      auto primary_key() const {return key;};
+    };
+
+      typedef eosio::multi_index&lt;&quot;userinfo&quot;_n,userinfo&gt; user_index;
+    typedef eosio::multi_index&lt;&quot;seed&quot;_n,seed&gt; seed_index;
+    user_index _users; //声明表的实例
+    seed_index _seed;
+
+  int random(const int range);
+  void draw_card(vector&lt;uint8_t&gt;&amp; deck, vector&lt;uint8_t&gt;&amp; hand);
+};
+</code></pre><p><code>cardgame.cpp</code></p>
+<pre><code>#include &quot;cardgame.hpp&quot;
+
+void cardgame::login(eosio::name user)
+{
+    _users.emplace(get_self(),[&amp;](auto&amp;  u){
+            u.name = user;
+    });
+}
+
+void cardgame::startgame(eosio::name user) {
+    auto&amp; itr = _users.get(user.value,&quot;User not exist&quot;);
+    _users.modify(itr,get_self(),[&amp;](auto&amp; _to_modify_user){
+        game game_data;
+        for(uint8_t i = 0; i &lt; 4; i++){
+            draw_card(game_data.deck_player,game_data.hand_player);
+            draw_card(game_data.deck_ai,game_data.hand_ai);
+        }
+        _to_modify_user.game_data = game_data;
+    });
+}
+
+void cardgame::playcard(eosio::name user, uint8_t player_card_index){
+    eosio::require_auth(user);
+    eosio_assert(player_card_index &lt; 4,&quot;invalid hand index&quot;);// 手上牌最多四张
+    // 通过user找到数据表中数据
+    auto&amp; player = _users.get(user.value,&quot;User not exist&quot;);
+    eosio_assert(player.game_data.status == ONGOING,&quot;game have ended&quot;);
+    eosio_assert(player.game_data.selected_card_player == 0,&quot;the player have selected car in this turn&quot;);
+    // 修改数据表
+    _users.modify(player,get_self(),[&amp;](auto&amp; _to_modify_user){
+        game&amp; game_data = _to_modify_user.game_data;
+        // 设定选中的卡片id
+        game_data.selected_card_player = game_data.hand_player[player_card_index];
+        // 将手中卡片对应位置置位empty
+        game_data.hand_player[player_card_index] = 0;
+    });
+};
+int cardgame::random(const int range) {
+    auto seed_itr = _seed.begin();
+    if (seed_itr  == _seed.end()){    // 如果没有随机数据，就用默认值初始化
+        seed_itr = _seed.emplace(get_self(),[&amp;](auto&amp; s){
+            s = seed{};
+        });
+    };
+    int prime = 65535;
+    int new_seed_value = (seed_itr-&gt;seed_value + now()) % prime;
+    _seed.modify(seed_itr,get_self(),[&amp;](auto&amp; s){
+            s.seed_value = new_seed_value;
+    });
+    // 随机范围  0 ~ range
+    int random_res = new_seed_value % range;
+    return random_res;
+};
+void cardgame::draw_card(vector&lt;uint8_t&gt;&amp; deck, vector&lt;uint8_t&gt;&amp; hand) {
+      int deck_card_idx = random(deck.size());
+      int first_empty_slot = -1;
+      for (int i = 0; i &lt;= hand.size(); i++) {
+          auto id = hand[i];
+          if (card_dict.at(id).type == EMPTY) {
+              first_empty_slot = i;
+              break;
+          }
+        }
+      eosio_assert(first_empty_slot != -1, &quot;No empty slot in the player&apos;s hand&quot;);
+      hand[first_empty_slot] = deck[deck_card_idx];
+      deck.erase(deck.begin() + deck_card_idx);
+ };
+EOSIO_DISPATCH(cardgame,(login)(startgame)(playcard))
+</code></pre><ul>
+<li>由于上面的坑，用shaokun11113是无法正确的，所以我用了shaokun11114进行部署  </li>
+<li>终于能够写数据到链上了<img src="/img_eos1/eos11.png" alt="eos">   </li>
+<li><a href="https://github.com/shaokun11/eoslearning/tree/eos-dve4-update" target="_blank" rel="noopener">更新的合约源码</a>，这次就没有更新前端的mock数据了，相信聪明的你一定知道怎样调整过来</li>
+</ul>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#97;&#111;&#x6b;&#117;&#x6e;&#105;&#x6e;&#103;&#x40;&#103;&#109;&#97;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#97;&#111;&#x6b;&#117;&#x6e;&#105;&#x6e;&#103;&#x40;&#103;&#109;&#97;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#117;&#110;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#117;&#110;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#111;&#x6d;</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/02/eos dapp开发 官方教程学习5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -515,7 +819,7 @@ void cardgame::draw_one_card(vector&lt;uint8_t&gt; &amp;deck,vector&lt;uint8_t&g
      deck.erase(deck.began() + deck_card_index);
  }
 </code></pre><h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#x61;&#x6f;&#107;&#117;&#x6e;&#105;&#110;&#103;&#x40;&#103;&#109;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#104;&#x61;&#x6f;&#107;&#117;&#x6e;&#105;&#110;&#103;&#x40;&#103;&#109;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#121;&#x40;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#121;&#x40;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#97;&#111;&#107;&#117;&#x6e;&#x69;&#x6e;&#103;&#x40;&#x67;&#109;&#97;&#105;&#108;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x68;&#97;&#111;&#107;&#117;&#x6e;&#x69;&#x6e;&#103;&#x40;&#x67;&#109;&#97;&#105;&#108;&#x2e;&#99;&#111;&#109;</a><br>email_2: <a href="mailto:&#x73;&#107;&#x75;&#x6e;&#110;&#x79;&#x40;&#49;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#x6e;&#110;&#x79;&#x40;&#49;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -744,7 +1048,7 @@ export default ApiService;
 <li>第三课  更改上课的错误，连接合约，增加新的展示界面</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#97;&#111;&#x6b;&#x75;&#110;&#x69;&#110;&#103;&#x40;&#x67;&#109;&#x61;&#105;&#x6c;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#97;&#111;&#x6b;&#x75;&#110;&#x69;&#110;&#103;&#x40;&#x67;&#109;&#x61;&#105;&#x6c;&#x2e;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#x75;&#x6e;&#x6e;&#121;&#x40;&#49;&#x36;&#x33;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#x6e;&#x6e;&#121;&#x40;&#49;&#x36;&#x33;&#x2e;&#99;&#111;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#111;&#x6b;&#x75;&#x6e;&#105;&#110;&#103;&#x40;&#x67;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#111;&#x6b;&#x75;&#x6e;&#105;&#110;&#103;&#x40;&#x67;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -919,7 +1223,7 @@ user_info =&gt; userinfo
 <p>总算完成了之前的坑。^o^<br>中间有很多前端的知识，这不是这个课程讲解的重点，只能靠各位同学自己去补习了。这个系列使用react，redux也是一个很庞大的工程，所以可以简单一点，展示一下交互就好。<br>应该说到此，区块链与前端的交互已经完成，接下来就是充实智能合约的功能了。如果你做到了这一步，建议去<a href="https://developers.eos.io/eosio-cpp/reference" target="_blank" rel="noopener">eos c++ api</a>这里了解一下api，这样对于后面的合约编写会有一个更深层次的掌握</p>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#111;&#x6b;&#x75;&#x6e;&#105;&#110;&#x67;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#111;&#x6b;&#x75;&#x6e;&#105;&#110;&#x67;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#x75;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#x6b;&#117;&#x6e;&#105;&#110;&#x67;&#64;&#103;&#x6d;&#x61;&#x69;&#108;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#x6b;&#117;&#x6e;&#105;&#110;&#x67;&#64;&#103;&#x6d;&#x61;&#x69;&#108;&#x2e;&#99;&#111;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1070,7 +1374,7 @@ user_info =&gt; userinfo
 <h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>这篇文章写的很不顺，没有完成最关键的上链一步给大家演示，真是抱歉了。那么只能够走思路了。附上本篇文章所用到的源码 <a href="https://github.com/shaokun11/eoslearning/tree/eos-dev02" target="_blank" rel="noopener">elementel battels dev2</a></p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#x6b;&#117;&#x6e;&#x69;&#x6e;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#x6b;&#117;&#x6e;&#x69;&#x6e;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#110;&#121;&#64;&#x31;&#54;&#51;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#110;&#121;&#64;&#x31;&#54;&#51;&#46;&#x63;&#111;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#111;&#107;&#117;&#x6e;&#105;&#110;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#111;&#107;&#117;&#x6e;&#105;&#110;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1225,7 +1529,7 @@ gameplay.cpp  // 包含智能合约中使用的内部帮助函数的C++源文件
 <h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>额，第0课和第一课就到这里结束了，可以看到和我们之前的流程是类似的。同样需要你掌握web和c++的知识，这些知识点都可以通过网络找到，需要自己积累。<br>第0课主要讲解了eosio开发环境的搭建，自备梯子很重要<br>第1课主要讲解的整个项目的结构</p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#97;&#x6f;&#107;&#x75;&#x6e;&#105;&#x6e;&#x67;&#64;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#104;&#97;&#x6f;&#107;&#x75;&#x6e;&#105;&#x6e;&#x67;&#64;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#111;&#107;&#117;&#110;&#105;&#x6e;&#x67;&#x40;&#x67;&#109;&#97;&#x69;&#x6c;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#111;&#107;&#117;&#110;&#105;&#x6e;&#x67;&#x40;&#x67;&#109;&#97;&#x69;&#x6c;&#46;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#x33;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#x33;&#x2e;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -1644,7 +1948,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
 </ul>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#x61;&#x6f;&#x6b;&#x75;&#x6e;&#x69;&#x6e;&#x67;&#64;&#103;&#109;&#97;&#105;&#108;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#x61;&#x6f;&#x6b;&#x75;&#x6e;&#x69;&#x6e;&#x67;&#64;&#103;&#109;&#97;&#105;&#108;&#x2e;&#99;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#x61;&#111;&#x6b;&#117;&#110;&#x69;&#110;&#103;&#64;&#x67;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x68;&#x61;&#111;&#x6b;&#117;&#110;&#x69;&#110;&#103;&#64;&#x67;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1785,7 +2089,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <p><strong>这样一点点的敲下来，内容还是蛮多的。本打算一次写完，结果遇到网络的问题，暂停了一会，这篇文章算是对第一篇的补充吧。到目前为止，我们只是创建好了账户，还没有涉及到dapp的开发，接下来的具体怎么开发dapp估计要等到下周了吧。</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#x61;&#111;&#107;&#x75;&#110;&#105;&#110;&#x67;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#111;&#107;&#x75;&#110;&#105;&#110;&#x67;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#46;&#99;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#97;&#x6f;&#107;&#x75;&#110;&#x69;&#110;&#x67;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x68;&#97;&#x6f;&#107;&#x75;&#110;&#x69;&#110;&#x67;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#x75;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#x6d;</a></p>
 
           
         
@@ -1981,313 +2285,7 @@ sudo ./install.sh
 </ul>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <p><strong>这里我的网络质量太差了。。。先写到这里，，， 请继续关注第二篇</strong>  </p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"><br>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#x6b;&#117;&#x6e;&#x69;&#110;&#103;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#x6b;&#117;&#x6e;&#x69;&#110;&#103;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#x2e;&#99;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#x6f;&#109;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/13/eos dapp开发 官方教程学习6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/13/eos dapp开发 官方教程学习6/" itemprop="url">Untitled</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-13T11:27:20+08:00">
-                2018-10-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <hr>
-<p>title: eos dapp开发学习 第四课 续<br>date: 2018-11-09 21:48:45</p>
-<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
-<p>很幸运，总算摸索出来了eos新版语法，踩过了很多坑，这里给大家分享一下  </p>
-<ul>
-<li>首先，目前本地我的环境eos1.4 eosio.cdt1.3.2 所以你按照接下来的教程走，那么请核对你的版本</li>
-<li>坑1 ==&gt; 如果在原来的账号上部署过类似的table的合约，再次更新合约如果在table中增加修改了字段，能够部署，但是不能够得到得到table的内容和执行action，建议用新的账号进行部署解决</li>
-<li>坑2 ==&gt; <a href="https://developers.eos.io/eosio-home/docs/your-first-contract" target="_blank" rel="noopener">helloworld</a>很流畅，一路走下去完美。<a href="https://developers.eos.io/eosio-home/docs/data-persistence" target="_blank" rel="noopener">table数据储存</a>这里不知道知道是我的操作不对还是怎么回事，跟着官网的教程，abi和wasm都能够正常生成，这里合约能够部署上去。但是来了，无法get table，也无法push action。</li>
-<li>坑3 ==&gt; 语法变了哈，这里强调一下，支持vector，enume，map 和任何自定义的类型哈，剩下的这个就大家自行琢磨了</li>
-<li>坑4 ==&gt; 目前来看，尽量把合code在一个cpp中，不然有想不到的意外等着的哈</li>
-</ul>
-</blockquote>
-<h4 id="合约代码"><a href="#合约代码" class="headerlink" title="合约代码"></a>合约代码</h4><p><code>cardgame.hpp</code></p>
-<pre><code>#pragma once
-#include &lt;eosiolib/eosio.hpp&gt;
-using namespace std;
-
-class [[eosio::contract]]cardgame : public eosio::contract {
-  public:
-    cardgame(eosio::name reciever,eosio::name code,eosio::datastream&lt;const char*&gt; ds )
-                                :contract(reciever,code,ds),
-                                _users(reciever,code.value),
-                                _seed(reciever,code.value){};
-
-    [[eosio::action]] void login(eosio::name user);
-    [[eosio::action]] void startgame(eosio::name user);
-    [[eosio::action]] void playcard(eosio::name user,uint8_t player_card_index);
-
-  private:
-    enum game_status:int8_t
-    {
-      ONGOING = 0,      // 游戏正在进行中
-      PLAYER_WON = 1,   // 游戏已经结束，玩家获得胜利
-      PLAYER_LOST = -1 // 游戏结束， 完结失败
-    };
-    enum card_type : uint8_t  // 卡片的类型 总共五种属性类型,总共17张卡牌
-    {
-      EMPTY = 0,    // 不存在的卡片
-      FIRE = 1,     // 火属性， 克木  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
-      WOOD = 2,     // 木属性， 克水  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
-      WATER = 3,    // 水属性   克火  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
-      NEUTRAL = 4,  // 中立属性       攻击力为3 总共1张 
-      VOID = 5      // 平局属性       共计力为0 总共1张
-    };
-
-    struct card
-    {
-      uint8_t type;   // 卡片类型
-      uint8_t attack_point; // 卡片的攻击力
-    };
-
-    const  map&lt;uint8_t,card&gt; card_dict = {
-        {0 , {EMPTY , 0}},
-        {1 , {EMPTY , 1}},
-        {2 , {EMPTY , 1}},
-        {3 , {EMPTY , 2}},
-        {4 , {EMPTY , 2}},
-        {5 , {EMPTY , 3}},
-        {6 , {EMPTY , 1}},
-        {7 , {EMPTY , 1}},
-        {8 , {EMPTY , 2}},
-        {9 , {EMPTY , 2}},
-        {10 , {EMPTY , 3}},
-        {11 , {EMPTY , 1}},
-        {12 , {EMPTY , 1}},
-        {13 , {EMPTY , 2}},
-        {14 , {EMPTY , 2}},
-        {15 , {EMPTY , 3}},
-        {16 , {EMPTY , 3}},
-        {17 , {EMPTY , 0}},
-    };
-    struct game
-    {
-     int8_t status = ONGOING;   // 只要登录 默认游戏正在进行
-     int8_t life_player = 5;    // 游戏玩家 5条生命
-     int8_t ai_player = 5;      // 游戏玩家 5条生命
-     vector&lt;uint8_t&gt;  deck_player = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17}; // 玩家待选的卡牌id
-     vector&lt;uint8_t&gt; deck_ai = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};     // ai待选的卡牌id
-     vector&lt;uint8_t&gt; hand_player = {0,0,0,0}; // 玩家的手里牌
-     vector&lt;uint8_t&gt; hand_ai = {0,0,0,0};     // ai的手里牌
-     uint8_t selected_card_player = 0;          // 从待选牌中选中的牌
-     uint8_t selected_card_ai = 0;              // 从待选牌中选中的牌
-    };
-
-
-      struct [[eosio::table]] userinfo
-      {
-          eosio::name  name;            
-          uint16_t win_count = 0;        
-          uint16_t lost_count = 0;
-      game game_data;         
-
-          auto primary_key() const {return name.value;}  
-      };
-
-    struct [[eosio::table]] seed 
-    {
-      uint64_t key = 1;
-      uint32_t seed_value = 1;
-
-      auto primary_key() const {return key;};
-    };
-
-      typedef eosio::multi_index&lt;&quot;userinfo&quot;_n,userinfo&gt; user_index;
-    typedef eosio::multi_index&lt;&quot;seed&quot;_n,seed&gt; seed_index;
-    user_index _users; //声明表的实例
-    seed_index _seed;
-
-  int random(const int range);
-  void draw_card(vector&lt;uint8_t&gt;&amp; deck, vector&lt;uint8_t&gt;&amp; hand);
-};
-</code></pre><p><code>cardgame.cpp</code></p>
-<pre><code>#include &quot;cardgame.hpp&quot;
-
-void cardgame::login(eosio::name user)
-{
-    _users.emplace(get_self(),[&amp;](auto&amp;  u){
-            u.name = user;
-    });
-}
-
-void cardgame::startgame(eosio::name user) {
-    auto&amp; itr = _users.get(user.value,&quot;User not exist&quot;);
-    _users.modify(itr,get_self(),[&amp;](auto&amp; _to_modify_user){
-        game game_data;
-        for(uint8_t i = 0; i &lt; 4; i++){
-            draw_card(game_data.deck_player,game_data.hand_player);
-            draw_card(game_data.deck_ai,game_data.hand_ai);
-        }
-        _to_modify_user.game_data = game_data;
-    });
-}
-
-void cardgame::playcard(eosio::name user, uint8_t player_card_index){
-    eosio::require_auth(user);
-    eosio_assert(player_card_index &lt; 4,&quot;invalid hand index&quot;);// 手上牌最多四张
-    // 通过user找到数据表中数据
-    auto&amp; player = _users.get(user.value,&quot;User not exist&quot;);
-    eosio_assert(player.game_data.status == ONGOING,&quot;game have ended&quot;);
-    eosio_assert(player.game_data.selected_card_player == 0,&quot;the player have selected car in this turn&quot;);
-    // 修改数据表
-    _users.modify(player,get_self(),[&amp;](auto&amp; _to_modify_user){
-        game&amp; game_data = _to_modify_user.game_data;
-        // 设定选中的卡片id
-        game_data.selected_card_player = game_data.hand_player[player_card_index];
-        // 将手中卡片对应位置置位empty
-        game_data.hand_player[player_card_index] = 0;
-    });
-};
-int cardgame::random(const int range) {
-    auto seed_itr = _seed.begin();
-    if (seed_itr  == _seed.end()){    // 如果没有随机数据，就用默认值初始化
-        seed_itr = _seed.emplace(get_self(),[&amp;](auto&amp; s){
-            s = seed{};
-        });
-    };
-    int prime = 65535;
-    int new_seed_value = (seed_itr-&gt;seed_value + now()) % prime;
-    _seed.modify(seed_itr,get_self(),[&amp;](auto&amp; s){
-            s.seed_value = new_seed_value;
-    });
-    // 随机范围  0 ~ range
-    int random_res = new_seed_value % range;
-    return random_res;
-};
-void cardgame::draw_card(vector&lt;uint8_t&gt;&amp; deck, vector&lt;uint8_t&gt;&amp; hand) {
-      int deck_card_idx = random(deck.size());
-      int first_empty_slot = -1;
-      for (int i = 0; i &lt;= hand.size(); i++) {
-          auto id = hand[i];
-          if (card_dict.at(id).type == EMPTY) {
-              first_empty_slot = i;
-              break;
-          }
-        }
-      eosio_assert(first_empty_slot != -1, &quot;No empty slot in the player&apos;s hand&quot;);
-      hand[first_empty_slot] = deck[deck_card_idx];
-      deck.erase(deck.begin() + deck_card_idx);
- };
-EOSIO_DISPATCH(cardgame,(login)(startgame)(playcard))
-</code></pre><ul>
-<li>由于上面的坑，用shaokun11113是无法正确的，所以我用了shaokun11114进行部署  </li>
-<li>终于能够写数据到链上了<img src="/img_eos1/eos11.png" alt="eos">   </li>
-<li><a href="https://github.com/shaokun11/eoslearning/tree/eos-dve4-update" target="_blank" rel="noopener">更新的合约源码</a>，这次就没有更新前端的mock数据了，相信聪明的你一定知道怎样调整过来</li>
-</ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#107;&#117;&#x6e;&#105;&#x6e;&#103;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#107;&#117;&#x6e;&#105;&#x6e;&#103;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#x63;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#x6e;&#x79;&#64;&#49;&#54;&#x33;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#x6e;&#x79;&#64;&#49;&#54;&#x33;&#x2e;&#99;&#x6f;&#109;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"><br>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#111;&#107;&#x75;&#110;&#105;&#110;&#x67;&#x40;&#103;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#111;&#107;&#x75;&#110;&#105;&#110;&#x67;&#x40;&#103;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#109;</a></p>
 
           
         
