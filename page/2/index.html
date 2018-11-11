@@ -233,6 +233,242 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/02/关于bancor的理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/02/关于bancor的理解/" itemprop="url">带你以通俗易懂的小例子了解bancor</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-02T14:33:22+08:00">
+                2018-10-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h5 id="bancor的简单概述"><a href="#bancor的简单概述" class="headerlink" title="bancor的简单概述"></a>bancor的简单概述</h5><blockquote>
+<p>bancor是一种算法用于区块链的一种新的token的交易方式，目的是解决长尾的问题，增加ERC20的流通。长尾简单理解就是99%和1%的关系，即1%的token在大家的认知中有实际价值，而99%的token是没有的。那么通过bancor协议就是可以解决这99%的token，也可以给一个机会，让他们也有实际的价值。<br>具体可访问<a href="https://github.com/bancorprotocol/contracts" target="_blank" rel="noopener">bancor github repo</a>，这里有详细的介绍和白皮书</p>
+</blockquote>
+<h5 id="bancor名词展示"><a href="#bancor名词展示" class="headerlink" title="bancor名词展示"></a>bancor名词展示</h5><p><em>以下资料来自网络</em>  <strong>start</strong></p>
+<p>Token的供应量【Smart Token’s Supply】，简称Supply；</p>
+<p>Token的价格【Smart Token’s Price 】，简称Price；</p>
+<p>Token的总市值【Smart Token’s Total Value】，简称TotalValue；</p>
+<p>储备金余额【Connector Balance】，简称Balance；</p>
+<p>储备金固定比率【Connector Weight】，简称CW。</p>
+<p>计算公式如下：</p>
+<pre><code>CW = Balance / TotalValue;
+
+TotalValue = Price * Supply;
+
+Price = Balance /（Supply * CW）
+</code></pre><p>举例：若当前AToken的发行量为1000，报价为0.5个ETH兑换1个AToken，那么AToken的总价值为500个ETH，但是储备金余额可能并没有500个ETH，比如为250个ETH，那么CW则为0.5（50%)  </p>
+<p>Token买入计算公式：</p>
+<pre><code>Token_Return = Supply *（（1 + ETH_Amount / Balance）^ CW - 1）
+//此公式的证明可以通过查看白皮书
+</code></pre><blockquote>
+<p>例如 若当前AToken的发行量为1000，储备金余额为250个ETH，CW为0.5，那么当前的报价则为0.5个ETH兑换1个AToken；现在Bob想花750个ETH购买AToken，带入公式：Token_Return = 1000 *（（1 + 750 / 250）^ 0.5 - 1）= 1000</p>
+</blockquote>
+<blockquote>
+<p>即Bob花了750个ETH购买了1000个AToken，本次购买的平均价格为0.75个ETH兑换1个AToken。<br>Bob的购买行为推高了AToken的报价。若Bob接着购买同样数量的AToken，则需要付出更多的ETH代价，每一笔购买都会继续推高AToken的报价。</p>
+</blockquote>
+<p>Token卖出计算公式：</p>
+<pre><code>ETH_Return = Balance *（1 - （1 - Token_Amount / Supply）^ （1 / CW））
+</code></pre><blockquote>
+<p>在Bob的那笔交易完成后，AToken的发行总量为2000个，储备金余额为1000个ETH，CW维持不变、仍然为0.5，那么通过公式可以计算当前的报价为1个ETH兑换1个AToken；现在Alice想卖掉1000个AToken，带入公式：ETH_Return = 1000 *（1 - （1 - 1000 / 2000）^ （1 /0.5））= 750</p>
+</blockquote>
+<blockquote>
+<p>即Alice 卖掉了1000个AToken，获得了750个ETH，本次购买的平均价格为0.75个ETH兑换1个AToken。因为Bob的购买行为推高了AToken的报价，而Alice是在Bob的购买行为之后卖掉了AToken，所以Alice卖到了相对较高的价位。假如没有Bob的购买行为，回到AToken的供应量为1000的那个时候，Alice卖掉全部的AToken，也只能获得250个ETH  </p>
+</blockquote>
+<p>智能代币(Smart Tokens)</p>
+<blockquote>
+<p>智能代币是Bancor协议的核心。它们的运作类似于常规代币，在ETH区块链上使用的符合ERC20标准[5]，但也要包含额外的逻辑，即允许用户通过它的智能合约直接购买和出售代币，价格通过程序自动调整以反映供求关系。实际上，智能代币拥有一种内置的流动性机制，确保它们可以持续地为兑换为其他代币。  </p>
+</blockquote>
+<p>智能代币连接器(Smart Token connectors)  </p>
+<blockquote>
+<p>智能代币连接器可以被视为分布式、自主、透明和可预测的做市商，而不是交易所。智能代币通过程序自动调整它们的价格，来管理它们的连接器准备金，以保持它们与智能代币的总市值之间的比率是恒定的。<br>锚定代币(connected token)<br>每个智能代币都配置了连接器模块，这些模块持有它连接的另一个代币作为准备金（例如，BNT智能代币有一个连接到ETH的连接器，它持有ETH作为准备金）。ETH此时就是连接器代币。</p>
+</blockquote>
+<p>代币网络(token network)</p>
+<blockquote>
+<p>智能代币可以实现自己和它们的连接代币之间进行即时兑换。这个功能足以使智能代币即时兑换为一定数量的以类似的方式连接到同一网络的任何其他代币。通过这种方式，智能代币可以连接到无限数量的代币，从而创建一个分布式的流动性网络，该网络可能由数百万个代币组成，这些代币都可以以不断计算的价格自动地相互兑换。</p>
+</blockquote>
+<p>中继代币(Relay Token)  </p>
+<blockquote>
+<p>具有两个连接器的智能代币，其总CW恰好为100%，其功能类似于分布式代币兑换币对。中继代币允许用户在两个连接代币之间互相兑换，通过两步操作实现，即购买一种代币，立即出售另外一种代币。</p>
+</blockquote>
+<p>流动性代币(Liquid Tokens)</p>
+<blockquote>
+<p>具有组合连接器总权重低于100%（更典型的低于20%）的智能代币成为流动性代币。可能有一个或者多个连接器。例如，BTN具有单个权重为10%的ETH连接器。流动性代币可以使用连接器代币买卖（使用Bancor公式计算它相对于连接代币的价格），并且可以自适应调节供应量，在购买时增加，出售时减少。  </p>
+</blockquote>
+<p>代理代币(Proxy Token)</p>
+<blockquote>
+<p>具有一个连接器占100%权重的智能代币。</p>
+</blockquote>
+<p>组合代币(Array Token)</p>
+<blockquote>
+<p>具有三个或者更多连接器权重为100%的智能代币。</p>
+</blockquote>
+<p>糖果代币(Bounty Tokens)</p>
+<blockquote>
+<p>具有单个尚未激活连接器的智能代币（当前连接器准备金为0），可以向早起持有者（例如社区支持者）发放将来会发行的代币。</p>
+</blockquote>
+<p>网络代币(Network Tokens)</p>
+<blockquote>
+<p>由多个(&gt;2)智能代币持有作为连接代币的智能代币,BNT就是一个网络代币，也是一个流动性代币。</p>
+</blockquote>
+<p>交易者</p>
+<blockquote>
+<p>持有、兑换和支付智能代币的终端用户</p>
+</blockquote>
+<p>智能代币发行者</p>
+<blockquote>
+<p>发行智能代币，配置初始供应量、价格、连接器权重CW和管理智能代币初始发行的人员、公司、社区、组织或基金会。还包括将现有ERC20代币连接到Bancor网络的中继代币的创建者。</p>
+</blockquote>
+<p>资产代币化者</p>
+<blockquote>
+<p>将代理代币或者组合代币映射到实体资产或者其他区块链上代币的创建者。这允许智能代币连接到更广泛的资产，如比特币、法定货币、黄金或其他新兴的区块链代币。</p>
+</blockquote>
+<p>套利者</p>
+<blockquote>
+<p>监控Bancor流动性网络与外部交易所或者其他智能代币的价格，并且通过套利消除价差的交易者。套利者通过消除价差获得奖励，因此是Bancor生态系统的重要参与者。 </p>
+</blockquote>
+<p><strong><em>end</em></strong></p>
+<h5 id="我之理解"><a href="#我之理解" class="headerlink" title="我之理解"></a>我之理解</h5><pre><code>cw的理解可以参考很那张很经典的图
+cw&lt;50%:price与supply的变化可理解为指数函数y = x^N 的形式变化
+cw=50%:price与supply的变化可理解为一次函数y = ax (a&gt;0)的形式变化
+cw&gt;50%:price与supply的变化可理解为对数函数y = y=logN(x)的形式变化
+cw=100%:price与supply的变化可理解为常数函数y = x的形式变化  
+</code></pre><ol>
+<li>我发行一个smart token（暂且叫sk）,总量1000个 ，即supply= 1000 sk</li>
+<li>预估一下我这个项目的价值，暂且估计价值1000个eth ，即TotalValue = 1000 eth</li>
+<li>而我只有100个eth,那作为储备金，剩余的向大家融资吧,即balance = 100 eth</li>
+<li>设定cw = 10%，</li>
+<li>根据算法，得到price = 1 sk/eth，</li>
+<li>到此，可理解为我用100eth以单价为10买了1000 sk,</li>
+<li>使用100 eth买入，根据买入公式，得到(（1+（100/100））^0.1 - 1) <em> 1000= 0.0718 </em>  1000 = 71.8个sk，</li>
+<li>当执行上笔交易后，cw是不会变得，其余的会动态调整。那么此时的sk supply = 1071.8 sk,balance = 200 eth，price = 1.866 sk / eth</li>
+<li>这里可以看到买入100个后，一个sk价值1.866个eth,价格上涨了呢。这里有兴趣的同学可以试试连续分批次买10次，每次10个eth，可以看到价格的变化,最终的结果也是一样的，这就是bancor算法保证的结果</li>
+<li>再继续使用100eth买入，根据买入公式，得到(（1+（100/200））^0.1 - 1) <em> 1071.8= 0.0414 </em>  1071.8 = 44.37个sk，这样后来买的价格就比之前的高了，获得的sk就会少，也就是价格高了</li>
+<li>supply = 1116.7 sk,balance = 300 eth，price = 26.86 sk/eth 单价已经翻了20倍了</li>
+<li>卖出50 sk，根据卖出公式 300 *（1 - 50/1116.7）^(1/0.1) = 189.7488 eth   </li>
+<li>额，初始值设定的不恰当，整个流程算出来的结果有点恐怖，有兴趣的同学可以按照流程调整一下初始值哈0.0</li>
+<li>这里可能有同学会问了，我刚使用100eth获得44个sk,我马上又卖出50个sk可以得到189个eth，大赚了啊。理论上是成立的，但是你得保证你这两个操作中间没有其他人的卖出哈（买入你就赚得越多），其他人卖出之后，你再去卖价格就低了，所以得自己评估风险哦  </li>
+</ol>
+<p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
+<p>小结：</p>
+<ul>
+<li>控制cw的变化，可以控制token的价格的走势</li>
+<li>买入,会提高smart token的价格，卖出会降低smart token的价格，具体变化由cw的决定</li>
+<li>缺点：这些数据都是采用智能合约编写的，无法改变。但是项目方可以更改cw的值，从而控制整个token的价格走势</li>
+<li>优点：你如果持有smart token是可以随时和储备金类型的token进行买卖的。这都是由智能合约自动执行，这点可以相对于传统的1co有着更好的安全，至少你持有的token有着更好的流通性，随时都可以流通，也可以换取其他的token或者储备金的token  </li>
+</ul>
+<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
+<h5 id="资料更新-2018-10-13-15-50-20"><a href="#资料更新-2018-10-13-15-50-20" class="headerlink" title="资料更新 2018-10-13 15:50:20"></a>资料更新 2018-10-13 15:50:20</h5><p>更新一下，这里补上bancor的经典cw图，便于大家理解。<br><img src="/bancor/bancor.png" alt="cw"><br>根据这张图中的曲线，那么你所持有的币的价值就是等于曲线上任意两点作x轴 所形成的面积。所以任何一点点的买入卖出都会影响整个智能代币的价格<br>另外附上bancor的白皮书<br><a href="https://storage.googleapis.com/website-bancor/2018/04/01ba8253-bancor_protocol_whitepaper_en.pdf" target="_blank" rel="noopener">bancor 白皮书 英文版</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/19/ERC998接口的理解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -355,7 +591,7 @@ function transferToParent(address _from, address _toContract, uint256 _toTokenId
 <h5 id="ERC998实际运用"><a href="#ERC998实际运用" class="headerlink" title="ERC998实际运用"></a>ERC998实际运用</h5><p><a href="https://www.bitguild.com/presale/bitizens" target="_blank" rel="noopener">Bitizens</a>在这里，你可以找到第一个基于ERC998创建的一款3D游戏，你可以免费创建一个只属于你自己的bitizen.</p>
 <h5 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h5><p>这篇文章仅仅分析了ERC998的标准接口，当然其中也涉及到ERC721和ERC20的一些知识，希望能够给将要进入dapp的开发者提供一点点帮助。</p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"><br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#107;&#117;&#x6e;&#105;&#x6e;&#103;&#64;&#x67;&#109;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#107;&#117;&#x6e;&#105;&#x6e;&#103;&#64;&#x67;&#109;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#107;&#x75;&#110;&#110;&#121;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#110;&#121;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"><br>email_1: <a href="mailto:&#115;&#104;&#x61;&#x6f;&#x6b;&#x75;&#x6e;&#x69;&#x6e;&#x67;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#x6f;&#x6b;&#x75;&#x6e;&#x69;&#x6e;&#x67;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#111;&#109;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -441,7 +677,7 @@ function transferToParent(address _from, address _toContract, uint256 _toTokenId
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
