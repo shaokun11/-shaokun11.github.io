@@ -233,6 +233,336 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/15/基于eos连接scatter开发dapp(下) 续/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/15/基于eos连接scatter开发dapp(下) 续/" itemprop="url">学习eos dapp开发，看这篇就够了（下）续</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-15T20:38:55+08:00">
+                2018-11-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="eos智能合约开发-前言"><a href="#eos智能合约开发-前言" class="headerlink" title="eos智能合约开发 前言"></a>eos智能合约开发 前言</h4><p><a href="https://shaokun11.github.io/2018/10/14/%E5%9F%BA%E4%BA%8Eeos%E8%BF%9E%E6%8E%A5scatter%E5%BC%80%E5%8F%91dapp(%E4%B8%8B" target="_blank" rel="noopener">学习eos dapp开发，看这篇就够了（下）</a>/)</p>
+<blockquote>
+<p>因为有阅读这个系列的朋友没看到源码，而我又把之前的源码给删掉了。那我也只好按照我的教程重新写一遍了。本以为copy后就能用，而当时写的时候所使用的旧版的语法，所以改了改，功能不变。<br>本篇文章的代码是使用的cdt1.3.2编译的</p>
+</blockquote>
+<h4 id="eos智能合约开发-结果展示"><a href="#eos智能合约开发-结果展示" class="headerlink" title="eos智能合约开发 结果展示"></a>eos智能合约开发 结果展示</h4><blockquote>
+<p>功能有添加todo,删除todo,和完成todo，具体看图  </p>
+</blockquote>
+<p><img src="/img_eos/eos_react7.gif" alt="scatter"></p>
+<h4 id="eos智能合约开发-源码展示"><a href="#eos智能合约开发-源码展示" class="headerlink" title="eos智能合约开发 源码展示"></a>eos智能合约开发 源码展示</h4><blockquote>
+<p>这就是最简单的页面了，希望你阅读起来不会有任何问题，项目你直接clone下来可以直接运行的  </p>
+</blockquote>
+<p>[学习eos dapp开发，看这篇就够了（下）续 源码]<br>(<a href="https://github.com/shaokun11/eos-todolist" target="_blank" rel="noopener">https://github.com/shaokun11/eos-todolist</a>)</p>
+<p><code>App.js</code></p>
+<pre><code>import React, { Component } from &apos;react&apos;;
+import &apos;./App.css&apos;;
+import ScatterJS from &apos;scatterjs-core&apos;;
+import ScatterEOS from &apos;scatterjs-plugin-eosjs&apos;;
+import Eos from &apos;eosjs&apos;;
+
+ScatterJS.plugins( new ScatterEOS());
+
+
+const network = {
+    blockchain:&apos;eos&apos;,
+    protocol:&apos;http&apos;,
+    host:&apos;jungle.cryptolions.io&apos;,
+    port:18888,
+    chainId:&apos;038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca&apos;
+}
+
+class App extends Component {
+
+   state = {
+       deleteId:1,
+       rows:[],
+       competedId:1,
+       scatter:null
+  }
+
+    componentDidMount() {
+        setTimeout(() =&gt; {
+            this.init()
+        }, 2000)
+    }
+
+    takeAction(action,params){
+       console.log(action,params)
+        const requiredFields = { accounts:[network] };
+        this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
+            const account = this.state.scatter.identity.accounts.find(x =&gt; x.blockchain === &apos;eos&apos;);
+            console.log(account)
+            const eosOptions = { expireInSeconds:60 };
+            const eos = this.state.scatter.eos(network,Eos,eosOptions);
+            const transactionOptions = { authorization:[`${account.name}@${account.authority}`] };
+             eos.contract(&quot;shaokun11113&quot;).then(ins =&gt; {
+                return ins[action](account.name, ...params, transactionOptions)
+            }).then(res =&gt; {
+                console.log(res);
+            }).catch(error =&gt; {
+                console.error(error);
+            });
+
+        }).catch(error =&gt; {
+            console.error(&quot;tack action&quot;,error);
+        });
+    }
+
+    init() {
+        ScatterJS.scatter.connect(&apos;todolist&apos;).then(connected =&gt; {
+            if(!connected) return false;
+
+            const scatter = ScatterJS.scatter;
+            this.setState({
+                scatter
+            });
+            alert(&quot;scatter load success&quot;)
+        }).then(err=&gt;{
+          console.log(err)
+        });
+    }
+
+    showTodo(){
+        this.state.scatter.eos(network,Eos).getTableRows({code: &quot;shaokun11113&quot;, scope: &quot;shaokun11113&quot;,table: &quot;tood&quot;, json: true})
+        .then(res=&gt;{
+            this.setState({
+                rows:res.rows
+            })
+        })
+    }
+
+    render() {
+    return (
+        &lt;div&gt;
+
+            &lt;div&gt;
+                &lt;button onClick={() =&gt; {
+                    const num = Math.floor(Math.random() * 100000);
+                    this.takeAction(&quot;create&quot;,[num,&quot;this is number &quot;+num])
+                }}&gt;create todo&lt;/button&gt;
+                &lt;button onClick={() =&gt; this.takeAction(&quot;destroy&quot;,[this.state.deleteId])}&gt;destroy todo&lt;/button&gt;
+                &lt;input type=&quot;text&quot; onChange={e =&gt; {
+                    this.setState({
+                        deleteId: Number.parseInt(e.target.value)
+                    })
+                }}/&gt;
+
+                &lt;button onClick={() =&gt; this.takeAction(&quot;complete&quot;,[this.state.competedId])}&gt;complete todo&lt;/button&gt;
+                &lt;input type=&quot;text&quot; onChange={e =&gt; {
+                    this.setState({
+                        competedId: Number.parseInt(e.target.value)
+                    })
+                }}/&gt;
+                &lt;button onClick={() =&gt; this.showTodo()}&gt;show todo&lt;/button&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;p&gt;below is data&lt;/p&gt;
+                &lt;ul&gt;
+                    {
+                        this.state.rows.map((todo, index) =&gt; {
+                            return &lt;li key={index}&gt;
+                                &lt;p&gt;id : {todo.id}&lt;/p&gt;
+                                &lt;p&gt;description : {todo.description}&lt;/p&gt;
+                                &lt;p&gt;completed : {todo.completed}&lt;/p&gt;
+                            &lt;/li&gt;
+                        })
+                    }
+                &lt;/ul&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+  }
+}
+
+export default App;
+</code></pre><p><code>todolist.cpp</code></p>
+<pre><code>include &lt;eosiolib/eosio.hpp&gt;  
+
+using namespace std;
+
+class [[eosio::contract]] todolist : public eosio::contract {  
+  public:
+
+  todolist(eosio::name reciever, eosio::name code, eosio::datastream&lt;const char*&gt; ds)
+                                                        :contract(reciever,code,ds),
+                                                         todos(reciever,code.value){};   
+
+
+  [[eosio::action]]   
+  void create(eosio::name author, const uint32_t id, const string&amp; description) {
+    todos.emplace(author, [&amp;](auto &amp;new_todo) {
+        new_todo.id = id;
+        new_todo.description = description;
+        new_todo.completed = 0;
+    });
+   }
+
+  [[eosio::action]]
+  void complete(eosio::name author,const uint32_t id)
+  {  
+      eosio::require_auth(author);
+
+      auto itr = todos.find(id);
+      // 是否用find()方法，去查找这条方法对应的实例
+      eosio_assert(itr != todos.end(), &quot;todo does not exit&quot;);
+    // 这里 如果找不到，todos.end() 会返回 null
+      todos.modify(itr,author,[&amp;](auto &amp;t) {
+          t.completed = 1;
+      });
+  }
+
+  [[eosio::action]]
+  void destroy(eosio::name author, const uint32_t id){    
+     eosio::require_auth(author);
+      auto itr = todos.find(id);
+      if(itr != todos.end()){
+         todos.erase(itr);
+      }
+  }
+
+  private:
+  struct [[eosio::table]] todo {
+      uint64_t id;
+      string description;
+      uint64_t completed;
+
+      uint64_t primary_key() const {
+          return id;
+      }
+  };
+
+  typedef eosio::multi_index&lt;&quot;tood&quot;_n, todo&gt; todo_index;
+  todo_index todos;
+};
+
+EOSIO_DISPATCH(todolist, (create)(complete)(destroy))
+</code></pre><blockquote>
+<ul>
+<li>这里有一点要说明，貌似一个账号只能部署一个智能合约，希望这个结论是正确的</li>
+<li>上面的todo这个table，由于我的笔误，生成表名的时候写成了 tood,哈哈</li>
+<li>合约比较简单了，交互也比较简单，细心点，仔细点，相信你也可以步入eos dapp开发的大门了</li>
+</ul>
+</blockquote>
+<h4 id="eos智能合约开发-总结"><a href="#eos智能合约开发-总结" class="headerlink" title="eos智能合约开发 总结"></a>eos智能合约开发 总结</h4><blockquote>
+<ul>
+<li>请一定耐心的看完文章，中间漏了一点也会造成失败  </li>
+<li>最开始的文章截图使用的分辨率较高，图片显示较大，如若对你阅读造成阅读困难，可以适当缩小页面进行阅读</li>
+</ul>
+</blockquote>
+<p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#97;&#111;&#107;&#117;&#x6e;&#105;&#110;&#103;&#64;&#103;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#97;&#111;&#107;&#117;&#x6e;&#105;&#110;&#103;&#64;&#103;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#49;&#x36;&#51;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#49;&#x36;&#51;&#46;&#99;&#111;&#x6d;</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/11/eos dapp开发 官方教程学习7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -387,7 +717,7 @@ void cardgame::endgame(eosio::name user) {
 <p>目前我的文章基本上都是比较简单的demo或者概念性的文章，这样看多了也没有意思，我写着也觉得没有意思了。所以接下来准备找一些具有代表性的基于以太坊，波场和eos合约与大家分享了。</p>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#x61;&#x6f;&#107;&#117;&#110;&#x69;&#110;&#x67;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x68;&#x61;&#x6f;&#107;&#117;&#110;&#x69;&#110;&#x67;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#x75;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#46;&#99;&#x6f;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#x6b;&#117;&#110;&#x69;&#110;&#103;&#64;&#x67;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#x6b;&#117;&#110;&#x69;&#110;&#103;&#64;&#x67;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#x75;&#110;&#110;&#121;&#64;&#x31;&#x36;&#51;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#110;&#121;&#64;&#x31;&#x36;&#51;&#46;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -691,7 +1021,7 @@ EOSIO_DISPATCH(cardgame,(login)(startgame)(playcard))
 <li><a href="https://github.com/shaokun11/eoslearning/tree/eos-dve4-update" target="_blank" rel="noopener">更新的合约源码</a>，这次就没有更新前端的mock数据了，相信聪明的你一定知道怎样调整过来</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#97;&#x6f;&#107;&#x75;&#110;&#x69;&#x6e;&#103;&#64;&#x67;&#109;&#97;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x68;&#97;&#x6f;&#107;&#x75;&#110;&#x69;&#x6e;&#103;&#64;&#x67;&#109;&#97;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#97;&#x6f;&#x6b;&#x75;&#110;&#105;&#110;&#103;&#64;&#103;&#109;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x68;&#97;&#x6f;&#x6b;&#x75;&#110;&#105;&#110;&#103;&#64;&#103;&#109;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#99;&#111;&#x6d;</a></p>
 
           
         
@@ -1022,7 +1352,7 @@ void cardgame::draw_one_card(vector&lt;uint8_t&gt; &amp;deck,vector&lt;uint8_t&g
      deck.erase(deck.began() + deck_card_index);
  }
 </code></pre><h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#x61;&#x6f;&#x6b;&#117;&#x6e;&#x69;&#x6e;&#103;&#64;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x68;&#x61;&#x6f;&#x6b;&#117;&#x6e;&#x69;&#x6e;&#103;&#64;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#109;</a><br>email_2: <a href="mailto:&#115;&#107;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#x33;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#x33;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#97;&#111;&#x6b;&#117;&#x6e;&#x69;&#110;&#103;&#x40;&#x67;&#109;&#x61;&#105;&#x6c;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#104;&#97;&#111;&#x6b;&#117;&#x6e;&#x69;&#110;&#103;&#x40;&#x67;&#109;&#x61;&#105;&#x6c;&#x2e;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -1251,7 +1581,7 @@ export default ApiService;
 <li>第三课  更改上课的错误，连接合约，增加新的展示界面</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#x61;&#111;&#107;&#x75;&#110;&#105;&#110;&#x67;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x68;&#x61;&#111;&#107;&#x75;&#110;&#105;&#110;&#x67;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#46;&#x63;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#107;&#117;&#110;&#110;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#110;&#110;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#x61;&#111;&#x6b;&#117;&#110;&#x69;&#x6e;&#103;&#x40;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x68;&#x61;&#111;&#x6b;&#117;&#110;&#x69;&#x6e;&#103;&#x40;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#x63;&#111;&#109;</a><br>email_2: <a href="mailto:&#115;&#107;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -1426,7 +1756,7 @@ user_info =&gt; userinfo
 <p>总算完成了之前的坑。^o^<br>中间有很多前端的知识，这不是这个课程讲解的重点，只能靠各位同学自己去补习了。这个系列使用react，redux也是一个很庞大的工程，所以可以简单一点，展示一下交互就好。<br>应该说到此，区块链与前端的交互已经完成，接下来就是充实智能合约的功能了。如果你做到了这一步，建议去<a href="https://developers.eos.io/eosio-cpp/reference" target="_blank" rel="noopener">eos c++ api</a>这里了解一下api，这样对于后面的合约编写会有一个更深层次的掌握</p>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#x6f;&#x6b;&#117;&#110;&#x69;&#110;&#x67;&#64;&#103;&#109;&#x61;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#x6f;&#x6b;&#117;&#110;&#x69;&#110;&#x67;&#64;&#103;&#109;&#x61;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#107;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#x61;&#x6f;&#107;&#x75;&#110;&#105;&#110;&#x67;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x68;&#x61;&#x6f;&#107;&#x75;&#110;&#105;&#110;&#x67;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#117;&#110;&#110;&#121;&#x40;&#x31;&#54;&#x33;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#117;&#110;&#110;&#121;&#x40;&#x31;&#54;&#x33;&#46;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1577,7 +1907,7 @@ user_info =&gt; userinfo
 <h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>这篇文章写的很不顺，没有完成最关键的上链一步给大家演示，真是抱歉了。那么只能够走思路了。附上本篇文章所用到的源码 <a href="https://github.com/shaokun11/eoslearning/tree/eos-dev02" target="_blank" rel="noopener">elementel battels dev2</a></p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#107;&#117;&#x6e;&#x69;&#110;&#x67;&#64;&#103;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#107;&#117;&#x6e;&#x69;&#110;&#x67;&#64;&#103;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#51;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#51;&#46;&#99;&#111;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#x61;&#111;&#x6b;&#117;&#x6e;&#x69;&#x6e;&#x67;&#x40;&#103;&#x6d;&#97;&#x69;&#x6c;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#104;&#x61;&#111;&#x6b;&#117;&#x6e;&#x69;&#x6e;&#x67;&#x40;&#103;&#x6d;&#97;&#x69;&#x6c;&#46;&#x63;&#111;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#x33;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#x33;&#x2e;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -1732,7 +2062,7 @@ gameplay.cpp  // 包含智能合约中使用的内部帮助函数的C++源文件
 <h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>额，第0课和第一课就到这里结束了，可以看到和我们之前的流程是类似的。同样需要你掌握web和c++的知识，这些知识点都可以通过网络找到，需要自己积累。<br>第0课主要讲解了eosio开发环境的搭建，自备梯子很重要<br>第1课主要讲解的整个项目的结构</p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#x61;&#x6f;&#107;&#117;&#x6e;&#105;&#x6e;&#x67;&#64;&#x67;&#109;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x68;&#x61;&#x6f;&#107;&#117;&#x6e;&#105;&#x6e;&#x67;&#64;&#x67;&#109;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#x6f;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#97;&#x6f;&#107;&#117;&#110;&#105;&#x6e;&#x67;&#64;&#103;&#109;&#x61;&#105;&#x6c;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#x68;&#97;&#x6f;&#107;&#117;&#110;&#105;&#x6e;&#x67;&#64;&#103;&#109;&#x61;&#105;&#x6c;&#x2e;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#107;&#x75;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -2151,7 +2481,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
 </ul>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#97;&#x6f;&#x6b;&#117;&#x6e;&#x69;&#110;&#103;&#64;&#x67;&#109;&#97;&#105;&#108;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x68;&#97;&#x6f;&#x6b;&#117;&#x6e;&#x69;&#110;&#103;&#64;&#x67;&#109;&#97;&#105;&#108;&#46;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#49;&#54;&#51;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#49;&#54;&#51;&#x2e;&#99;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#x61;&#x6f;&#107;&#x75;&#110;&#105;&#110;&#103;&#x40;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#x6f;&#107;&#x75;&#110;&#105;&#110;&#103;&#x40;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#110;&#110;&#121;&#64;&#49;&#x36;&#x33;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#110;&#121;&#64;&#49;&#x36;&#x33;&#46;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -2292,203 +2622,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <p><strong>这样一点点的敲下来，内容还是蛮多的。本打算一次写完，结果遇到网络的问题，暂停了一会，这篇文章算是对第一篇的补充吧。到目前为止，我们只是创建好了账户，还没有涉及到dapp的开发，接下来的具体怎么开发dapp估计要等到下周了吧。</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#97;&#x6f;&#x6b;&#117;&#110;&#105;&#110;&#x67;&#64;&#x67;&#109;&#x61;&#x69;&#x6c;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x68;&#97;&#x6f;&#x6b;&#117;&#110;&#105;&#110;&#x67;&#64;&#x67;&#109;&#x61;&#x69;&#x6c;&#46;&#x63;&#111;&#109;</a><br>email_2: <a href="mailto:&#x73;&#107;&#117;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#x6f;&#x6d;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/13/基于eos连接scatter开发dapp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/13/基于eos连接scatter开发dapp/" itemprop="url">学习eos dapp开发，看这篇就够了（上）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-13T15:14:24+08:00">
-                2018-10-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="eos安装-方式1"><a href="#eos安装-方式1" class="headerlink" title="eos安装 方式1"></a>eos安装 方式1</h4><p><a href="https://developers.eos.io/eosio-home/docs/setting-up-your-environment" target="_blank" rel="noopener">eos安装1</a><br>这是eos官网推荐的安装方式。</p>
-<p>官网推荐docker，可以减少不必要的麻烦 ，而且步骤超级详细，超级详细，要是安装不成功的话，请确认是否使用mac电脑或者官网推荐的其他操作系统，千万不要使用Windows系统来玩eos,因为官方说过不支持的哈。</p>
-<h4 id="eos安装-方式2"><a href="#eos安装-方式2" class="headerlink" title="eos安装 方式2"></a>eos安装 方式2</h4><p><a href="https://developers.eos.io/eosio-nodeos/docs/getting-the-code" target="_blank" rel="noopener">eos 安装2</a> </p>
-<pre><code>git clone https://github.com/EOSIO/eos --recursive
-cd eos
-./eosio_build.sh
-./eosio_install.sh
-// 从源码编译 准备好梯子很重要
-</code></pre><h4 id="eoscdt安装"><a href="#eoscdt安装" class="headerlink" title="eoscdt安装"></a>eoscdt安装</h4><p><a href="https://developers.eos.io/eosio-home/docs/installing-the-contract-development-toolkit" target="_blank" rel="noopener">eosio.cdt 安装1</a> 这里遵循官网的步骤</p>
-<pre><code>git clone --recursive https://github.com/eosio/eosio.cdt --branch     v1.2.1 --single-branch
-cd eosio.cdt 
-./build.sh eos
-sudo ./install.sh
-//这是新的生成wasm 和 abi的工具，以后官方会维护的，之前方式会在后续被移除 
-</code></pre><p><a href="https://developers.eos.io/eosio-home/docs/installing-the-contract-development-toolkit" target="_blank" rel="noopener">eosio.cdt 安装2</a> 这里是最新的步骤</p>
-<h4 id="eos安装-方式总结"><a href="#eos安装-方式总结" class="headerlink" title="eos安装 方式总结"></a>eos安装 方式总结</h4><p>简单，超级简单。<br>但是，受限于我们得环境，自备梯子是成功的第一步，第二步就是要一个适合的硬件，两者缺一不可。</p>
-<h4 id="eos智能合约开发-开发体会"><a href="#eos智能合约开发-开发体会" class="headerlink" title="eos智能合约开发 开发体会"></a>eos智能合约开发 开发体会</h4><p>最好的学习资料就是官方提供的资料了，而且eos官方的资料具详细，在此送上<br><a href="https://developers.eos.io/" target="_blank" rel="noopener">eos官网</a></p>
-<p>安装不是我要说的重点，过程艰辛就不说了，有问题Google或者度娘吧，我这里主要想要与大家分享的是如何使用scatter连接eos的测试网或者主网进行dapp的开发。  </p>
-<p>上面的环境安装了可以启动本地的节点来进行测试，官网也是如此，而现在我能够搜索到的文章基本上也是基于本地节点使用命令行来进行开发，这样只能保证你学习开发eos的流程，但是具体怎样开发dapp你可能还是不清楚，因为你不知道如何连接scatter，如何与智能合约进行交互，所以这篇文章重点解决的问题是在这里。</p>
-<p>这里再区分一下钱包开发和dapp的开发。钱包开发需要用户提供他的私钥给你，或者你创建好给用户。而我们此处所要使用的是官方的钱包scatter来进行开发dapp，不需要用户提供私钥给我们，他只需要接入官方提供的scatter就好，如果你有以太坊的经验，这就是metamask</p>
-<h4 id="eos智能合约开发-scatter安装"><a href="#eos智能合约开发-scatter安装" class="headerlink" title="eos智能合约开发 scatter安装"></a>eos智能合约开发 scatter安装</h4><p>scatter，官方提供的eos钱包，这样用户才会放心把他们的密钥放进去，所以先安装它吧<br>scatter是chrome的插件，所以你先得安装它<a href="https://www.google.com/chrome/" target="_blank" rel="noopener">chrome浏览器下载</a><br>接下来把scatter 插件安装上 <a href="https://chrome.google.com/webstore/search/scatter?hl=zh-CN" target="_blank" rel="noopener">scatter Chrome插件</a>  </p>
-<p><img src="/images/scatter00.png" alt="scatter"><br>搜索scatter安装就好，我这里是安装好的界面  </p>
-<ul>
-<li><img src="/images/scatter0.png" alt="scatter"><br>点击插件的scatter图标弹出如图界面，输入你的钱包密码然后点击生成钱包就好   </li>
-<li><img src="/images/scatter1.png" alt="scatter"><br>助记词，抄写下来吧，以后恢复钱包用的   </li>
-<li><img src="/images/scatter2.png" alt="scatter"><br>这里我选择skip basic setup，后续再来设置也是可行的  </li>
-<li><img src="/images/scatter3.png" alt="scatter"><br>这个界面，点击右上角的⚙图标  </li>
-<li><img src="/images/scatter4.png" alt="scatter"><br>这个界面，选择language，设置语言  </li>
-<li><img src="/images/scatter5.png" alt="scatter"><br>设置好后，切换回来，成功了  <h4 id="eos智能合约开发-使用scatter生成密匙对"><a href="#eos智能合约开发-使用scatter生成密匙对" class="headerlink" title="eos智能合约开发 使用scatter生成密匙对"></a>eos智能合约开发 使用scatter生成密匙对</h4></li>
-</ul>
-<ol>
-<li>经过以上的步骤，scatter已经安装好了，也就是我们创建了钱包，但是我们的钱包还没有内容的，为什么呢？这里我还是看看官网的这张图吧<br><img src="/images/eosio2.png" alt="eos钱包关系"></li>
-<li>基于上张图的方式，我们得创建一对密匙，那就按照接下来的方式做吧<ul>
-<li><img src="/images/scatter6.png" alt="scatter"><br>点击密匙对，点击新建</li>
-<li><img src="/images/scatter7.png" alt="scatter"><br>点击生成密匙对  </li>
-<li><img src="/images/scatter8.png" alt="scatter"><br>重点，记住这里的步骤不能省略<br>重点，记住这里的步骤不能省略<br>重点，记住这里的步骤不能省略<br>点击   复制  </li>
-<li><img src="/images/scatter9.png" alt="scatter"><br>新开一个文本文档，点击粘贴，这样就把生成好的密匙对保存下来了，待会要用的  </li>
-<li><img src="/images/scatter10.png" alt="scatter"><br>为这个密匙对取个名字，随便写，随意几好 </li>
-<li><img src="/images/scatter11.png" alt="scatter"><br>完成了这些步骤，你应该能够看到上面的信息，如果没有，就再从头来一遍了。<br>这样我们的密匙对就创建好了，但是只是在本地创建好了的啊，怎么连接到测试网络和主网络呢？  </li>
-</ul>
-</li>
-</ol>
-<h4 id="eos智能合约开发-设置scatter连接-jungle-test-net"><a href="#eos智能合约开发-设置scatter连接-jungle-test-net" class="headerlink" title="eos智能合约开发 设置scatter连接 jungle test net"></a>eos智能合约开发 设置scatter连接 jungle test net</h4><ul>
-<li><img src="/images/scatter5.png" alt="scatter net setting"><br>回到这个界面，选择设置图标，选择</li>
-<li><img src="/images/scatter12.png" alt="scatter net setting"><br>这个界面选择网络  </li>
-<li><img src="/images/scatter13.png" alt="scatter net setting"><br>这里可以看到已经有一个eos和eth的主网的网络节点，那么我们来把我们的测试网络的节点加入进去，点击右上角的新建  </li>
-<li><img src="/images/scatter14.png" alt="scatter net setting"><br>这个界面就是设置网络所需要的一些必要信息，我们一个一个来填  <ol>
-<li>由于我们是连接eos网络，所以这里第一项默认不变，下拉框可以选择eth,以后还可以支持tron</li>
-<li>名称： 随便写一个，你自己记得住就好  </li>
-<li>改成http,因为我们测试网络的endpoint就是用的这个协议，照改就好。</li>
-<li>域名或ip地址：jungle.cryptolions.io    </li>
-<li>端口 ：18888</li>
-<li>chaninId:  038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca</li>
-<li>如果你对以上填入的这些信息想知道为什么，那么可以补一下rpc协议，不想了解直接填入就好，以后就懂了  </li>
-</ol>
-</li>
-<li><img src="/images/scatter15.png" alt="scatter net setting"><br>按照上述的步骤填完后，信息如上，点击右上角保存  </li>
-<li><img src="/images/scatter16.png" alt="scatter net setting"><br>没有问题的话，会看到如上红框的显示内容，代表我们得测试网络已经设置好了</li>
-</ul>
-<h4 id="eos智能合约开发-在jungle测试网络上创建account"><a href="#eos智能合约开发-在jungle测试网络上创建account" class="headerlink" title="eos智能合约开发 在jungle测试网络上创建account"></a>eos智能合约开发 在jungle测试网络上创建account</h4><blockquote>
-<p>为什么要创建账户呢？这就是eos的一大特点。BM说，你创建了一个密匙对，谁记得住呢，所以就设计了一个这样的账户系统，这个账户 长12位，只能由a-z12345这些字符组成。简而言之，方便记忆。</p>
-</blockquote>
-<ul>
-<li><a href="http://jungle.cryptolions.io/#home" target="_blank" rel="noopener">jungle net account </a><br>打开jungle测试网络地址</li>
-<li><img src="/images/jungle1.png" alt="jungle net account "><br>来到jungle的主页，点击 Create Account  </li>
-<li><img src="/images/jungle2.png" alt="jungle net account ">  <ol>
-<li>Account name : 看清楚要求 <em>小写字母 加上12345，总共12个字符</em><br>这里我写作 shaokun11113</li>
-<li>owner public key : 将我们用scatter生成的那个密匙对的公钥填入这里</li>
-<li>active public key: 将我们用scatter生成的那个密匙对的公钥填入这里</li>
-<li>我这里用一对就好，在主网申请账号的时候建议使用两对密匙对。想要知道为什么？可以看看eos第二版的白皮书</li>
-</ol>
-</li>
-<li><img src="/images/jungle03.png" alt="jungle net account "><br>这次我就这样填写，然后人机验证，通过后点击左下角的create,确保网络质量优良  </li>
-</ul>
-<p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
-<p><strong>这里我的网络质量太差了。。。先写到这里，，， 请继续关注第二篇</strong>  </p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"><br>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#97;&#111;&#107;&#117;&#110;&#105;&#x6e;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#108;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x68;&#97;&#111;&#107;&#117;&#110;&#105;&#x6e;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#108;&#x2e;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#97;&#x6f;&#107;&#x75;&#x6e;&#105;&#110;&#x67;&#64;&#103;&#x6d;&#97;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#97;&#x6f;&#107;&#x75;&#x6e;&#105;&#110;&#x67;&#64;&#103;&#x6d;&#97;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -2574,7 +2708,7 @@ sudo ./install.sh
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
