@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言 相信各位同学看eos白皮书的权限看得很是头疼,而我能搜索到的例子基本上是官方的那个权限图再结合eos.token进行转账的权限介绍.如果不细心跟着走一遍,你是绝对不好理解这个权限怎么用的.由于我头脑比较笨,着实按照大佬的文章走了三四遍才大约摸索清楚,这里给自己做一个备忘录吧而我站在大佬的肩膀上,结合实际的操作给大家聊聊这个权限如何使用吧.这里主要参考的    EOS 权限管理之-权限的使用">
+<meta name="keywords" content="eos,eth,tron,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简单例子带你彻底的理解eos中的权限在dapp中如何使用">
+<meta property="og:url" content="http://yoursite.com/2018/11/17/eos 权限的理解/index.html">
+<meta property="og:site_name" content="hello shaokun">
+<meta property="og:description" content="前言 相信各位同学看eos白皮书的权限看得很是头疼,而我能搜索到的例子基本上是官方的那个权限图再结合eos.token进行转账的权限介绍.如果不细心跟着走一遍,你是绝对不好理解这个权限怎么用的.由于我头脑比较笨,着实按照大佬的文章走了三四遍才大约摸索清楚,这里给自己做一个备忘录吧而我站在大佬的肩膀上,结合实际的操作给大家聊聊这个权限如何使用吧.这里主要参考的    EOS 权限管理之-权限的使用">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/eospermission/per1.gif">
+<meta property="og:image" content="http://yoursite.com/eospermission/per2.gif">
+<meta property="og:image" content="http://yoursite.com/common/wx.png">
+<meta property="og:updated_time" content="2018-11-17T15:47:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="简单例子带你彻底的理解eos中的权限在dapp中如何使用">
+<meta name="twitter:description" content="前言 相信各位同学看eos白皮书的权限看得很是头疼,而我能搜索到的例子基本上是官方的那个权限图再结合eos.token进行转账的权限介绍.如果不细心跟着走一遍,你是绝对不好理解这个权限怎么用的.由于我头脑比较笨,着实按照大佬的文章走了三四遍才大约摸索清楚,这里给自己做一个备忘录吧而我站在大佬的肩膀上,结合实际的操作给大家聊聊这个权限如何使用吧.这里主要参考的    EOS 权限管理之-权限的使用">
+<meta name="twitter:image" content="http://yoursite.com/eospermission/per1.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/17/eos 权限的理解/"/>
+
+
+
+
+
+  <title>简单例子带你彻底的理解eos中的权限在dapp中如何使用 | hello shaokun</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">hello shaokun</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">hello friend, let us go to the world together</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/17/eos 权限的理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">简单例子带你彻底的理解eos中的权限在dapp中如何使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-17T21:15:01+08:00">
+                2018-11-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 浏览
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>相信各位同学看eos白皮书的权限看得很是头疼,而我能搜索到的例子基本上是官方的那个权限图再结合eos.token进行转账的权限介绍.如果不细心跟着走一遍,你是绝对不好理解这个权限怎么用的.由于我头脑比较笨,着实按照大佬的文章走了三四遍才大约摸索清楚,这里给自己做一个备忘录吧<br>而我站在大佬的肩膀上,结合实际的操作给大家聊聊这个权限如何使用吧.<br>这里主要参考的  </p>
+<ul>
+<li><a href="https://eosfans.io/topics/653" target="_blank" rel="noopener">EOS 权限管理之-权限的使用 (你绝对找不到的干货)</a>  <ul>
+<li><a href="https://bihu.com/article/293974" target="_blank" rel="noopener">EOS开发系列目录</a> 松果的文章都是根据源码分析的,建议开发dapp的同学都认真读几遍吧,这样更能帮助理解eos到底是怎样运行的</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h4 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
+<li><p>提前在测试网上申请两个账号,并领取测试币(不知道怎么做的可以翻看我前面的文章),我这里申请了两个.  </p>
+</li>
+<li><p>这次使用cleos操作,就不使用scatter操作了.原理一样.所以得把申请的这两个账号的私钥导入到cleos创建的钱包里面  </p>
+<pre><code>shaokun11121
+Private key: 5KFoeWx69fjPj7mTDbcD9JauYd9LLjikYTa9Qg7N5CVZTqZrzNG
+Public key: EOS69w5V46oUaBD5PSx3AMRxWXPi6b3St2PwbX9kBPY6tZvSs65o1
+
+shaokun11122
+Private key: 5HrJQ9eepF6FuG47eSJprxoFQ6PWRkombbWEwxoSQr6FJ1wQPbg
+Public key: EOS8ZZCicammR45b9tQUSU8VHqX4M8oFM89Cs8tFFWYgUGasegnnV
+</code></pre></li>
+</ul>
+<h4 id="以太坊权限的实现"><a href="#以太坊权限的实现" class="headerlink" title="以太坊权限的实现"></a>以太坊权限的实现</h4><blockquote>
+<p>这里先给贴一段简单的以太坊的权限的管理吧,这个要自己来写,如果你有以太坊的经验,相信更加容易理解.<br>理一理:</p>
+<ol>
+<li>部署合约,部署完成后,owner就是部署者的地址</li>
+<li>查看count的值,此时count为初始值1</li>
+<li>执行add方法</li>
+<li>查看count的值,此时count的值为2</li>
+<li>切换address</li>
+<li>执行add方法,报错,因为不是owner</li>
+<li>查看count的值 还是为2</li>
+<li>再次执行3,4步骤,此时count的值的值为3</li>
+</ol>
+</blockquote>
+<p> <img src="/eospermission/per1.gif" alt="eos"></p>
+<pre><code>pragma solidity ^0.4.24;
+
+contract Ownable {
+  address public owner;
+
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  modifier onlyOwner() {
+    require(msg.sender == owner);
+    _;
+  }
+}
+contract leranper is Ownable {
+
+    uint256 public count = 1;
+
+    function add() external onlyOwner  {
+       count += 1;
+    }
+}
+</code></pre><h4 id="eos的权限的实现"><a href="#eos的权限的实现" class="headerlink" title="eos的权限的实现"></a>eos的权限的实现</h4><blockquote>
+<p>eos的权限不需要写到合约中,底层已经帮我们实现了,我们只需要进行相应的设置即可,以下是设置权限的签名.至于设置的各个参数怎么设置,怎么用,可以看看官方文档吧</p>
+</blockquote>
+<pre><code>Usage: cleos set account permission [OPTIONS] account permission authority [parent]
+
+Positionals:
+  account TEXT                The account to set/delete a permission authority for (required)
+  permission TEXT             The permission name to set/delete an authority for (required)
+  authority TEXT              [delete] NULL, [create/update] public key, JSON string, or filename defining the authority (required)
+  parent TEXT                 [create] The permission name of this parents permission (Defaults to: &quot;Active&quot;)
+</code></pre><p>方法1:使用account设置  </p>
+<pre><code>cleos set account permission shaokun11121 add &apos;{&quot;threshold&quot;:1,&quot;keys&quot;:[],&quot;accounts&quot;:[{&quot;permission&quot;:{&quot;actor&quot;:&quot;shaokun11122&quot;,&quot;permission&quot;:&quot;active&quot;},&quot;weight&quot;:1}]}&apos;
+</code></pre><p>方法二:使用public key进行设置</p>
+<pre><code>cleos set account permission shaokun11121 add &apos;{&quot;threshold&quot;:1,&quot;keys&quot;:[{&quot;permission&quot;:{&quot;key&quot;:&quot;EOS8ZZCicammR45b9tQUSU8VHqX4M8oFM89Cs8tFFWYgUGasegnnV&quot;,&quot;permission&quot;:&quot;active&quot;},&quot;weight&quot;:1}]}&apos;  
+</code></pre><p>当然你可以把两种设置方式都用上,根据个人习惯设定就好,</p>
+<blockquote>
+<p>这里建议后面的permission这段,先使用ide写上正确的json格式.然后在<a href="http://www.bejson.com/" target="_blank" rel="noopener">json格式压缩</a>进行压缩成一行,这样可以避免不必要的麻烦</p>
+</blockquote>
+<pre><code>    {
+    &quot;threshold&quot;: 1,
+    &quot;keys&quot;: [],
+    &quot;accounts&quot;: [
+        {
+            &quot;permission&quot;: {
+                &quot;actor&quot;: &quot;kun2&quot;,
+                &quot;permission&quot;: &quot;active&quot;
+            },
+            &quot;weight&quot;: 1
+        }
+    ]
+}
+</code></pre><h4 id="eos的权限的解读"><a href="#eos的权限的解读" class="headerlink" title="eos的权限的解读"></a>eos的权限的解读</h4><ul>
+<li>当按照上述方式设置好后,可以通过此命令查看设置的权限,注意看这里permissions里多了一个add权限 这个权限的名字是 add,阀值是1 权限值 是1 ,父权限是active. </li>
+<li>这样设置后,也就是说 只要是active shaokun11121的active的权限能够执行的操作,使用shaokun11122的密钥生成的账户的active权限均能做</li>
+<li>一个私钥与一个公钥是一一对应,而这一对钥匙可以作为一个或者多个account中的权限级别</li>
+<li><p>当然你也可以按照上述的方式多设置几个权限看看,它的形式就像Windows的目录展示的形式,很好辨认的</p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888  get account shaokun11121
+</code></pre></li>
+</ul>
+<p>查看的结果  </p>
+<pre><code>bogon:libraries shaokun$ cleos -u http://jungle.cryptolions.io:18888  get account shaokun11121
+created: 2018-11-17T12:46:30.000
+permissions: 
+     owner     1:    1 EOS69w5V46oUaBD5PSx3AMRxWXPi6b3St2PwbX9kBPY6tZvSs65o1
+        active     1:    1 EOS69w5V46oUaBD5PSx3AMRxWXPi6b3St2PwbX9kBPY6tZvSs65o1
+           add     1:    1 shaokun11122@active
+memory: 
+     quota:     260.1 KiB    used:     95.82 KiB  
+
+net bandwidth: 
+     staked:        100.0000 EOS           (total stake delegated from account to self)
+     delegated:       0.0000 EOS           (total staked delegated to account from others)
+     used:             5.534 KiB  
+     available:        18.23 MiB  
+     limit:            18.24 MiB  
+
+cpu bandwidth:
+     staked:        100.0000 EOS           (total stake delegated from account to self)
+     delegated:       0.0000 EOS           (total staked delegated to account from others)
+     used:             9.367 ms   
+     available:        3.629 sec  
+     limit:            3.639 sec  
+
+EOS balances: 
+     liquid:           80.1129 EOS
+     staked:          200.0000 EOS
+     unstaking:         0.0000 EOS
+     total:           280.1129 EOS
+
+producers:     &lt;not voted&gt;
+</code></pre><h4 id="eos权限的使用"><a href="#eos权限的使用" class="headerlink" title="eos权限的使用"></a>eos权限的使用</h4><blockquote>
+<p>上述方法给shaokun11121设置了一个add的权限,得添加到具体的action上才能体现出这个价值.目前能够搜到的文章都是加载 transfer这个操作上面的.为什么呢? 因为有了这个权,就可以不用登陆shaokun11121转账了,直接使用shaokun11122转账了.</p>
+</blockquote>
+<ul>
+<li><p>权限签名 </p>
+<pre><code>Positionals:
+  account TEXT                The account to set/delete a permission authority for (required)
+  code TEXT                   The account that owns the code for the action (required)
+  type TEXT                   the type of the action (required)
+  requirement TEXT            [delete] NULL, [set/update] The permission name require for executing the given action (required)
+</code></pre></li>
+<li><p>给shaokun11121 add action和add 权限关联起来,这样只要是shaokun111121的合约中有add action,那么使用shaokun11122的add权限均可以调用.根据我的测试,一个account目前只能部署一个智能合约,所以这个add方法是唯一的</p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888  set action permission shaokun11121 shaokun11121 add add
+</code></pre></li>
+</ul>
+<h4 id="eos权限合约的编写"><a href="#eos权限合约的编写" class="headerlink" title="eos权限合约的编写"></a>eos权限合约的编写</h4><blockquote>
+<p>合约编写很简单,就是helloworld,注意其中的权限验证那一行,也就是说,只有自己的account 才能添加或者更新自己的这条信息</p>
+</blockquote>
+<pre><code>#include &lt;eosiolib/eosio.hpp&gt;
+
+using namespace eosio;
+
+class [[eosio::contract]] learnper2 : public contract {
+  public:
+    using contract::contract;
+    learnper2(eosio::name reciever,eosio::name code,eosio::datastream&lt;const char*&gt; ds )
+                              :contract(reciever,code,ds),
+                              _students(reciever,code.value){};
+
+    [[eosio::action]]
+    void add(name user, const std::string msg) {
+      require_auth(user); // 权限额验证 
+      auto itr = _students.find(user.value);
+      if (itr == _students.end()){
+        _students.emplace(get_self(),[&amp;](auto&amp; row){
+          row.user = user;
+          row.msg = msg;
+        });
+      } else {
+        _students.modify(itr, get_self(), [&amp;](auto&amp; row){
+          row.msg = msg;
+        });
+      }
+    };
+
+
+  private:
+  struct [[eosio::table]] student 
+  {
+    name user;
+    std::string msg = &quot;hello world&quot;;
+    uint64_t primary_key() const {return user.value;};
+
+  };
+  typedef eosio::multi_index&lt;&quot;student&quot;_n, student&gt; student_index;
+  student_index _students; 
+};
+EOSIO_DISPATCH( learnper2, (add))
+</code></pre><h4 id="eos权限合约的编译-部署"><a href="#eos权限合约的编译-部署" class="headerlink" title="eos权限合约的编译,部署"></a>eos权限合约的编译,部署</h4><ul>
+<li><p>编译:这里有个小插曲,放合约cpp文件的文件夹貌似必须命名和主合约的文件名一致,生成的abi里面没有内容,这着实也困扰了我一会</p>
+<p>  eosio-cpp -abigen learnper2.cpp learnper2.wasm</p>
+</li>
+<li><p>这里部署合约一般需要购买ram  </p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888  system buyram shaokun11121 shaokun11121 -k 256
+</code></pre></li>
+<li><p>部署:  </p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888 set contract shaokun11121 ./learnper2/ -p shaokun11121@active
+</code></pre></li>
+</ul>
+<h4 id="eos权限合约结果展示"><a href="#eos权限合约结果展示" class="headerlink" title="eos权限合约结果展示"></a>eos权限合约结果展示</h4><p><img src="/eospermission/per2.gif" alt="eos"></p>
+<blockquote>
+<p>这里说一下我的操作流程</p>
+</blockquote>
+<ul>
+<li>调用合约的add action 插入一条信息(我这里之前插入信息,故此步未进行演示)  </li>
+<li>首先查看了 shaokun11121的 account信息,可以看到添加了一条add的permission</li>
+<li>再次查看了 shaokun11122的account信息,正常状态,只要你新建一个account都是这样的</li>
+<li>查看了钱包里面的信息,这里显示的是shaokun11122的公钥(大家可以仔细对比一下)</li>
+<li>查看链上table的数据</li>
+<li><p>修改数据,我们仔细来分析这条命令  </p>
+<blockquote>
+<ol>
+<li>这里使用的传入的user是shaokun11121</li>
+<li>传入的permission是 shaokun111121的add这个permission,各位同学可以回想一下之前的合约,调用都是是用的active</li>
+<li>钱包中并没有shaokun11121的私钥</li>
+<li>钱包中占有shaokun11122的私钥  </li>
+</ol>
+</blockquote>
+</li>
+<li><p>再次展示数据,数据修改成功  </p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888  push action shaokun11121 add &apos;{&quot;user&quot;:&quot;shaokun11121&quot;,&quot;msg&quot;:&quot;i am shaokun&quot;}&apos; -p shaokun11121@add
+</code></pre></li>
+</ul>
+<h4 id="eos权限使用心得"><a href="#eos权限使用心得" class="headerlink" title="eos权限使用心得"></a>eos权限使用心得</h4><blockquote>
+<p>这里只是展示的单个权限的使用在dapp中怎么使用<br>eos的权限如果只看白皮书还是很难理解的,建议通过实际的操作,加深理解吧  </p>
+</blockquote>
+<h4 id="eos权限的进一步思考"><a href="#eos权限的进一步思考" class="headerlink" title="eos权限的进一步思考"></a>eos权限的进一步思考</h4><blockquote>
+<ul>
+<li>以太坊和eos的多重权限的签名目前我还没遇到过在dapp中实际使用的例子,官方的例子就是基本上是转账需要多个人同意,那么在dapp中我想应用也差不多吧  </li>
+<li>本课程只展示了阀值为1,权限值为1的active权限,那么如果按照官方例子,如果阈值为2,同时需要两个权限值都为1的账号的active权限来进行某个action的执行呢? </li>
+<li>接上一条,如果需要的不是active权限,比如本课中的add权限呢?</li>
+</ul>
+</blockquote>
+<p><a href="https://github.com/shaokun11/eos-permission" target="_blank" rel="noopener">本课源码</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#107;&#x75;&#110;&#x69;&#110;&#103;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#107;&#x75;&#110;&#x69;&#110;&#103;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#46;&#x63;&#111;&#109;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#x75;&#110;&#110;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#110;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/15/基于eos连接scatter开发dapp(下) 续/" rel="next" title="学习eos dapp开发，看这篇就够了（下）续">
+                <i class="fa fa-chevron-left"></i> 学习eos dapp开发，看这篇就够了（下）续
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">shaokun</p>
+              <p class="site-description motion-element" itemprop="description">记录自己对相关技术的点点滴滴和一些思考，希望能够帮助来到这里的你，如果你喜欢我的文章，可以加个微信共同进步</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#准备工作"><span class="nav-number">2.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#以太坊权限的实现"><span class="nav-number">3.</span> <span class="nav-text">以太坊权限的实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos的权限的实现"><span class="nav-number">4.</span> <span class="nav-text">eos的权限的实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos的权限的解读"><span class="nav-number">5.</span> <span class="nav-text">eos的权限的解读</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos权限的使用"><span class="nav-number">6.</span> <span class="nav-text">eos权限的使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos权限合约的编写"><span class="nav-number">7.</span> <span class="nav-text">eos权限合约的编写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos权限合约的编译-部署"><span class="nav-number">8.</span> <span class="nav-text">eos权限合约的编译,部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos权限合约结果展示"><span class="nav-number">9.</span> <span class="nav-text">eos权限合约结果展示</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos权限使用心得"><span class="nav-number">10.</span> <span class="nav-text">eos权限使用心得</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eos权限的进一步思考"><span class="nav-number">11.</span> <span class="nav-text">eos权限的进一步思考</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">12.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">shaokun</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+ <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 访问总量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
