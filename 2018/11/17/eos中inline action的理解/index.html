@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next gemini use-motion" lang="zh-CN">
+<html class="theme-next gemini use-motion" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -82,16 +82,16 @@
 <meta name="description" content="前言 eos中有两种action,一种是本此索要带大家理解使用的inline action,一种deffer action.关于他们的差别我觉得主要一点就是前者一定是打包在同一个块中的,而且是事务操作.  surprise  jungle的测试网升级到2.0了,既然升级了,应该有不少的优化吧jugnle2.0地址   由于在jungle测试网遇到很多坑,所以试了试另外一个测试网麒麟,用起来很不错,">
 <meta name="keywords" content="eos,eth,tron,区块链">
 <meta property="og:type" content="article">
-<meta property="og:title" content="简单的例子带你理解eos中inline action的使用方式 (上)">
+<meta property="og:title" content="eos中inline action的使用方式 (上)">
 <meta property="og:url" content="http://yoursite.com/2018/11/17/eos中inline action的理解/index.html">
 <meta property="og:site_name" content="hello shaokun">
 <meta property="og:description" content="前言 eos中有两种action,一种是本此索要带大家理解使用的inline action,一种deffer action.关于他们的差别我觉得主要一点就是前者一定是打包在同一个块中的,而且是事务操作.  surprise  jungle的测试网升级到2.0了,既然升级了,应该有不少的优化吧jugnle2.0地址   由于在jungle测试网遇到很多坑,所以试了试另外一个测试网麒麟,用起来很不错,">
-<meta property="og:locale" content="zh-CN">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/eosinline/inline1.gif">
 <meta property="og:image" content="http://yoursite.com/common/wx.png">
-<meta property="og:updated_time" content="2018-11-25T11:18:05.000Z">
+<meta property="og:updated_time" content="2018-11-25T11:23:31.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="简单的例子带你理解eos中inline action的使用方式 (上)">
+<meta name="twitter:title" content="eos中inline action的使用方式 (上)">
 <meta name="twitter:description" content="前言 eos中有两种action,一种是本此索要带大家理解使用的inline action,一种deffer action.关于他们的差别我觉得主要一点就是前者一定是打包在同一个块中的,而且是事务操作.  surprise  jungle的测试网升级到2.0了,既然升级了,应该有不少的优化吧jugnle2.0地址   由于在jungle测试网遇到很多坑,所以试了试另外一个测试网麒麟,用起来很不错,">
 <meta name="twitter:image" content="http://yoursite.com/eosinline/inline1.gif">
 
@@ -109,7 +109,7 @@
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     duoshuo: {
       userId: '0',
-      author: 'Author'
+      author: '博主'
     },
     algolia: {
       applicationID: '',
@@ -129,7 +129,7 @@
 
 
 
-  <title>简单的例子带你理解eos中inline action的使用方式 (上) | hello shaokun</title>
+  <title>eos中inline action的使用方式 (上) | hello shaokun</title>
   
 
 
@@ -141,7 +141,7 @@
 
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
   
@@ -189,7 +189,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
-            Home
+            首页
           </a>
         </li>
       
@@ -199,7 +199,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
-            Archives
+            归档
           </a>
         </li>
       
@@ -253,7 +253,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">简单的例子带你理解eos中inline action的使用方式 (上)</h1>
+          <h1 class="post-title" itemprop="name headline">eos中inline action的使用方式 (上)</h1>
         
 
         <div class="post-meta">
@@ -263,9 +263,9 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-11-17T21:15:01+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-17T21:15:01+08:00">
                 2018-11-17
               </time>
             
@@ -431,7 +431,7 @@ yarn add eosjs scatterjs-core scatterjs-plugin-eosjs
 </ul>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#97;&#111;&#x6b;&#x75;&#110;&#x69;&#110;&#103;&#x40;&#103;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#97;&#111;&#x6b;&#x75;&#110;&#x69;&#110;&#103;&#x40;&#103;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#x61;&#111;&#107;&#x75;&#110;&#x69;&#110;&#x67;&#x40;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#104;&#x61;&#111;&#107;&#x75;&#110;&#x69;&#110;&#x67;&#x40;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#111;&#109;</a></p>
 
       
     </div>
@@ -545,10 +545,10 @@ yarn add eosjs scatterjs-core scatterjs-plugin-eosjs
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
+            文章目录
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
+            站点概览
           </li>
         </ul>
       
@@ -569,7 +569,7 @@ yarn add eosjs scatterjs-core scatterjs-plugin-eosjs
                 <a href="/archives/">
               
                   <span class="site-state-item-count">15</span>
-                  <span class="site-state-item-name">posts</span>
+                  <span class="site-state-item-name">日志</span>
                 </a>
               </div>
             
@@ -635,7 +635,7 @@ yarn add eosjs scatterjs-core scatterjs-plugin-eosjs
 </div>
 
 
-  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
 
 
 
@@ -643,7 +643,7 @@ yarn add eosjs scatterjs-core scatterjs-plugin-eosjs
 
 
 
-  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
 
 
 
