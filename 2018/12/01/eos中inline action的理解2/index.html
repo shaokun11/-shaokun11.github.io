@@ -91,7 +91,7 @@
 <meta property="og:image" content="http://yoursite.com/eospermission/per3.gif">
 <meta property="og:image" content="http://yoursite.com/eospermission/per4.gif">
 <meta property="og:image" content="http://yoursite.com/common/wx.png">
-<meta property="og:updated_time" content="2018-12-01T06:24:03.000Z">
+<meta property="og:updated_time" content="2018-12-01T06:25:55.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="eos中inline action的使用方式 (下)">
 <meta name="twitter:description" content="前言 关于上一篇的inline action关于作为log的用法,我觉得这是其一,其二是可以action调用action,这样的话应该也算作action的第二种用法了吧   本篇文章介绍inline action的第三种用户,外部合约的调用   记住一点,这些调用都是在一个事务中进行的,所以可以放心大胆的使用 由于eos的体系,需要你完全明白eos中 account 和permission lev">
@@ -345,7 +345,8 @@
 <li>新添加了一个合约 Test3,其中我们将Test2的合约地址用来实例化了Service</li>
 <li>这个Service中需要包含Test2合约中你需要调用的方法的签名(这里关于是怎样找到的可以去看看官方文档,其实  <code>function notify(string _notification) external;</code> 就是这个函数的签名,包括方法名字和参数类型,返回值类型hash后 取了四个字节)</li>
 <li>部署Test3合约,部署成功后再Test3合约中的callNotify调用Test2合约中的notify方法,可以看到Test合约中的内容生效了</li>
-<li>这里有同学可能有疑问了,你这样的合约岂不是没有安全?拿到Test2合约地址,任何人新建一个合约就可以调用其合约的方法?是的,理论上是这样的.但是,凡事都有个但是哈.还记得我在之前的文章中关于eth中的权限如果验证吗?如果你看了那篇文章,那聪明的你一定知道该怎么做了哈<br><img src="/eospermission/per4.gif" alt="shaokun"></li>
+<li>这里有同学可能有疑问了,你这样的合约岂不是没有安全?拿到Test2合约地址,任何人新建一个合约就可以调用其合约的方法?是的,理论上是这样的.但是,凡事都有个但是哈.还记得我在之前的文章中关于eth中的权限如果验证吗?如果你看了那篇文章,那聪明的你一定知道该怎么做了哈  </li>
+<li><img src="/eospermission/per4.gif" alt="shaokun"></li>
 </ul>
 <h4 id="源码献上"><a href="#源码献上" class="headerlink" title="源码献上"></a>源码献上</h4><blockquote>
 <p><code>addressbook.cpp</code>,没什么说的,注意写法,变化的部分如果你认真阅读了应该知道变化在哪里</p>
@@ -500,7 +501,7 @@ EOSIO_DISPATCH(adcounter,(count));
 <li>还有一点,哪位同学知道eos中有类似eth中的event的功能,即合约主动推送信息给我们,我觉得这很重要.我觉得eosjs应该提供类似的功能呢.知道的同学麻烦告知一声</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#x6b;&#x75;&#x6e;&#x69;&#x6e;&#x67;&#64;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#x6b;&#x75;&#x6e;&#x69;&#x6e;&#x67;&#64;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#107;&#117;&#110;&#110;&#121;&#64;&#x31;&#54;&#x33;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#110;&#110;&#121;&#64;&#x31;&#54;&#x33;&#46;&#99;&#111;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#97;&#111;&#107;&#117;&#x6e;&#105;&#110;&#103;&#64;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#97;&#111;&#107;&#117;&#x6e;&#105;&#110;&#103;&#64;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#111;&#x6d;</a></p>
 
       
     </div>
