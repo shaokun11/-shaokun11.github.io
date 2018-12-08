@@ -79,21 +79,21 @@
 
 
 
-<meta name="description" content="填坑 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.     之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉. 也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮训最新区块的内容而进行的事件的匹配然后产生的回调.   requestmanager.js">
+<meta name="description" content="填坑 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.     之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉. 也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮询最新区块的内容而进行的事件的匹配然后产生的回调.   requestmanager.js">
 <meta name="keywords" content="eos,eth,tron,区块链">
 <meta property="og:type" content="article">
 <meta property="og:title" content="eos中inline action的使用方式 (续)">
 <meta property="og:url" content="http://yoursite.com/2018/12/08/eos中inline action的理解3/index.html">
 <meta property="og:site_name" content="hello shaokun">
-<meta property="og:description" content="填坑 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.     之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉. 也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮训最新区块的内容而进行的事件的匹配然后产生的回调.   requestmanager.js">
+<meta property="og:description" content="填坑 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.     之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉. 也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮询最新区块的内容而进行的事件的匹配然后产生的回调.   requestmanager.js">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/eosinline/inline3.gif">
 <meta property="og:image" content="http://yoursite.com/eosinline/inline4.gif">
 <meta property="og:image" content="http://yoursite.com/common/wx.png">
-<meta property="og:updated_time" content="2018-12-08T03:47:25.000Z">
+<meta property="og:updated_time" content="2018-12-08T04:14:14.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="eos中inline action的使用方式 (续)">
-<meta name="twitter:description" content="填坑 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.     之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉. 也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮训最新区块的内容而进行的事件的匹配然后产生的回调.   requestmanager.js">
+<meta name="twitter:description" content="填坑 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.     之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉. 也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮询最新区块的内容而进行的事件的匹配然后产生的回调.   requestmanager.js">
 <meta name="twitter:image" content="http://yoursite.com/eosinline/inline3.gif">
 
 
@@ -312,7 +312,7 @@
         <h4 id="填坑"><a href="#填坑" class="headerlink" title="填坑"></a>填坑</h4><p> 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.   </p>
 <ol>
 <li>之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉.</li>
-<li>也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮训最新区块的内容而进行的事件的匹配然后产生的回调.  </li>
+<li>也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮询最新区块的内容而进行的事件的匹配然后产生的回调.  </li>
 <li><p><a href="https://github.com/ethereum/web3.js/blob/develop/lib/web3/requestmanager.js" target="_blank" rel="noopener">requestmanager.js</a>,如果你感兴趣,可以看看这个文件就大概知道了,更加进一步,你可以发现一些更有趣并且非常熟悉的东西,那就是在<a href="https://github.com/ethereum/web3.js/blob/develop/lib/web3/methods/eth.js" target="_blank" rel="noopener">methods.js</a>这个文件中 </p>
 </li>
 <li><p>这是web3提供的方法,既然这样,那我们是不是不调用web3的方法也可以得到同样的效果呢?答案肯定是可以的.通过以上的两个文件,那我们用node也来写一个监听最新块的方法</p>
@@ -333,16 +333,23 @@ function getBlockInfo() {
         })
 }
 </code></pre></li>
-<li>上面的方式可以监听到最新一个快的所有交易信息,然后根据条件筛选即可达到我们要的目的了.这里注意两点:一是json-rpc的请求格式,二是json-rpc提供的endpoint,我这里使用的是infrua提供的.其实metamask也是使用的这个端点,所以使用web3的时候会让你提供provider,其实就是提供的这个端点</li>
+<li>上面的方式可以监听到最新一个块的所有交易信息,然后根据条件筛选即可达到我们要的目的了.这里注意两点:一是json-rpc的请求格式,二是json-rpc提供的endpoint,我这里使用的是infrua提供的.其实metamask也是使用的这个端点,所以使用web3的时候会让你提供provider,其实就是提供的这个端点</li>
 </ol>
 <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
-<p>上面你的坑填完后,可以发现实际上区块链从来不会主动推送消息给各位同学的.所以这里各位同学需要记住的是:所有的区块链上的数据都是在区块里面的,只要在区块链发生的所有操作,均可以通过轮训区块得到结果.到了这里,我想聪明的你应该也知道了如何在eos中实现类似以太坊中web3.js的 event的监听的功能了吧</p>
+<p>填完坑后,给出个结论   </p>
 </blockquote>
 <blockquote>
-<p>填了坑,接下来继续挖坑吧.<br>这个坑还是inline action的范畴.就是如何在合约中进行eos的交易</p>
+<ul>
+<li>区块链从来不会主动推送消息给各位同学的</li>
+<li>所有的数据都是在区块里面的,只要在区块链发生的所有操作,均可以通过查询区块得到结果.</li>
+<li>至于web3或者是其他库提供的监听的功能,实际上是封装了这个轮询的过程</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>本篇文章还是属于inline action的范畴.就是如何在合约中进行eos的交易</p>
 </blockquote>
 <h4 id="在合约中交易eos"><a href="#在合约中交易eos" class="headerlink" title="在合约中交易eos"></a>在合约中交易eos</h4><ol>
-<li><p>直接调用eosjs提供的api,这种方式比较简单,但不是我要说的重点(这里使用的是scatter官网提供的这个例子)</p>
+<li><p>直接调用eosjs提供的api,这种方式比较简单,也不是我要说的重点(这里使用的是scatter官网提供的这个例子)</p>
 <pre><code>const transactionOptions = { authorization:[`${account.name}@${account.authority}`] };
 
     eos.transfer(account.name, &apos;helloworld&apos;, &apos;1.0000 EOS&apos;, &apos;memo&apos;, transactionOptions).then(trx =&gt; {
@@ -418,9 +425,10 @@ function withPayable() public payable {
 <li><a href="https://github.com/shaokun11/eosabout/tree/eos-transfer" target="_blank" rel="noopener">合约transfer</a></li>
 <li>相对于eth来说,个人觉得eos中在合约中转账过于麻烦,这需要用户手动去给合约设置转账权限</li>
 <li>如果哪位同学有更好的关于转账的方法,请告知一下,个人觉得在合约中进行转账还是很常见的需求</li>
+<li>官方的eos dice合约现在已经移除了,但是可以在历史中找到<a href="https://github.com/EOSIO/eos/blob/v1.0.0/contracts/dice/dice.cpp" target="_blank" rel="noopener">eos dice</a> 有兴趣的同学可以研究一下</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#97;&#x6f;&#107;&#x75;&#110;&#105;&#x6e;&#x67;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#97;&#x6f;&#107;&#x75;&#110;&#105;&#x6e;&#x67;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#110;&#110;&#121;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#110;&#121;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#111;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#x61;&#x6f;&#x6b;&#117;&#110;&#x69;&#110;&#x67;&#x40;&#103;&#109;&#97;&#105;&#108;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#x6f;&#x6b;&#117;&#110;&#x69;&#110;&#x67;&#x40;&#103;&#109;&#97;&#105;&#108;&#x2e;&#99;&#111;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#109;</a></p>
 
       
     </div>
