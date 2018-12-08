@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="填坑 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.     之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉. 也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮训最新区块的内容而进行的事件的匹配然后产生的回调.   requestmanager.js">
+<meta name="keywords" content="eos,eth,tron,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="eos中inline action的使用方式 (续)">
+<meta property="og:url" content="http://yoursite.com/2018/12/08/eos中inline action的理解3/index.html">
+<meta property="og:site_name" content="hello shaokun">
+<meta property="og:description" content="填坑 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.     之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉. 也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮训最新区块的内容而进行的事件的匹配然后产生的回调.   requestmanager.js">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/eosinline/inline3.gif">
+<meta property="og:image" content="http://yoursite.com/eosinline/inline4.gif">
+<meta property="og:image" content="http://yoursite.com/common/wx.png">
+<meta property="og:updated_time" content="2018-12-08T03:47:25.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="eos中inline action的使用方式 (续)">
+<meta name="twitter:description" content="填坑 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.     之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉. 也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮训最新区块的内容而进行的事件的匹配然后产生的回调.   requestmanager.js">
+<meta name="twitter:image" content="http://yoursite.com/eosinline/inline3.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/08/eos中inline action的理解3/"/>
+
+
+
+
+
+  <title>eos中inline action的使用方式 (续) | hello shaokun</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">hello shaokun</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">hello friend, let us go to the world together</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/08/eos中inline action的理解3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">eos中inline action的使用方式 (续)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-08T11:47:24+08:00">
+                2018-12-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 浏览
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="填坑"><a href="#填坑" class="headerlink" title="填坑"></a>填坑</h4><p> 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.   </p>
+<ol>
+<li>之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉.</li>
+<li>也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮训最新区块的内容而进行的事件的匹配然后产生的回调.  </li>
+<li><p><a href="https://github.com/ethereum/web3.js/blob/develop/lib/web3/requestmanager.js" target="_blank" rel="noopener">requestmanager.js</a>,如果你感兴趣,可以看看这个文件就大概知道了,更加进一步,你可以发现一些更有趣并且非常熟悉的东西,那就是在<a href="https://github.com/ethereum/web3.js/blob/develop/lib/web3/methods/eth.js" target="_blank" rel="noopener">methods.js</a>这个文件中 </p>
+</li>
+<li><p>这是web3提供的方法,既然这样,那我们是不是不调用web3的方法也可以得到同样的效果呢?答案肯定是可以的.通过以上的两个文件,那我们用node也来写一个监听最新块的方法</p>
+<pre><code>const axios = require(&apos;axios&apos;)
+const obj = { &quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;eth_getBlockByNumber&quot;, &quot;params&quot;: [&quot;latest&quot;, true], &quot;id&quot;: 1 }
+
+getBlockInfo()
+
+function getBlockInfo() {
+    axios.request(&apos;https://mainnet.infura.io/v3/e8947e207ac142519554d382200e663b&apos;, {
+        method: &apos;post&apos;,
+        header: {
+            &apos;Content-type&apos;: &apos;application/json&apos;
+        },
+        data: JSON.stringify(obj)
+    }).then(response =&gt; response.data).then(res =&gt; {
+            console.log(res)
+        })
+}
+</code></pre></li>
+<li>上面的方式可以监听到最新一个快的所有交易信息,然后根据条件筛选即可达到我们要的目的了.这里注意两点:一是json-rpc的请求格式,二是json-rpc提供的endpoint,我这里使用的是infrua提供的.其实metamask也是使用的这个端点,所以使用web3的时候会让你提供provider,其实就是提供的这个端点</li>
+</ol>
+<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>上面你的坑填完后,可以发现实际上区块链从来不会主动推送消息给各位同学的.所以这里各位同学需要记住的是:所有的区块链上的数据都是在区块里面的,只要在区块链发生的所有操作,均可以通过轮训区块得到结果.到了这里,我想聪明的你应该也知道了如何在eos中实现类似以太坊中web3.js的 event的监听的功能了吧</p>
+</blockquote>
+<blockquote>
+<p>填了坑,接下来继续挖坑吧.<br>这个坑还是inline action的范畴.就是如何在合约中进行eos的交易</p>
+</blockquote>
+<h4 id="在合约中交易eos"><a href="#在合约中交易eos" class="headerlink" title="在合约中交易eos"></a>在合约中交易eos</h4><ol>
+<li><p>直接调用eosjs提供的api,这种方式比较简单,但不是我要说的重点(这里使用的是scatter官网提供的这个例子)</p>
+<pre><code>const transactionOptions = { authorization:[`${account.name}@${account.authority}`] };
+
+    eos.transfer(account.name, &apos;helloworld&apos;, &apos;1.0000 EOS&apos;, &apos;memo&apos;, transactionOptions).then(trx =&gt; {
+        // That&apos;s it!
+        console.log(`Transaction ID: ${trx.transaction_id}`);
+    }).catch(error =&gt; {
+        console.error(error);
+    });
+</code></pre></li>
+<li><p>这里有一种需求,就是在执行某个action的时候,需要预先支付一定费用的eos,当达到某种条件时候,再返回给调用者一定的量的eos.</p>
+</li>
+<li>根据需求我们写出了如下的代码,(注意asset这个类型,必须这样传入,关于它的更详细的用法得去看看api了哈;二是now()这个函数返回当前的时间戳,真实环境中这都是固定的,不能用来产生随机数).</li>
+<li>还记得之前的权限操作吗? 如果要在合约中转账,必须给合约添加eosio.code的权限,我这个合约现在部署在shaokun11113中的,那么就要给shaokun11113添加eosio.code权限.</li>
+<li>添加了权限之后,我们使用shaokun11112来调用这个合约,可以看到当shaokun11113向shaokun11112转账可以成功,但是shaokun11112向shaokun11113转账是没有权限的.</li>
+<li>那么,我们在shaokun11112中给shaokun11113添加eosio.code的权限</li>
+<li>添加权限后,可以看到一切转账成功了</li>
+<li>那么就实现了在合约中进行transfer eos的操作</li>
+</ol>
+<pre><code>#include &lt;eosiolib/eosio.hpp&gt;
+#include &lt;eosiolib/asset.hpp&gt;    
+using namespace eosio;
+
+class [[eosio::contract]] lucky : eosio::contract {
+
+public:
+    using contract::contract;
+    lucky(name r,name c, datastream&lt;const char*&gt; ds):contract(r,c,ds){}
+
+[[eosio::action]]
+void play(name player, const asset&amp; quantity) {
+    require_auth(player);
+    if(now() % 2 == 1){
+        action(
+    permission_level{get_self(),&quot;active&quot;_n},  //所需要的权限结构
+    &quot;eosio.token&quot;_n,                          // 调用的合约名称
+    &quot;transfer&quot;_n,                              // 合约的方法
+    std::make_tuple(get_self(),player, quantity, std::string(&quot;shao kun game&quot;)) // 传递的参数
+    } else {
+        action(
+        permission_level{player,&quot;active&quot;_n},
+        &quot;eosio.token&quot;_n,
+        &quot;transfer&quot;_n,
+        std::make_tuple(player,get_self(), quantity, std::string(&quot;shao kun game&quot;))
+        ).send();
+    }
+};
+};
+EOSIO_DISPATCH(lucky,(play))
+</code></pre><p><img src="/eosinline/inline3.gif" alt="shaokun"></p>
+<h4 id="以太坊中eth使用合约进行交易"><a href="#以太坊中eth使用合约进行交易" class="headerlink" title="以太坊中eth使用合约进行交易"></a>以太坊中eth使用合约进行交易</h4><ul>
+<li>在以太坊中,如果某个方法要接收eth,必须给这个方法加上payable的关键字即可,合约中可以通过msg.value获取到交易的金额.如果此方法不加上payable而调用时传递了金额,那么调用此方法会失败  </li>
+<li><p>如果要在初始化的时候传入eth,必须给构造方法加上payable</p>
+<pre><code>contract Test4 {
+
+constructor() public payable {
+
+}
+
+function withPayable() public payable {
+    if(now % 2 == 0 ){
+        msg.sender.transfer(msg.value * 2);
+    }
+}
+
+ function withoutPayable() public {
+
+ }
+}
+</code></pre><p><img src="/eosinline/inline4.gif" alt="shaokun"></p>
+</li>
+</ul>
+<h4 id="源码与总结"><a href="#源码与总结" class="headerlink" title="源码与总结"></a>源码与总结</h4><ul>
+<li><a href="https://github.com/shaokun11/eosabout/tree/eos-transfer" target="_blank" rel="noopener">合约transfer</a></li>
+<li>相对于eth来说,个人觉得eos中在合约中转账过于麻烦,这需要用户手动去给合约设置转账权限</li>
+<li>如果哪位同学有更好的关于转账的方法,请告知一下,个人觉得在合约中进行转账还是很常见的需求</li>
+</ul>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#97;&#x6f;&#107;&#x75;&#110;&#105;&#x6e;&#x67;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#97;&#x6f;&#107;&#x75;&#110;&#105;&#x6e;&#x67;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#110;&#110;&#121;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#110;&#121;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#111;&#109;</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/01/eos中inline action的理解2/" rel="next" title="eos中inline action的使用方式 (下)">
+                <i class="fa fa-chevron-left"></i> eos中inline action的使用方式 (下)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">shaokun</p>
+              <p class="site-description motion-element" itemprop="description">记录自己对相关技术的点点滴滴和一些思考，希望能够帮助来到这里的你，如果你喜欢我的文章，可以加个微信共同进步</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#填坑"><span class="nav-number">1.</span> <span class="nav-text">填坑</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在合约中交易eos"><span class="nav-number">3.</span> <span class="nav-text">在合约中交易eos</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#以太坊中eth使用合约进行交易"><span class="nav-number">4.</span> <span class="nav-text">以太坊中eth使用合约进行交易</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#源码与总结"><span class="nav-number">5.</span> <span class="nav-text">源码与总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">6.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">shaokun</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+ <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 访问总量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

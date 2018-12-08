@@ -233,6 +233,237 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/08/eos中inline action的理解3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/08/eos中inline action的理解3/" itemprop="url">eos中inline action的使用方式 (续)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-08T11:47:24+08:00">
+                2018-12-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="填坑"><a href="#填坑" class="headerlink" title="填坑"></a>填坑</h4><p> 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.   </p>
+<ol>
+<li>之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉.</li>
+<li>也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮训最新区块的内容而进行的事件的匹配然后产生的回调.  </li>
+<li><p><a href="https://github.com/ethereum/web3.js/blob/develop/lib/web3/requestmanager.js" target="_blank" rel="noopener">requestmanager.js</a>,如果你感兴趣,可以看看这个文件就大概知道了,更加进一步,你可以发现一些更有趣并且非常熟悉的东西,那就是在<a href="https://github.com/ethereum/web3.js/blob/develop/lib/web3/methods/eth.js" target="_blank" rel="noopener">methods.js</a>这个文件中 </p>
+</li>
+<li><p>这是web3提供的方法,既然这样,那我们是不是不调用web3的方法也可以得到同样的效果呢?答案肯定是可以的.通过以上的两个文件,那我们用node也来写一个监听最新块的方法</p>
+<pre><code>const axios = require(&apos;axios&apos;)
+const obj = { &quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;eth_getBlockByNumber&quot;, &quot;params&quot;: [&quot;latest&quot;, true], &quot;id&quot;: 1 }
+
+getBlockInfo()
+
+function getBlockInfo() {
+    axios.request(&apos;https://mainnet.infura.io/v3/e8947e207ac142519554d382200e663b&apos;, {
+        method: &apos;post&apos;,
+        header: {
+            &apos;Content-type&apos;: &apos;application/json&apos;
+        },
+        data: JSON.stringify(obj)
+    }).then(response =&gt; response.data).then(res =&gt; {
+            console.log(res)
+        })
+}
+</code></pre></li>
+<li>上面的方式可以监听到最新一个快的所有交易信息,然后根据条件筛选即可达到我们要的目的了.这里注意两点:一是json-rpc的请求格式,二是json-rpc提供的endpoint,我这里使用的是infrua提供的.其实metamask也是使用的这个端点,所以使用web3的时候会让你提供provider,其实就是提供的这个端点</li>
+</ol>
+<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>上面你的坑填完后,可以发现实际上区块链从来不会主动推送消息给各位同学的.所以这里各位同学需要记住的是:所有的区块链上的数据都是在区块里面的,只要在区块链发生的所有操作,均可以通过轮训区块得到结果.到了这里,我想聪明的你应该也知道了如何在eos中实现类似以太坊中web3.js的 event的监听的功能了吧</p>
+</blockquote>
+<blockquote>
+<p>填了坑,接下来继续挖坑吧.<br>这个坑还是inline action的范畴.就是如何在合约中进行eos的交易</p>
+</blockquote>
+<h4 id="在合约中交易eos"><a href="#在合约中交易eos" class="headerlink" title="在合约中交易eos"></a>在合约中交易eos</h4><ol>
+<li><p>直接调用eosjs提供的api,这种方式比较简单,但不是我要说的重点(这里使用的是scatter官网提供的这个例子)</p>
+<pre><code>const transactionOptions = { authorization:[`${account.name}@${account.authority}`] };
+
+    eos.transfer(account.name, &apos;helloworld&apos;, &apos;1.0000 EOS&apos;, &apos;memo&apos;, transactionOptions).then(trx =&gt; {
+        // That&apos;s it!
+        console.log(`Transaction ID: ${trx.transaction_id}`);
+    }).catch(error =&gt; {
+        console.error(error);
+    });
+</code></pre></li>
+<li><p>这里有一种需求,就是在执行某个action的时候,需要预先支付一定费用的eos,当达到某种条件时候,再返回给调用者一定的量的eos.</p>
+</li>
+<li>根据需求我们写出了如下的代码,(注意asset这个类型,必须这样传入,关于它的更详细的用法得去看看api了哈;二是now()这个函数返回当前的时间戳,真实环境中这都是固定的,不能用来产生随机数).</li>
+<li>还记得之前的权限操作吗? 如果要在合约中转账,必须给合约添加eosio.code的权限,我这个合约现在部署在shaokun11113中的,那么就要给shaokun11113添加eosio.code权限.</li>
+<li>添加了权限之后,我们使用shaokun11112来调用这个合约,可以看到当shaokun11113向shaokun11112转账可以成功,但是shaokun11112向shaokun11113转账是没有权限的.</li>
+<li>那么,我们在shaokun11112中给shaokun11113添加eosio.code的权限</li>
+<li>添加权限后,可以看到一切转账成功了</li>
+<li>那么就实现了在合约中进行transfer eos的操作</li>
+</ol>
+<pre><code>#include &lt;eosiolib/eosio.hpp&gt;
+#include &lt;eosiolib/asset.hpp&gt;    
+using namespace eosio;
+
+class [[eosio::contract]] lucky : eosio::contract {
+
+public:
+    using contract::contract;
+    lucky(name r,name c, datastream&lt;const char*&gt; ds):contract(r,c,ds){}
+
+[[eosio::action]]
+void play(name player, const asset&amp; quantity) {
+    require_auth(player);
+    if(now() % 2 == 1){
+        action(
+    permission_level{get_self(),&quot;active&quot;_n},  //所需要的权限结构
+    &quot;eosio.token&quot;_n,                          // 调用的合约名称
+    &quot;transfer&quot;_n,                              // 合约的方法
+    std::make_tuple(get_self(),player, quantity, std::string(&quot;shao kun game&quot;)) // 传递的参数
+    } else {
+        action(
+        permission_level{player,&quot;active&quot;_n},
+        &quot;eosio.token&quot;_n,
+        &quot;transfer&quot;_n,
+        std::make_tuple(player,get_self(), quantity, std::string(&quot;shao kun game&quot;))
+        ).send();
+    }
+};
+};
+EOSIO_DISPATCH(lucky,(play))
+</code></pre><p><img src="/eosinline/inline3.gif" alt="shaokun"></p>
+<h4 id="以太坊中eth使用合约进行交易"><a href="#以太坊中eth使用合约进行交易" class="headerlink" title="以太坊中eth使用合约进行交易"></a>以太坊中eth使用合约进行交易</h4><ul>
+<li>在以太坊中,如果某个方法要接收eth,必须给这个方法加上payable的关键字即可,合约中可以通过msg.value获取到交易的金额.如果此方法不加上payable而调用时传递了金额,那么调用此方法会失败  </li>
+<li><p>如果要在初始化的时候传入eth,必须给构造方法加上payable</p>
+<pre><code>contract Test4 {
+
+constructor() public payable {
+
+}
+
+function withPayable() public payable {
+    if(now % 2 == 0 ){
+        msg.sender.transfer(msg.value * 2);
+    }
+}
+
+ function withoutPayable() public {
+
+ }
+}
+</code></pre><p><img src="/eosinline/inline4.gif" alt="shaokun"></p>
+</li>
+</ul>
+<h4 id="源码与总结"><a href="#源码与总结" class="headerlink" title="源码与总结"></a>源码与总结</h4><ul>
+<li><a href="https://github.com/shaokun11/eosabout/tree/eos-transfer" target="_blank" rel="noopener">合约transfer</a></li>
+<li>相对于eth来说,个人觉得eos中在合约中转账过于麻烦,这需要用户手动去给合约设置转账权限</li>
+<li>如果哪位同学有更好的关于转账的方法,请告知一下,个人觉得在合约中进行转账还是很常见的需求</li>
+</ul>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#97;&#x6f;&#107;&#x75;&#110;&#105;&#x6e;&#x67;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#97;&#x6f;&#107;&#x75;&#110;&#105;&#x6e;&#x67;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#110;&#110;&#121;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#110;&#121;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#111;&#109;</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/01/eos中inline action的理解2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -321,7 +552,7 @@
 <li>使用shaokun11112部署合约 adcounter</li>
 <li>在addressbook中使用inline action调用adcounter中的count方法</li>
 <li>这样设置后,多个合约就可以相互调用了</li>
-<li>关键点,如果要shaokun11111有权限调用其他合约的权限,必须给shaokun11111账号授予权限eosio.code,这是个系统的权限.</li>
+<li>关键点,如果要actor shaokun11111能够拥有调用其他合约的权限,必须给shaokun11111账号授予权限eosio.code,这是个系统的权限.</li>
 </ul>
 <pre><code>cleos -u https://api-kylin.eosasia.one:443 set account permission shaokun11111 active &apos;{&quot;threshold&quot;:1,&quot;keys&quot;:[{&quot;key&quot;:&quot;EOS5694dNS19CXwNMgQ3nd8eVG4gnqcihdstnmsChM8AdHNaDCC82&quot;,&quot;weight&quot;:1}],&quot;accounts&quot;:[{&quot;permission&quot;:{&quot;actor&quot;:&quot;shaokun11111&quot;,&quot;permission&quot;:&quot;eosio.code&quot;}}]}&apos; -p shaokun11111@owner
 </code></pre><ul>
@@ -495,7 +726,7 @@ EOSIO_DISPATCH(adcounter,(count));
 <li>还有一点,哪位同学知道eos中有类似eth中的event的功能,即合约主动推送信息给我们,我觉得这很重要.我觉得eosjs应该提供类似的功能呢.知道的同学麻烦告知一声</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#97;&#111;&#107;&#117;&#x6e;&#105;&#110;&#103;&#64;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#97;&#111;&#107;&#117;&#x6e;&#105;&#110;&#103;&#64;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#x40;&#49;&#x36;&#51;&#46;&#x63;&#111;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#97;&#111;&#x6b;&#117;&#x6e;&#x69;&#110;&#103;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x68;&#97;&#111;&#x6b;&#117;&#x6e;&#x69;&#110;&#103;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#109;</a></p>
 
           
         
@@ -741,7 +972,7 @@ yarn add eosjs scatterjs-core scatterjs-plugin-eosjs
 </ul>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#x61;&#111;&#107;&#117;&#x6e;&#x69;&#x6e;&#x67;&#x40;&#103;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#111;&#107;&#117;&#x6e;&#x69;&#x6e;&#x67;&#x40;&#103;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#x63;&#111;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#x61;&#x6f;&#107;&#x75;&#x6e;&#x69;&#110;&#103;&#64;&#103;&#x6d;&#x61;&#105;&#108;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x68;&#x61;&#x6f;&#107;&#x75;&#x6e;&#x69;&#110;&#103;&#64;&#103;&#x6d;&#x61;&#105;&#108;&#46;&#x63;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#x75;&#x6e;&#110;&#121;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#x6e;&#110;&#121;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -1097,7 +1328,7 @@ EOSIO_DISPATCH( learnper2, (add))
 </blockquote>
 <p><a href="https://github.com/shaokun11/eos-permission" target="_blank" rel="noopener">本课源码</a></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#x6f;&#x6b;&#x75;&#110;&#105;&#x6e;&#x67;&#x40;&#x67;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#x6f;&#x6b;&#x75;&#110;&#105;&#x6e;&#x67;&#x40;&#x67;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#x61;&#x6f;&#107;&#117;&#x6e;&#105;&#110;&#x67;&#64;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#x6f;&#107;&#117;&#x6e;&#105;&#110;&#x67;&#64;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#99;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -1165,7 +1396,7 @@ EOSIO_DISPATCH( learnper2, (add))
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/11/15/基于eos连接scatter开发dapp(下) 续/" itemprop="url">学习eos dapp开发，看这篇就够了（下）续</a></h1>
+                <a class="post-title-link" href="/2018/11/15/基于eos连接scatter开发dapp(下) 续/" itemprop="url">结合scatter 学习eos dapp开发，看这篇就够了（下）续</a></h1>
         
 
         <div class="post-meta">
@@ -1427,7 +1658,7 @@ EOSIO_DISPATCH(todolist, (create)(complete)(destroy))
 </blockquote>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#111;&#107;&#117;&#110;&#105;&#x6e;&#x67;&#x40;&#x67;&#109;&#97;&#105;&#x6c;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#111;&#107;&#117;&#110;&#105;&#x6e;&#x67;&#x40;&#x67;&#109;&#97;&#105;&#x6c;&#46;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#110;&#110;&#x79;&#64;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#110;&#x79;&#64;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#107;&#117;&#x6e;&#105;&#110;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#108;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#107;&#117;&#x6e;&#105;&#110;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#108;&#x2e;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#115;&#107;&#117;&#110;&#110;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#110;&#110;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#109;</a></p>
 
           
         
@@ -1630,7 +1861,7 @@ void cardgame::endgame(eosio::name user) {
 <p>目前我的文章基本上都是比较简单的demo或者概念性的文章，这样看多了也没有意思，我写着也觉得没有意思了。所以接下来准备找一些具有代表性的基于以太坊，波场和eos合约与大家分享了。</p>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#x6f;&#107;&#x75;&#x6e;&#105;&#x6e;&#x67;&#64;&#103;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#x6f;&#107;&#x75;&#x6e;&#105;&#x6e;&#x67;&#64;&#103;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#111;&#109;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#111;&#107;&#x75;&#110;&#105;&#x6e;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#111;&#107;&#x75;&#110;&#105;&#x6e;&#103;&#x40;&#103;&#x6d;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#110;&#110;&#121;&#64;&#49;&#54;&#51;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#110;&#121;&#64;&#49;&#54;&#51;&#46;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -1934,7 +2165,7 @@ EOSIO_DISPATCH(cardgame,(login)(startgame)(playcard))
 <li><a href="https://github.com/shaokun11/eoslearning/tree/eos-dve4-update" target="_blank" rel="noopener">更新的合约源码</a>，这次就没有更新前端的mock数据了，相信聪明的你一定知道怎样调整过来</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#111;&#107;&#x75;&#110;&#105;&#110;&#103;&#x40;&#103;&#109;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#111;&#107;&#x75;&#110;&#105;&#110;&#103;&#x40;&#103;&#109;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#110;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#110;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#x61;&#111;&#107;&#117;&#110;&#x69;&#x6e;&#x67;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#x68;&#x61;&#111;&#107;&#117;&#110;&#x69;&#x6e;&#x67;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#x6e;&#x79;&#64;&#49;&#x36;&#x33;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#x6e;&#x79;&#64;&#49;&#x36;&#x33;&#46;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -2265,7 +2496,7 @@ void cardgame::draw_one_card(vector&lt;uint8_t&gt; &amp;deck,vector&lt;uint8_t&g
      deck.erase(deck.began() + deck_card_index);
  }
 </code></pre><h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#97;&#111;&#107;&#117;&#x6e;&#x69;&#110;&#103;&#x40;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x68;&#97;&#111;&#107;&#117;&#x6e;&#x69;&#110;&#103;&#x40;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#111;&#109;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#110;&#110;&#121;&#64;&#x31;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#110;&#121;&#64;&#x31;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#x68;&#97;&#x6f;&#x6b;&#117;&#110;&#105;&#x6e;&#103;&#x40;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x68;&#97;&#x6f;&#x6b;&#117;&#110;&#105;&#x6e;&#103;&#x40;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#99;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#110;&#121;&#x40;&#x31;&#54;&#51;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#110;&#121;&#x40;&#x31;&#54;&#51;&#46;&#99;&#111;&#x6d;</a></p>
 
           
         
@@ -2494,7 +2725,7 @@ export default ApiService;
 <li>第三课  更改上课的错误，连接合约，增加新的展示界面</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#97;&#x6f;&#x6b;&#117;&#x6e;&#105;&#x6e;&#x67;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#97;&#x6f;&#x6b;&#117;&#x6e;&#105;&#x6e;&#x67;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#x61;&#x6f;&#107;&#117;&#x6e;&#x69;&#110;&#103;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#x61;&#x6f;&#107;&#117;&#x6e;&#x69;&#110;&#103;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#x33;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#x33;&#46;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -2669,158 +2900,7 @@ user_info =&gt; userinfo
 <p>总算完成了之前的坑。^o^<br>中间有很多前端的知识，这不是这个课程讲解的重点，只能靠各位同学自己去补习了。这个系列使用react，redux也是一个很庞大的工程，所以可以简单一点，展示一下交互就好。<br>应该说到此，区块链与前端的交互已经完成，接下来就是充实智能合约的功能了。如果你做到了这一步，建议去<a href="https://developers.eos.io/eosio-cpp/reference" target="_blank" rel="noopener">eos c++ api</a>这里了解一下api，这样对于后面的合约编写会有一个更深层次的掌握</p>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#97;&#x6f;&#x6b;&#x75;&#x6e;&#105;&#110;&#103;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#104;&#97;&#x6f;&#x6b;&#x75;&#x6e;&#105;&#110;&#103;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#46;&#x63;&#111;&#109;</a><br>email_2: <a href="mailto:&#x73;&#107;&#117;&#110;&#x6e;&#x79;&#64;&#49;&#54;&#51;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#110;&#x6e;&#x79;&#64;&#49;&#54;&#51;&#x2e;&#x63;&#x6f;&#109;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/20/eos dapp开发 官方教程学习2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/20/eos dapp开发 官方教程学习2/" itemprop="url">eos dapp开发学习 第二课</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-20T22:11:25+08:00">
-                2018-10-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h5 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h5><blockquote>
-<p>我们将学习如何在智能合约中存储玩家信息;使用登录操作。然后我们将开始构建Web前端，添加Login页面。 要使登录页面与智能合约交互，我们将使用eosjs连接到EOSIO区块链。我们使用eosjs库来调用智能合约中的登录操作。接下来，我们将React连接到Redux以存储应用程序状态。最后，我们将所有这些结合起来并添加一个游戏页面，以便我们有一个工作登录屏幕。 在本课程结束时，玩家应该能够登录游戏并进入游戏中的第一个屏幕。</p>
-</blockquote>
-<h4 id="step-1-定义表结构"><a href="#step-1-定义表结构" class="headerlink" title="step 1 定义表结构"></a>step 1 定义表结构</h4><p>对于元素战斗，我们需要存储每个玩家的游戏进度的详细信息或状态。为此，我们将使用多索引表，这是EOSIO的一个功能。您可以将多索引表视为内存数据库。要使用多索引表，我们需要告诉EOSIO我们要在其中存储哪些数据。 对于游戏，我们需要存储玩家信息，所以让我们在之前创建的cardgame.hpp中创建一个名为user_info的结构。我们要存储：</p>
-<ul>
-<li>the player’s name</li>
-<li>win count (default to 0)</li>
-<li><p>lost count (default to 0)</p>
-</li>
-<li><p>cardgame.hpp（这里传图片得了，看得仔细一点）<br><img src="/img_eos1/eos5.png" alt="lessons"></p>
-</li>
-</ul>
-<h4 id="step-2-写入数据到多索引表-user中"><a href="#step-2-写入数据到多索引表-user中" class="headerlink" title="step 2 写入数据到多索引表_user中"></a>step 2 写入数据到多索引表_user中</h4><blockquote>
-<p>现在我们可以使用我们的多索引表了。所以让我们存储我们的合同状态。为此，我们将创建第一个操作，即登录操作。</p>
-</blockquote>
-<p><img src="/img_eos1/eos6.png" alt="lessons"></p>
-<h4 id="step-3-前端页面组件布局"><a href="#step-3-前端页面组件布局" class="headerlink" title="step 3 前端页面组件布局"></a>step 3 前端页面组件布局</h4><blockquote>
-<p>这里还是使用Jungle test net来做，account shaokun11113。<br>我这里出现了一个问题，就是之前我把eos升级了，但是我的电脑没有升级升级到eoscdt。导致现在能够生成abi和wasm文件，但是部署不到链上去，出现的是如下错误，哪位同学知道可以告诉我，感谢。<br><img src="/img_eos1/eos7.png" alt="lessons"></p>
-</blockquote>
-<p>这里卡住我太久了，那部署合约这一步就先跳过，这一篇文章我们先根据官方的步骤先把前端页面展示出来吧！<br><img src="/img_eos1/eos_react.gif" alt="lessons"><br>主要是精简了官方的图片和ui，这一部分先把功能实现，有心思的同学如果觉得我的这个丑就按照官方的来吧，这里用到了几个react的库，建议你们先了解一下</p>
-<pre><code> &quot;eosjs&quot;: &quot;^16.0.9&quot;,   
-&quot;react&quot;: &quot;^16.5.2&quot;,
-&quot;react-dom&quot;: &quot;^16.5.2&quot;,
-&quot;react-redux&quot;: &quot;^5.0.7&quot;,
-&quot;react-scripts&quot;: &quot;2.0.5&quot;,
-&quot;redux&quot;: &quot;^4.0.1&quot;,
-&quot;redux-logger&quot;: &quot;^3.0.6&quot;
-</code></pre><h4 id="step-4-页面交互"><a href="#step-4-页面交互" class="headerlink" title="step 4 页面交互"></a>step 4 页面交互</h4><p>由于合约没有部署上，所以没有办法上链进行演示，故此处仅仅是将整个前端的ui交互成功，如果你看过我之前的两篇文章，那么到这里你应该可以理解的。<br><img src="/img_eos1/eos_react2.gif" alt="lessons"></p>
-<h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>这篇文章写的很不顺，没有完成最关键的上链一步给大家演示，真是抱歉了。那么只能够走思路了。附上本篇文章所用到的源码 <a href="https://github.com/shaokun11/eoslearning/tree/eos-dev02" target="_blank" rel="noopener">elementel battels dev2</a></p>
-<p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#104;&#x61;&#x6f;&#x6b;&#117;&#x6e;&#105;&#x6e;&#103;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#104;&#x61;&#x6f;&#x6b;&#117;&#x6e;&#105;&#x6e;&#103;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#x6f;&#109;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#110;&#110;&#121;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#110;&#121;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#x73;&#104;&#x61;&#111;&#107;&#117;&#110;&#x69;&#x6e;&#103;&#64;&#103;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#104;&#x61;&#111;&#107;&#117;&#110;&#x69;&#x6e;&#103;&#64;&#103;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#x6d;</a><br>email_2: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#54;&#51;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#54;&#51;&#x2e;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -2906,7 +2986,7 @@ user_info =&gt; userinfo
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
