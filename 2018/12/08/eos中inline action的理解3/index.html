@@ -90,7 +90,7 @@
 <meta property="og:image" content="http://yoursite.com/eosinline/inline3.gif">
 <meta property="og:image" content="http://yoursite.com/eosinline/inline4.gif">
 <meta property="og:image" content="http://yoursite.com/common/wx.png">
-<meta property="og:updated_time" content="2018-12-08T04:14:14.000Z">
+<meta property="og:updated_time" content="2019-01-12T05:03:38.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="eos中inline action的使用方式 (续)">
 <meta name="twitter:description" content="填坑 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.     之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉. 也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮询最新区块的内容而进行的事件的匹配然后产生的回调.   requestmanager.js">
@@ -387,6 +387,7 @@ void play(name player, const asset&amp; quantity) {
     &quot;eosio.token&quot;_n,                          // 调用的合约名称
     &quot;transfer&quot;_n,                              // 合约的方法
     std::make_tuple(get_self(),player, quantity, std::string(&quot;shao kun game&quot;)) // 传递的参数
+        ).send();
     } else {
         action(
         permission_level{player,&quot;active&quot;_n},
@@ -428,7 +429,7 @@ function withPayable() public payable {
 <li>官方的eos dice合约现在已经移除了,但是可以在历史中找到<a href="https://github.com/EOSIO/eos/blob/v1.0.0/contracts/dice/dice.cpp" target="_blank" rel="noopener">eos dice</a> 有兴趣的同学可以研究一下</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>（加好友时，请备注 区块链，谢谢）<br><img src="/common/wx.png" alt="jungle"> </p>
-<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#x61;&#x6f;&#x6b;&#117;&#110;&#x69;&#110;&#x67;&#x40;&#103;&#109;&#97;&#105;&#108;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#x6f;&#x6b;&#117;&#110;&#x69;&#110;&#x67;&#x40;&#103;&#109;&#97;&#105;&#108;&#x2e;&#99;&#111;&#109;</a><br>email_2: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#109;</a></p>
+<p>当然也可以通过以下方式联系我<br>email_1: <a href="mailto:&#115;&#x68;&#x61;&#111;&#x6b;&#x75;&#110;&#105;&#110;&#103;&#x40;&#x67;&#x6d;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#x68;&#x61;&#111;&#x6b;&#x75;&#110;&#105;&#110;&#103;&#x40;&#x67;&#x6d;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;</a><br>email_2: <a href="mailto:&#x73;&#107;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#46;&#99;&#111;&#109;</a></p>
 
       
     </div>
@@ -462,6 +463,10 @@ function withPayable() public payable {
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/12/eos中inline action的理解4/" rel="prev" title="eos的dispatcher的使用(1)">
+                eos的dispatcher的使用(1) <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -565,7 +570,7 @@ function withPayable() public payable {
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -622,7 +627,7 @@ function withPayable() public payable {
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
