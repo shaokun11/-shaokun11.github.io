@@ -37,7 +37,7 @@ date: 2019-02-23 13:33:56
 * issue 900个给eostoday1235,然后在retire掉(可以理解为销毁,不要这个action也可以) 
 * 后续再转账,都可以在浏览器上查到对应的结果
 * ![演示结果](/img_eos1/eos_gif_2.gif)
-* [源码](https://github.com/shaokun11/eoslearning/tree/create-token)
+* [源码](https://github.com/shaokun11/eosabout/tree/create-token)
 
 #### 总结
 * 按照上面的步骤,我们已经发行了一种token,注意是使用我们自己的账号
