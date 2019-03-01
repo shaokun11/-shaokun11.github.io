@@ -95,7 +95,8 @@ date: 2019-03-02 21:30:27
 
 
 #### 填坑
-* 之前很困惑的一个是关于scatter和eosjs2无法一起使用,官方也没有例子,而现在找到了[github](https://github.com/GetScatter/scatter-js)
+* 之前有一个困惑的问题是关于scatter和eosjs2无法一起使用,官方也没有例子,而现在找到了[github](https://github.com/GetScatter/scatter-js)
+* 以下我只是搬运工 ^.^
 * scatter + eosjs2  
 * npm i -S scatterjs-core scatterjs-plugin-eosjs2 eosjs@20.0.0-beta3
 
@@ -212,7 +213,9 @@ ScatterJS.connect('YourAppName', {network}).then(connected => {
 
     ScatterJS.login().then(id => {
         if(!id) return console.error('no identity');
-        const account = ScatterJS.account('trx');
+        // https://github.com/GetScatter/scatter-js/blob/master/packages/core/src/models/Blockchains.js
+        // 这里官方应该写错了,携程trx了,我们把它改过来
+        const account = ScatterJS.account('eth');
         web3.eth.sendTransaction({
             from: account.address,
             to: '0x...',
