@@ -121,14 +121,7 @@ scatter是chrome的插件，所以你先得安装它[chrome浏览器下载](http
 * ![jungle net account ](/images/jungle03.png)  
 这次我就这样填写，然后人机验证，通过后点击左下角的create,确保网络质量优良  
 
-**文章允许转载，但请注明出处，谢谢**
-
-**这里我的网络质量太差了。。。先写到这里，，， 请继续关注第二篇**  
-
 #### 关于我
 区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  
-（加好友时，请备注 区块链，谢谢）  
-![jungle](/common/wx.png)          
-当然也可以通过以下方式联系我  
-email_1: <shaokuning@gmail.com>   
-email_2: <skunny@163.com>
+ 
+email: <skunny@163.com>

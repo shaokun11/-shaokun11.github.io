@@ -6,7 +6,7 @@ date: 2020-02-02 16:19:14
 - ts开发后端项目,考虑到维护的需要,还是需要ts来支持.其中涉及到的lib都能找到对应的types,但是也有例外比如eosjs-ecc
 
 #### 解决方法
-1. 简单快速,但是没有任何提示了,IDE基本的提示都没有了,对于直接将.js-->.ts可以使用
+1. 简单快速,但是没有任何提示了,IDE基本的提示都没有了,对于直接将.js--->.ts可以使用
 
 ```javascript
 	// tsconfig.json中将此字段设为false
@@ -34,13 +34,13 @@ date: 2020-02-02 16:19:14
 	export function randomKey(cpuEntropyBits?: number ): Promise<string>;
 	```
 
+#### 优化(2020-02-21 15:14:56)
+
+* 上述第二点中,使用ts-node需要加上ts-ignore,而直接使用tsc编译为什么能过呢?
+* 原来在tsconfig.json中,我使用include属性将其声明文件包含到编译中了,故可使用.查看ts-node文档,只需要在执行ts-node 加上--files选项,这样将会加载tcconfig.json的include属性,这样就移除ts-ignore这个选项了
+
 #### 总结
   最开始自己写*.d.ts,后续发现了居然还有dts-gen这样的工具.回头想想,利用这些工具,真香 ^0^,
 #### 关于我
 区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  
-（加好友时，请备注 区块链，谢谢）  
-![jungle](/common/wx.png) 
-
-当然也可以通过以下方式联系我  
-email_1: <shaokuning@gmail.com>   
-email_2: <skunny@163.com>
+email: <skunny@163.com>

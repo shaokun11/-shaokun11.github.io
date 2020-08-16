@@ -220,9 +220,5 @@ date: 2018-11-15 20:38:55
 
 #### 关于我
 区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  
-（加好友时，请备注 区块链，谢谢）  
-![jungle](/common/wx.png) 
-
-当然也可以通过以下方式联系我  
-email_1: <shaokuning@gmail.com>   
-email_2: <skunny@163.com>
+ 
+email: <skunny@163.com>

@@ -69,7 +69,6 @@ const typography = {
 ![material-ui self host font](/react/material-ui-font.gif) 
 ##### 关于我
 区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  
-（加好友时，请备注 区块链，谢谢）  
-![jungle](/common/wx.png) 
+
 
 
