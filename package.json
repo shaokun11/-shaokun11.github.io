@@ -4,6 +4,10 @@
   "private": true,
   "hexo": {
     "version": "3.9.0"
+    
+  },
+  "scripts":{
+    "start":"hexo clean && hexo g && hexo d"
   },
   "dependencies": {
     "hexo": "^3.9.0",
