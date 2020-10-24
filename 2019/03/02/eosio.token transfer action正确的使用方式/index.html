@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言 额,正确使用的方式不就是转账吗?直接调用不就可以了? 是的,就是转账,但是 我要在账号中的合约中执行转账(这个之前的文章已经实现了,不是本篇文章的重点) 同时执行一个greet(std::string msg) action呢? 当其他任何玩家转账给我,我要知道转账的数据,同时给我捎句话呢   那就使用一个action转账,一个action greet(msg)!!! 目的是到了呢,但是这个">
+<meta name="keywords" content="eos,eth,tron,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="eosio.token transfer正确的使用方式">
+<meta property="og:url" content="http://yoursite.com/2019/03/02/eosio.token transfer action正确的使用方式/index.html">
+<meta property="og:site_name" content="hello shaokun">
+<meta property="og:description" content="前言 额,正确使用的方式不就是转账吗?直接调用不就可以了? 是的,就是转账,但是 我要在账号中的合约中执行转账(这个之前的文章已经实现了,不是本篇文章的重点) 同时执行一个greet(std::string msg) action呢? 当其他任何玩家转账给我,我要知道转账的数据,同时给我捎句话呢   那就使用一个action转账,一个action greet(msg)!!! 目的是到了呢,但是这个">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/img_eos1/eos_gif_3.gif">
+<meta property="og:updated_time" content="2020-10-16T15:03:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="eosio.token transfer正确的使用方式">
+<meta name="twitter:description" content="前言 额,正确使用的方式不就是转账吗?直接调用不就可以了? 是的,就是转账,但是 我要在账号中的合约中执行转账(这个之前的文章已经实现了,不是本篇文章的重点) 同时执行一个greet(std::string msg) action呢? 当其他任何玩家转账给我,我要知道转账的数据,同时给我捎句话呢   那就使用一个action转账,一个action greet(msg)!!! 目的是到了呢,但是这个">
+<meta name="twitter:image" content="http://yoursite.com/img_eos1/eos_gif_3.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/02/eosio.token transfer action正确的使用方式/">
+
+
+
+
+
+  <title>eosio.token transfer正确的使用方式 | hello shaokun</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">hello shaokun</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">code is law</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/02/eosio.token transfer action正确的使用方式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">eosio.token transfer正确的使用方式</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-02T21:30:27+08:00">
+                2019-03-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 浏览
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><ul>
+<li>额,正确使用的方式不就是转账吗?直接调用不就可以了?</li>
+<li>是的,就是转账,但是<ol>
+<li>我要在账号中的合约中执行转账(这个之前的文章已经实现了,不是本篇文章的重点)</li>
+<li>同时执行一个greet(std::string msg) action呢?</li>
+<li>当其他任何玩家转账给我,我要知道转账的数据,同时给我捎句话呢</li>
+</ol>
+</li>
+<li>那就使用一个action转账,一个action greet(msg)!!!</li>
+<li>目的是到了呢,但是这个是两个action呢?那就是有时间差的,貌似不符合我的需求哦,那该怎么办呢?</li>
+<li>好的,如果你看过之前的文章,其实你已经明白怎么做了,自定义dispatcher这个宏</li>
+<li>是的,完全正确,那么本篇文章就是接着之前的文章而来,把数据记录起来</li>
+</ul>
+<h4 id="游戏设计"><a href="#游戏设计" class="headerlink" title="游戏设计"></a>游戏设计</h4><ul>
+<li>本次的合约来玩一个游戏叫做:paymsg</li>
+<li>游戏规则:<ul>
+<li>任何人均可以参加游戏,每次参加至少游戏需花费1eos</li>
+<li>花费了这个费用的玩家 合约会自动将他转账的memo储存在区块链中,但是会加上我的签名</li>
+<li>当然,当你花费超过5个eos时,将会有一次免费的机会再次更新你储存的信息<h4 id="合约设计"><a href="#合约设计" class="headerlink" title="合约设计"></a>合约设计</h4></li>
+</ul>
+</li>
+<li>合约的具体设计请看源码就可以了<ol>
+<li>拦截transfer方法,获取转账信息</li>
+<li>记住反序列化的时候,需要建一个struct来承载数据的信息 </li>
+<li>设计一个对外的action用于 用户免费更新储存的信息</li>
+<li>此合约只是demo,仅供参考</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">[[eosio::action]]</span><br><span class="line">void upmsg(name player, std::string msg) &#123;</span><br><span class="line">  require_auth(player);</span><br><span class="line">  // 这个地方可以使用这种方式初始化table 真不知道是哪里醉了</span><br><span class="line">  paymessage_index paymessages(get_self(), _code.value);</span><br><span class="line">  auto iterator = paymessages.find(player.value);</span><br><span class="line">  eosio_assert(iterator != paymessages.end(), &quot;you are not in shaokun paymsg game&quot;);</span><br><span class="line">  eosio_assert(iterator-&gt;uamount &gt;= 50000, &quot;you must send more than 5 eos that can update your msg&quot;);</span><br><span class="line">  paymessages.modify(iterator, player, [&amp;]( auto&amp; row ) &#123;</span><br><span class="line">      row.player = player;</span><br><span class="line">      row.msg = msg;</span><br><span class="line">      row.uamount = 0;  //置为0 ,下次更改必须花5eos以上</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void transfer()&#123;</span><br><span class="line">  // 反序列化得到st_transfer结构体对象</span><br><span class="line">  // 就可以拿到transfer的交易信息了,而且是eosio.token发过的transfer</span><br><span class="line">  auto transfer_data = unpack_action_data&lt;st_transfer&gt;();</span><br><span class="line">  // eos是4位小数,由于不支持实际意义上的小数,所以这里要使用整形10000代替1eos</span><br><span class="line">  eosio_assert(transfer_data.quantity.amount &gt;= 10000, &quot;must more than 1 eos provide&quot;);</span><br><span class="line">  auto tr_from = transfer_data.from;</span><br><span class="line">  if(tr_from == get_self()) &#123;</span><br><span class="line">      //自己转出去就不需要参加游戏了</span><br><span class="line">      return;</span><br><span class="line">  &#125;</span><br><span class="line">  auto tr_amount = transfer_data.quantity.amount;</span><br><span class="line">  // https://github.com/EOSIO/eosio.cdt/blob/master/libraries/eosiolib/symbol.hpp</span><br><span class="line">  if(transfer_data.quantity.symbol != eosio::symbol(&quot;EOS&quot;,4))&#123;</span><br><span class="line">      // 我们只收eos</span><br><span class="line">      return;</span><br><span class="line">  &#125;</span><br><span class="line">  auto tr_memo = transfer_data.memo;</span><br><span class="line">  // 这里一定要按照这样的格式初始化table,不然无法写入数据</span><br><span class="line">  // 理论上这种方式初始化的table权限是一样的呢 paymessage_index paymessages(get_self(), _code.value);</span><br><span class="line">  paymessage_index paymessages(get_self(), get_self().value);</span><br><span class="line">  auto itr = paymessages.find(transfer_data.from.value);</span><br><span class="line">  if (itr == paymessages.end())&#123;</span><br><span class="line">      paymessages.emplace(get_self(), [&amp;]( auto&amp; row ) &#123;</span><br><span class="line">          row.player = tr_from;</span><br><span class="line">          row.uamount = tr_amount;</span><br><span class="line">          row.tamount = tr_amount;</span><br><span class="line">          row.msg = &quot;welcome to shaokun paygame, your pay msg is :&quot; + tr_memo;</span><br><span class="line">      &#125;);</span><br><span class="line">  &#125;else &#123;</span><br><span class="line">      paymessages.modify(itr, get_self(), [&amp;]( auto&amp; row ) &#123;</span><br><span class="line">          row.tamount += tr_amount;</span><br><span class="line">          row.uamount += tr_amount ;</span><br><span class="line">          row.msg = &quot;welcome come back to shaokun paygame:&quot;+ tr_memo;</span><br><span class="line">      &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="编译-部署-验证"><a href="#编译-部署-验证" class="headerlink" title="编译,部署,验证"></a>编译,部署,验证</h4><ul>
+<li>编译,买RAM,部署</li>
+<li>使用shaokunpay11部署合约</li>
+<li>使用eostoday1235进行添加数据</li>
+<li><p>使用eostoday1235进行两次的upmsg进行修改数据</p>
+<p><img src="/img_eos1/eos_gif_3.gif" alt="shaokun"></p>
+</li>
+<li><p><a href="https://github.com/shaokun11/eosabout.git" target="_blank" rel="noopener">源码</a></p>
+</li>
+</ul>
+<h4 id="填坑"><a href="#填坑" class="headerlink" title="填坑"></a>填坑</h4><ul>
+<li>之前有一个困惑的问题是关于scatter和eosjs2无法一起使用,官方也没有例子,而现在找到了<a href="https://github.com/GetScatter/scatter-js" target="_blank" rel="noopener">github</a></li>
+<li>以下我只是搬运工 ^.^</li>
+<li>scatter + eosjs2  </li>
+<li>npm i -S scatterjs-core scatterjs-plugin-eosjs2 <a href="mailto:eosjs@20.0.0-beta3" target="_blank" rel="noopener">eosjs@20.0.0-beta3</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">import ScatterJS from &apos;scatterjs-core&apos;;</span><br><span class="line">import ScatterEOS from &apos;scatterjs-plugin-eosjs2&apos;;</span><br><span class="line">import &#123;JsonRpc, Api&#125; from &apos;eosjs&apos;;</span><br><span class="line"></span><br><span class="line">ScatterJS.plugins( new ScatterEOS() );</span><br><span class="line"></span><br><span class="line">const network = ScatterJS.Network.fromJson(&#123;</span><br><span class="line">    blockchain:&apos;eos&apos;,</span><br><span class="line">    chainId:&apos;aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906&apos;,</span><br><span class="line">    host:&apos;nodes.get-scatter.com&apos;,</span><br><span class="line">    port:443,</span><br><span class="line">    protocol:&apos;https&apos;</span><br><span class="line">&#125;);</span><br><span class="line">const rpc = new JsonRpc(network.fullhost());</span><br><span class="line"></span><br><span class="line">ScatterJS.connect(&apos;hello shaokun&apos;, &#123;network&#125;).then(connected =&gt; &#123;</span><br><span class="line">    if(!connected) return console.error(&apos;no scatter&apos;);</span><br><span class="line"></span><br><span class="line">    const eos = ScatterJS.eos(network, Api, &#123;rpc, beta3:true&#125;);</span><br><span class="line"></span><br><span class="line">    ScatterJS.login().then(id =&gt; &#123;</span><br><span class="line">        if(!id) return console.error(&apos;no identity&apos;);</span><br><span class="line">        const account = ScatterJS.account(&apos;eos&apos;);</span><br><span class="line"></span><br><span class="line">        eos.transact(&#123;</span><br><span class="line">            actions: [&#123;</span><br><span class="line">                account: &apos;eosio.token&apos;,</span><br><span class="line">                name: &apos;transfer&apos;,</span><br><span class="line">                authorization: [&#123;</span><br><span class="line">                    actor: account.name,</span><br><span class="line">                    permission: account.authority,</span><br><span class="line">                &#125;],</span><br><span class="line">                data: &#123;</span><br><span class="line">                    from: account.name,</span><br><span class="line">                    to: &apos;safetransfer&apos;,</span><br><span class="line">                    quantity: &apos;0.0001 EOS&apos;,</span><br><span class="line">                    memo: account.name,</span><br><span class="line">                &#125;,</span><br><span class="line">            &#125;]</span><br><span class="line">        &#125;, &#123;</span><br><span class="line">            blocksBehind: 3,</span><br><span class="line">            expireSeconds: 30,</span><br><span class="line">        &#125;).then(res =&gt; &#123;</span><br><span class="line">            console.log(&apos;sent: &apos;, res);</span><br><span class="line">        &#125;).catch(err =&gt; &#123;</span><br><span class="line">            console.error(&apos;error: &apos;, err);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>scatter + eosjs1  </li>
+<li>npm i -S scatterjs-core scatterjs-plugin-eosjs <a href="mailto:eosjs@16.0.9" target="_blank" rel="noopener">eosjs@16.0.9</a></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">import ScatterJS from &apos;scatterjs-core&apos;;</span><br><span class="line">import ScatterEOS from &apos;scatterjs-plugin-eosjs&apos;;</span><br><span class="line">import Eos from &apos;eosjs&apos;;</span><br><span class="line"></span><br><span class="line">ScatterJS.plugins( new ScatterEOS() );</span><br><span class="line"></span><br><span class="line">const network = ScatterJS.Network.fromJson(&#123;</span><br><span class="line">    blockchain:&apos;eos&apos;,</span><br><span class="line">    chainId:&apos;aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906&apos;,</span><br><span class="line">    host:&apos;nodes.get-scatter.com&apos;,</span><br><span class="line">    port:443,</span><br><span class="line">    protocol:&apos;https&apos;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">ScatterJS.connect(&apos;YourAppName&apos;, &#123;network&#125;).then(connected =&gt; &#123;</span><br><span class="line">    if(!connected) return console.error(&apos;no scatter&apos;);</span><br><span class="line"></span><br><span class="line">    const eos = ScatterJS.eos(network, Eos);</span><br><span class="line"></span><br><span class="line">    ScatterJS.login().then(id =&gt; &#123;</span><br><span class="line">        if(!id) return console.error(&apos;no identity&apos;);</span><br><span class="line">        const account = ScatterJS.account(&apos;eos&apos;);</span><br><span class="line">        const options = &#123;authorization:[`$&#123;account.name&#125;@$&#123;account.authority&#125;`]&#125;;</span><br><span class="line">        eos.transfer(account.name, &apos;safetransfer&apos;, &apos;0.0001 EOS&apos;, account.name, options).then(res =&gt; &#123;</span><br><span class="line">            console.log(&apos;sent: &apos;, res);</span><br><span class="line">        &#125;).catch(err =&gt; &#123;</span><br><span class="line">            console.error(&apos;error: &apos;, err);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>scatter + web3</li>
+<li>npm i -S scatterjs-core scatterjs-plugin-web3 web3</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">import ScatterJS from &apos;scatterjs-core&apos;;</span><br><span class="line">import ScatterETH from &apos;scatterjs-plugin-web3&apos;;</span><br><span class="line">import Web3 from &apos;web3&apos;;</span><br><span class="line"></span><br><span class="line">ScatterJS.plugins( new ScatterETH() );</span><br><span class="line"></span><br><span class="line">const network = ScatterJS.Network.fromJson(&#123;</span><br><span class="line">    blockchain:&apos;eth&apos;,</span><br><span class="line">    chainId:&apos;1&apos;,</span><br><span class="line">    host:&apos;YOUR ETHEREUM NODE&apos;,</span><br><span class="line">    port:443,</span><br><span class="line">    protocol:&apos;https&apos;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">ScatterJS.connect(&apos;YourAppName&apos;, &#123;network&#125;).then(connected =&gt; &#123;</span><br><span class="line">    if(!connected) return console.error(&apos;no scatter&apos;);</span><br><span class="line"></span><br><span class="line">    const web3 = ScatterJS.web3(network, Web3);</span><br><span class="line"></span><br><span class="line">    ScatterJS.login().then(id =&gt; &#123;</span><br><span class="line">        if(!id) return console.error(&apos;no identity&apos;);</span><br><span class="line">        // https://github.com/GetScatter/scatter-js/blob/master/packages/core/src/models/Blockchains.js</span><br><span class="line">        // 这里官方应该写错了,携程trx了,我们把它改过来</span><br><span class="line">        const account = ScatterJS.account(&apos;eth&apos;);</span><br><span class="line">        web3.eth.sendTransaction(&#123;</span><br><span class="line">            from: account.address,</span><br><span class="line">            to: &apos;0x...&apos;,</span><br><span class="line">            value: &apos;1000000000000000&apos;</span><br><span class="line">        &#125;).then(res =&gt; &#123;</span><br><span class="line">            console.log(&apos;sent: &apos;, res);</span><br><span class="line">        &#125;).catch(err =&gt; &#123;</span><br><span class="line">            console.error(&apos;error: &apos;, err);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>scatter + tronweb</li>
+<li>npm i -S scatterjs-core scatterjs-plugin-tron tronweb</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">import ScatterJS from &apos;scatterjs-core&apos;;</span><br><span class="line">import ScatterTron from &apos;scatterjs-plugin-tron&apos;;</span><br><span class="line">import TronWeb from &apos;tronweb&apos;;</span><br><span class="line"></span><br><span class="line">ScatterJS.plugins( new ScatterTron() );</span><br><span class="line"></span><br><span class="line">const network = ScatterJS.Network.fromJson(&#123;</span><br><span class="line">    blockchain:&apos;tron&apos;,</span><br><span class="line">    chainId:&apos;1&apos;,</span><br><span class="line">    host:&apos;api.trongrid.io&apos;,</span><br><span class="line">    port:443,</span><br><span class="line">    protocol:&apos;https&apos;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">const httpProvider = new TronWeb.providers.HttpProvider(network.fullhost());</span><br><span class="line">let tron = new TronWeb(httpProvider, httpProvider, network.fullhost());</span><br><span class="line">tron.setDefaultBlock(&apos;latest&apos;);</span><br><span class="line"></span><br><span class="line">ScatterJS.connect(&apos;YourAppName&apos;, &#123;network&#125;).then(connected =&gt; &#123;</span><br><span class="line">    if(!connected) return console.error(&apos;no scatter&apos;);</span><br><span class="line"></span><br><span class="line">    tron = ScatterJS.trx(network, tron);</span><br><span class="line"></span><br><span class="line">    ScatterJS.login().then(id =&gt; &#123;</span><br><span class="line">        if(!id) return console.error(&apos;no identity&apos;);</span><br><span class="line">        const account = ScatterJS.account(&apos;trx&apos;);</span><br><span class="line">        tron.trx.sendTransaction(&apos;TX...&apos;, 100).then(res =&gt; &#123;</span><br><span class="line">            console.log(&apos;sent: &apos;, res);</span><br><span class="line">        &#125;).catch(err =&gt; &#123;</span><br><span class="line">            console.error(&apos;error: &apos;, err);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
+<li>这样就实现了以太坊payable关键字的功能了</li>
+<li>paymsg这个小game的逻辑,其实也和市面上大多数的菠菜类游戏的实现方式类似,只是其中的规则少了点</li>
+<li>至此,基于eos开发dapp的所有流程基本上是讲完了</li>
+<li>当然其中有很多点我也没有讲到,主要是我在学习的过程中,其他点没有遇到太大的问题.比如说multi_index的操作</li>
+<li>关于感想,就是要有耐心去学习这个,因为目前也没有其他的更好的资料,我比较推荐官方的教程<a href="https://developers.eos.io/eosio-home/docs/introduction" target="_blank" rel="noopener">eos smart contract</a></li>
+<li>还有一点,如果你使用eosiocpp编译wasm,abi文件,写合约的时候,有时候需要参考源码<a href="https://sourcegraph.com/github.com/EOSIO/eos" target="_blank" rel="noopener">eosio</a>,如果使用eosio.cdt编译的合约,<a href="https://github.com/EOSIO/eosio.cdt/tree/master/libraries/eosiolib" target="_blank" rel="noopener">eosio.cdt eoslib</a>要去这里找(ps:这个地方受过很多伤…)</li>
+<li>最后,祝大家学的开心</li>
+</ul>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#x40;&#49;&#54;&#51;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#x40;&#49;&#54;&#51;&#46;&#x63;&#x6f;&#x6d;</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/23/eos测试网发行token/" rel="next" title="一步一步教你在eos主网上发行自己的tokens">
+                <i class="fa fa-chevron-left"></i> 一步一步教你在eos主网上发行自己的tokens
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/12/我应该怎样学习eos智能合约的开发?/" rel="prev" title="我应该怎样学习eos智能合约的开发?">
+                我应该怎样学习eos智能合约的开发? <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">shaokun</p>
+              <p class="site-description motion-element" itemprop="description">记录自己对相关技术的点点滴滴和一些思考，希望能够帮助来到这里的你，如果你喜欢我的文章，可以加个微信共同探讨</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#游戏设计"><span class="nav-number">2.</span> <span class="nav-text">游戏设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#合约设计"><span class="nav-number">3.</span> <span class="nav-text">合约设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编译-部署-验证"><span class="nav-number">4.</span> <span class="nav-text">编译,部署,验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#填坑"><span class="nav-number">5.</span> <span class="nav-text">填坑</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">7.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">shaokun</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+ <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 访问总量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

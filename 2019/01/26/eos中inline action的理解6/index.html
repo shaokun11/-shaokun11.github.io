@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言经过前面两篇文章的练习,相信各位同学都已经对自定义dispatcher已经有了自己的看法了,那么今天我们继续跟着官方的教程走,把接下来的知识点完整一下 自定义dispatcher 方式3 这种方式官方说了,不能用于eosio-cpp生成abi,所以我也不详细去探究了,有兴趣的同学可以自己研究一下.官方最后总结这是最为灵活的一种方式呢  12This dispatcher places most">
+<meta name="keywords" content="eos,eth,tron,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="eos的dispatcher的使用(3 完结)">
+<meta property="og:url" content="http://yoursite.com/2019/01/26/eos中inline action的理解6/index.html">
+<meta property="og:site_name" content="hello shaokun">
+<meta property="og:description" content="前言经过前面两篇文章的练习,相信各位同学都已经对自定义dispatcher已经有了自己的看法了,那么今天我们继续跟着官方的教程走,把接下来的知识点完整一下 自定义dispatcher 方式3 这种方式官方说了,不能用于eosio-cpp生成abi,所以我也不详细去探究了,有兴趣的同学可以自己研究一下.官方最后总结这是最为灵活的一种方式呢  12This dispatcher places most">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/img_eos1/eos_gif_1.gif">
+<meta property="og:updated_time" content="2020-10-16T15:03:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="eos的dispatcher的使用(3 完结)">
+<meta name="twitter:description" content="前言经过前面两篇文章的练习,相信各位同学都已经对自定义dispatcher已经有了自己的看法了,那么今天我们继续跟着官方的教程走,把接下来的知识点完整一下 自定义dispatcher 方式3 这种方式官方说了,不能用于eosio-cpp生成abi,所以我也不详细去探究了,有兴趣的同学可以自己研究一下.官方最后总结这是最为灵活的一种方式呢  12This dispatcher places most">
+<meta name="twitter:image" content="http://yoursite.com/img_eos1/eos_gif_1.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/26/eos中inline action的理解6/">
+
+
+
+
+
+  <title>eos的dispatcher的使用(3 完结) | hello shaokun</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">hello shaokun</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">code is law</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/eos中inline action的理解6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">eos的dispatcher的使用(3 完结)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T15:08:04+08:00">
+                2019-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 浏览
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>经过前面两篇文章的练习,相信各位同学都已经对自定义dispatcher已经有了自己的看法了,那么今天我们继续跟着官方的教程走,把接下来的知识点完整一下</p>
+<h4 id="自定义dispatcher-方式3"><a href="#自定义dispatcher-方式3" class="headerlink" title="自定义dispatcher 方式3"></a>自定义dispatcher 方式3</h4><ul>
+<li>这种方式官方说了,不能用于eosio-cpp生成abi,所以我也不详细去探究了,有兴趣的同学可以自己研究一下.官方最后总结这是最为灵活的一种方式呢</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">This dispatcher places most of the security logic and control inside the action handler, however, cannot use eosio-cpp&apos;s ABI generator.</span><br><span class="line">此调度程序将大多数安全逻辑和控件放在操作处理程序中，但是，不能使用eosio-cpp的ABI生成器。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">extern &quot;C&quot; void apply(uint64_t receiver, uint64_t code, uint64_t action) &#123; </span><br><span class="line">  switch(action) &#123;</span><br><span class="line">      case name(&quot;upsert&quot;).value: return upsert(receiver, code);</span><br><span class="line">      case name(&quot;notify&quot;).value: return notify(receiver, code);</span><br><span class="line">      case name(&quot;erase&quot;).value: return erase(receiver, code);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">To handle these requests, we move security logic that was otherwise in the dispatcher, into the action. This can provide more control, but may introduce redundancy, particularly for larger contracts. In the end, it accomplishes all the same points as the above patterns while allowing more information into the scope (namely code). Having access to code inside your action may be useful in some situations. This pattern provides the most flexibility in both the dispatcher and the action, hence &quot;Fully Flexible.&quot;</span><br><span class="line">为了处理这些请求，我们将调度程序中的安全逻辑移动到操作中。这可以提供更多控制，但可能会引入冗余，特别是对于大型合同。最后，它完成了与上述模式相同的所有点，同时允许更多信息进入范围（即代码）。在某些情况下，访问操作中的代码可能很有用。这种模式在调度程序和操作中提供了最大的灵活性，因此“完全灵活”。</span><br></pre></td></tr></table></figure>
+<h4 id="自定义dispatcher-方式4"><a href="#自定义dispatcher-方式4" class="headerlink" title="自定义dispatcher 方式4"></a>自定义dispatcher 方式4</h4><ul>
+<li>官方说,上面自定义apply函数的时候,如果action少还是可以接受的,如果很多呢?就编程了体力劳动了,而且有可能出现漏洞.这显然和我们程序猿的做法不一致,所以官方最后给我们推荐了新的方法,功能类似,且减少体力劳动,不得不说还是很贴心的</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#define EOSIO_DISPATCH_CUSTOM( TYPE, MEMBERS ) \</span><br><span class="line">extern &quot;C&quot; &#123; \</span><br><span class="line">   void apply( uint64_t receiver, uint64_t code, uint64_t action ) &#123; \</span><br><span class="line">      if( code == receiver ) &#123; \</span><br><span class="line">         switch( action ) &#123; \</span><br><span class="line">            EOSIO_DISPATCH_HELPER( TYPE, MEMBERS ) \</span><br><span class="line">         &#125; \</span><br><span class="line">         /* does not allow destructor of thiscontract to run: eosio_exit(0); */ \</span><br><span class="line">      &#125; \</span><br><span class="line">   &#125; \</span><br><span class="line">&#125; \</span><br></pre></td></tr></table></figure>
+<ul>
+<li>就是这么简单,虽然简单,但是我们还是得看看有什么魔法(以下内容为官方的介绍)</li>
+</ul>
+<ol>
+<li>一定要使用这个 code == receiver的判断,而这个可以自动允许eosio.token进行transfer的方法呢</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Checks if code==receiverand that the action is not transfer. If this condition is omitted, you may introduce a vulnerability into your contract. It allows the action through if the code is eosio.token and the action is transfer. This check prevents another contract with a transfer function from exploiting your contract.</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">2. 合约的实例化,可以看出和之前的apply方法是一样的,之前是在apply函数中实例化,这里直接传入一个实例</span><br></pre></td></tr></table></figure>
+<p>Instantiates the TYPE (this would be your standard C++11 class)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">3. 说内部调用了execute_action方法,和我们之前的设计一样</span><br></pre></td></tr></table></figure></p>
+<p>Use the EOSIO_DISPATCH_HELPER macro, which inserts a case for each MEMBER into your switch. Inside this case, it calls execute_action using a pattern very similar to the one demonstrated in the Flexible/Compatible Dispatcher defined above.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">4. 直接替换就可以了.不用做任何改变</span><br></pre></td></tr></table></figure></p>
+<p>You can then use this macro the same way you would with the provided EOSIO_DISPATCH macro.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 既然这样,这里多了一个EOSIO_DISPATCH_HELPER的宏,我们还是得去源码看看它究竟做了什么我们才能放心呢</span><br><span class="line">* 这里出现了一个小的惊喜,由于我目前的源码都是在eos去找,我居然没有找到EOSIO_DISPATCH_HELPER这个宏,这就尴尬了,转而我转向cdt的源码,总算找到了这个宏</span><br></pre></td></tr></table></figure></p>
+<p>// Helper macro for EOSIO_DISPATCH</p>
+<p>#define EOSIO_DISPATCH_HELPER( TYPE,  MEMBERS ) \<br>   BOOST_PP_SEQ_FOR_EACH( EOSIO_DISPATCH_INTERNAL, TYPE, MEMBERS )</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>// Helper macro for EOSIO_DISPATCH_INTERNAL</p>
+<p>#define EOSIO_DISPATCH_INTERNAL( r, OP, elem ) \<br>   case eosio::name( BOOST_PP_STRINGIZE(elem) ).value: \<br>      eosio::execute_action( eosio::name(receiver), eosio::name(code), &amp;OP::elem ); \<br>      break;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<p>#define EOSIO_DISPATCH( TYPE, MEMBERS ) \<br>extern “C” { \<br>   void apply( uint64_t receiver, uint64_t code, uint64_t action ) { \<br>      if( code == receiver ) { \<br>         switch( action ) { \<br>            EOSIO_DISPATCH_HELPER( TYPE, MEMBERS ) \<br>         } \<br>         /<em> does not allow destructor of thiscontract to run: eosio_exit(0); </em>/ \<br>      } \<br>   } \<br>} \<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">* 这里一下子三个宏了,我们关心的EOSIO_DISPATCH其实内部也是调用了EOSIO_DISPATCH_HELPER,所以这第三种方式定义的宏我觉得没有必要了哈,</span><br><span class="line">* 哎,官方的文档貌似又落后了,不过已经习以为常了呢.</span><br><span class="line"></span><br><span class="line">####  Security, Security, Security...</span><br></pre></td></tr></table></figure></p>
+<p>Your contract’s first line of security begins at your dispatcher. Understanding how the dispatching of actions to your contracts is handled is imperative to limiting exposure to logic inside your actions. Always take great caution when writing a custom dispatcher, and be aware of the security implications of each individual implementation method.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 安全第一,所以应该小心使用apply函数,所以官方最后建议还是直接使用EOSIO_DISPATCHER就可以了,至于原因则如下</span><br></pre></td></tr></table></figure></p>
+<p>For simple contracts that only execute internal public actions, the EOSIO_DISPATCH is more than suitable, eliminates cruft and greatly decrease the chance of introducing logical errors.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#### 猜想</span><br><span class="line">* 既然使用cdt中的EOSIO_DISPATCH就能够达到需求了,那我们该如何实现前面课程的监听呢?</span><br><span class="line">* 通过查看EOSIO_DISPATCHER的判断,这里是不允许code为eosio.token的的操作的记录的,既然这样那我们改造一下EOSIO_DISPATCHER如下所示</span><br></pre></td></tr></table></figure></p>
+<p>#define EOSIO_DISPATCH_CUSTOM( TYPE, MEMBERS ) \<br>extern “C” { \<br>   void apply( uint64_t receiver, uint64_t code, uint64_t action ) { \<br>      if( code == receiver || code == “eosio.token”_n.value &amp;&amp; action == “transfer”_n.value) { \<br>         switch( action ) { \<br>            EOSIO_DISPATCH_HELPER( TYPE, MEMBERS ) \<br>         } \<br>         /<em> does not allow destructor of thiscontract to run: eosio_exit(0); </em>/ \<br>      } \<br>   } \<br>} \<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 那么最终结果和上篇文章的内容是一样的,只是我们也没有自己实现apply函数了,而是借助于helper这个宏帮助我们完成</span><br></pre></td></tr></table></figure></p>
+<p>#include &lt;eosiolib/eosio.hpp&gt;</p>
+<p>#include &lt;eosiolib/print.hpp&gt;</p>
+<p>using namespace eosio;</p>
+<p>class [[eosio::contract]] addressbook : public eosio::contract {</p>
+<p>public:<br>  using contract::contract;</p>
+<p>  addressbook(name receiver, name code,  datastream<const char*> ds): contract(receiver, code, ds) {}</const></p>
+<p>  [[eosio::action]]<br>  void upsert(name user, std::string first_name, std::string last_name) {<br>    require_auth(user);<br>    address_index addresses(_code, _code.value);<br>    auto iterator = addresses.find(user.value);<br>    if( iterator == addresses.end() )<br>    {<br>      addresses.emplace(user, <a href="auto&amp; row">&amp;</a> {<br>       row.key = user;<br>       row.first_name = first_name;<br>       row.last_name = last_name;<br>      });<br>      send_summary(user, “ successfully emplaced record to addressbook”);<br>    }<br>    else {<br>      std::string changes;<br>      addresses.modify(iterator, user, <a href="auto&amp; row">&amp;</a> {<br>        row.key = user;<br>        row.first_name = first_name;<br>        row.last_name = last_name;<br>      });<br>      send_summary(user, “ successfully modified record to addressbook”);<br>    }<br>  }</p>
+<p>  [[eosio::action]]<br>  void erase(name user) {<br>    require_auth(user);</p>
+<pre><code>address_index addresses(_self, _code.value);
+
+auto iterator = addresses.find(user.value);
+eosio_assert(iterator != addresses.end(), &quot;Record does not exist&quot;);
+addresses.erase(iterator);
+send_summary(user, &quot; successfully erased record from addressbook&quot;);
+</code></pre><p>  }</p>
+<p>  void transfer(uint64_t receiver, uint64_t code){<br>    send_summary(name(code), “eosio.token transfer”);<br>  }</p>
+<p>private:<br>  struct [[eosio::table]] person {<br>    name key;<br>    std::string first_name;<br>    std::string last_name;<br>    uint64_t primary_key() const { return key.value; }<br>  };</p>
+<p>  void send_summary(name user, std::string message) {<br>    action(<br>      permission_level{get_self(),”active”_n},<br>      get_self(),<br>      “notify”_n,<br>      std::make_tuple(user, name{user}.to_string() + message)<br>    ).send();<br>  };</p>
+<p>  typedef eosio::multi_index&lt;”people”_n, person&gt; address_index;<br>};</p>
+<p>#define EOSIO_DISPATCH_CUSTOM( TYPE, MEMBERS ) \<br>extern “C” { \<br>   void apply( uint64_t receiver, uint64_t code, uint64_t action ) { \<br>      if( code == receiver || code == “eosio.token”_n.value &amp;&amp; action == “transfer”_n.value) { \<br>         switch( action ) { \<br>            EOSIO_DISPATCH_HELPER( TYPE, MEMBERS ) \<br>         } \<br>         /<em> does not allow destructor of thiscontract to run: eosio_exit(0); </em>/ \<br>      } \<br>   } \<br>} \</p>
+<p>EOSIO_DISPATCH_CUSTOM( addressbook, (upsert)(erase)(transfer) )<br><code>`</code></p>
+<h4 id="结果验证"><a href="#结果验证" class="headerlink" title="结果验证"></a>结果验证</h4><ul>
+<li>通过我们自定义的dispatcher,我们已经实现了和上篇文章同样的功能,且不用自己实现apply函数,极大的简化了操作</li>
+<li>当然,目前的方式我们允许的是eosio.token执行transfer操作,那么我们也可以仿照实现其他特殊合约的记录,比如说eosio.system(用来操作cpu,ram)的或者其他我们自定义的合约</li>
+</ul>
+<p><img src="/img_eos1/eos_gif_1.gif" alt="shaokun"></p>
+<p><a href="https://github.com/shaokun11/eosabout/tree/eos-dispatcher-03" target="_blank" rel="noopener">本课源码</a></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
+<li>上一篇最后一个问题,我们已经记录了当我们账户上eos的交易的数据,但是具体的数据我们还不知道呢?比如说转给谁?谁转的?转了多少?还有memo(这个也很重要的,有时候很多数据的有效性可以通过它来进行验证)</li>
+<li>第二个问题,我们怎么在链上发我们的自己的代币呢?而且这个代币要符合eos代币的标准标准(这里为什么要抛出这个问题呢?因为我只在本地的环境按照教程走,发过行过代币,但是在测试网,我没有eosio.token的账号,我居然懵逼了,不知道怎么发了),过程很简单,但是留给各位同学自己也思考一下</li>
+<li>三篇文章下来,可以看到跟着官网走,有好处,权威,也有坑,文档总是落后实际情况,那么我们能做点什么吗?我觉得能的,虽然语法变了,但是核心不变,所以我们掌握它的基础性内容,变来变去我们只需要去补一点它变化的内容就好了,如果你之前有基础,这应该就是手到擒来的事情了,只是,看我们还能否学得动哈^_^</li>
+</ul>
+<h4 id="啰嗦一句"><a href="#啰嗦一句" class="headerlink" title="啰嗦一句"></a>啰嗦一句</h4><ul>
+<li>莫名其妙,就叫收拾东西走人了,具体原因都没有,寒冬的果实也落在了我的头上了…(ps:猜测是俺站错了队吧,整个团队一起走人了…)</li>
+<li>换个方向想,何尝不是又给了我们人生中多一次选择的机会呢?</li>
+<li>这应该是年前的最后一篇文章了,希望年后能够继续给大家分享一些dapp开发的知识,谢谢你的阅读</li>
+</ul>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#x6b;&#x75;&#110;&#x6e;&#121;&#64;&#49;&#54;&#51;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#x6e;&#121;&#64;&#49;&#54;&#51;&#x2e;&#x63;&#x6f;&#109;</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/19/eos中inline action的理解5/" rel="next" title="eos的dispatcher的使用(2)">
+                <i class="fa fa-chevron-left"></i> eos的dispatcher的使用(2)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/23/eos测试网发行token/" rel="prev" title="一步一步教你在eos主网上发行自己的tokens">
+                一步一步教你在eos主网上发行自己的tokens <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">shaokun</p>
+              <p class="site-description motion-element" itemprop="description">记录自己对相关技术的点点滴滴和一些思考，希望能够帮助来到这里的你，如果你喜欢我的文章，可以加个微信共同探讨</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义dispatcher-方式3"><span class="nav-number">2.</span> <span class="nav-text">自定义dispatcher 方式3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义dispatcher-方式4"><span class="nav-number">3.</span> <span class="nav-text">自定义dispatcher 方式4</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结果验证"><span class="nav-number">4.</span> <span class="nav-text">结果验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#啰嗦一句"><span class="nav-number">6.</span> <span class="nav-text">啰嗦一句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">7.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">shaokun</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+ <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 访问总量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

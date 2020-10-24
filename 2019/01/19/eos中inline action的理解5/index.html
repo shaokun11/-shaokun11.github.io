@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言 希望阅读本篇文章的同学去看一下上一篇文章,不然思路断了接不上就有点麻烦了      多说两句 话说以太坊的分叉计划又延期了,而此次的升级主要是针对底层的安全机制,所以可见写智能合约的最关键点还是安全第一吧, eos一直被攻击,从未被停止.最近的eos因为一个derferred action的问题的漏洞又被黑客利用了,哎… 受伤的总是开发者 大家写的合约还有一个点,就是安全.这里一个朋友已经开">
+<meta name="keywords" content="eos,eth,tron,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="eos的dispatcher的使用(2)">
+<meta property="og:url" content="http://yoursite.com/2019/01/19/eos中inline action的理解5/index.html">
+<meta property="og:site_name" content="hello shaokun">
+<meta property="og:description" content="前言 希望阅读本篇文章的同学去看一下上一篇文章,不然思路断了接不上就有点麻烦了      多说两句 话说以太坊的分叉计划又延期了,而此次的升级主要是针对底层的安全机制,所以可见写智能合约的最关键点还是安全第一吧, eos一直被攻击,从未被停止.最近的eos因为一个derferred action的问题的漏洞又被黑客利用了,哎… 受伤的总是开发者 大家写的合约还有一个点,就是安全.这里一个朋友已经开">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/img_eos1/eos_react9.gif">
+<meta property="og:image" content="http://yoursite.com/img_eos1/eos_react10.gif">
+<meta property="og:updated_time" content="2020-10-16T15:03:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="eos的dispatcher的使用(2)">
+<meta name="twitter:description" content="前言 希望阅读本篇文章的同学去看一下上一篇文章,不然思路断了接不上就有点麻烦了      多说两句 话说以太坊的分叉计划又延期了,而此次的升级主要是针对底层的安全机制,所以可见写智能合约的最关键点还是安全第一吧, eos一直被攻击,从未被停止.最近的eos因为一个derferred action的问题的漏洞又被黑客利用了,哎… 受伤的总是开发者 大家写的合约还有一个点,就是安全.这里一个朋友已经开">
+<meta name="twitter:image" content="http://yoursite.com/img_eos1/eos_react9.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/19/eos中inline action的理解5/">
+
+
+
+
+
+  <title>eos的dispatcher的使用(2) | hello shaokun</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">hello shaokun</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">code is law</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/19/eos中inline action的理解5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">eos的dispatcher的使用(2)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-19T20:25:13+08:00">
+                2019-01-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 浏览
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>希望阅读本篇文章的同学去看一下上一篇文章,不然思路断了接不上就有点麻烦了    </p>
+</blockquote>
+<h4 id="多说两句"><a href="#多说两句" class="headerlink" title="多说两句"></a>多说两句</h4><ul>
+<li>话说以太坊的分叉计划又延期了,而此次的升级主要是针对底层的安全机制,所以可见写智能合约的最关键点还是安全第一吧,</li>
+<li>eos一直被攻击,从未被停止.最近的eos因为一个derferred action的问题的漏洞又被黑客利用了,哎… 受伤的总是开发者</li>
+<li>大家写的合约还有一个点,就是安全.这里一个朋友已经开发了一款应用,也已经上线到主网,各种测试也做了,什么逻辑,压力,数据,前端页面的跳转等等… 然而当项目上线后,他找到我对我说,别人可以绕过前端代码直接调用的它的合约…  我只能说,这就是智能合约,你所写的合约是全世界的人(当然,如果你的项目很成功,那么黑客也是由兴趣来光顾的)都可以调用的,除非你做一些权限的验证.在eos上还好,可以通过升级合约来弥补,而且code还不用开源.但是在eth,code is law,code还要开源,所以各位同学想想这个合约安全的重要性.eos底层虽然还有bug,我们无法避免,但是我们还是应该对我们的应用层的逻辑进行严格的测试,这样开发的智能合约才经得住世界人民的考验,你说是不是呢?</li>
+</ul>
+<h4 id="自定义dispatcher-方式2"><a href="#自定义dispatcher-方式2" class="headerlink" title="自定义dispatcher 方式2"></a>自定义dispatcher 方式2</h4><blockquote>
+<p>按照上篇文章的做法,那么我们实现了自己定义apply函数来取代EOSIO_DISPATCHER,但是实现的功能是一模一样的,那我们这样做的目的是什么呢?</p>
+</blockquote>
+<ul>
+<li>那么接下来我们继续按照官方的教程走,通过另外一种方式来实现.</li>
+<li>那么此种方式相对于上一中方式有什么区别呢?</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">This pattern provides more control over security at the expense of maintainability. Utilizing if...else if statements as opposed to a switch inherently provides more granularity.</span><br><span class="line">此模式以可维护性为代价提供了对安全性的更多控制。利用if ... else if语句而不是switch提供更精细的控制。</span><br></pre></td></tr></table></figure>
+<p>好吧,既然看起来优点这么多,那么我们就看看是怎么样实现的吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">extern &quot;C&quot; &#123;</span><br><span class="line">  void apply(uint64_t receiver, uint64_t code, uint64_t action) &#123;</span><br><span class="line">    addressbook _addressbook(receiver);</span><br><span class="line">    if(code==receiver &amp;&amp; action==name(&quot;upsert&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::upsert );</span><br><span class="line">    &#125;</span><br><span class="line">    else if(code==receiver &amp;&amp; action==name(&quot;notify&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::notify );</span><br><span class="line">    &#125;</span><br><span class="line">    else if(code==receiver &amp;&amp; action==name(&quot;erase&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::erase );</span><br><span class="line">    &#125;</span><br><span class="line">    else if(code==name(&quot;eosio.token&quot;).value &amp;&amp; action==name(&quot;transfer&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::transfer );</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>初看和上一篇文章简直是一模一样,就是把switch换成了if…else,看来官方真实说的大实话呢</li>
+<li>不过,最后一个else多了一个判断,addressbook去调用transfer方法,可是我们没有啊,既然是这样,那我们就依样画葫芦,待会写一个吧</li>
+<li>第二点,最后一个else判断变成了code == eosio.token,这就是我们上篇文章说的这个code的意义了.而eosio.token是系统的账号,当发生eos或者其他代币时才会调用这个方法呢,那么我猜测一下这个判断是当发生eosio.token执行transfer的时候,将会执行我们合约transfer方法</li>
+</ul>
+<h4 id="结果验证"><a href="#结果验证" class="headerlink" title="结果验证"></a>结果验证</h4><blockquote>
+<p>按照上面说的,我们就按照我们得思路先写一个吧,那么就加一个transfer方法如下.</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void transfer(uint64_t receiver, uint64_t code)&#123;</span><br><span class="line">   send_summary(name(code), &quot;eosio.token transfer&quot;);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>很简单,当发生transfer时,我们出发一个inline action来记录一下数据</li>
+<li>那我们看下结果,结果报错了???? </li>
+<li>why? 我们仅仅是转账啊,自己转出去或者别人转进来,现在都失败了</li>
+</ul>
+<h4 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h4><p><em>Authorization failure with inline action sent to self</em></p>
+<ul>
+<li>权限不允许给自己发送内联action?</li>
+<li>这是什么情况?给自己发送内联action还要权限?</li>
+<li>想想想… 对了,要让自己的合约调用其他合约需要给eosio.code发送权限,那我们接下来试试看看是不是这个原因呢</li>
+</ul>
+<p><img src="/img_eos1/eos_react9.gif" alt="shaokun"></p>
+<h4 id="再次验证分析结果"><a href="#再次验证分析结果" class="headerlink" title="再次验证分析结果"></a>再次验证分析结果</h4><ul>
+<li>使用owner权限,给eosio.code授予active权限</li>
+<li>执行相互转账</li>
+<li>查看是否能够出发我们自定义的内联action(经过上一步的操作,和我们之前的经验,它应该是调用了我们得inline action,不过还是得看事实说话呢)</li>
+<li>去kylin,确实达到了我们的结果,无论转账转出或者转入,那么我们都发送了一个inline action<br><img src="/img_eos1/eos_react10.gif" alt="shaokun"></li>
+</ul>
+<p><a href="https://github.com/shaokun11/eosabout/tree/eos-dispatcher-02" target="_blank" rel="noopener">本课源码</a>  </p>
+<ul>
+<li>这里说一下这个源码,我已经编译好的abi和wasm文件,各位同学可以直接部署,如果要修改源码,就得自己编译了.不同的编译版本可能会有不同的eos语法,我这里用的是cdt1.3.2</li>
+<li>还有,部署的时候,最好文件夹名字和主合约的名字一样,这样可以可以避免一些想不到的奇奇怪怪的错误.</li>
+</ul>
+<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><ul>
+<li>关于上一篇文章开篇提到的类似以太坊中payable关键字的功能,我想各位同学应该知道怎么实现了吧</li>
+<li>通过我们目前自己实现apply的方式,不用eosio.code授予权限,我们是可以拒绝或者转出eos的,当然这样的方式达到了目的,但是不够优雅</li>
+<li>通过结果,我们发现了我们也可以在合约中检查监听到eos的转出和转入,那么我们是否可以通过此做出相应的动作呢?答案是可以的,具体怎么使用我们以后的文章再说</li>
+<li>那么我们怎么优雅的实现拒绝账户eos的交易呢,我觉得最简单的方法就是调用eosio_assert(1==2);哈哈,^_^</li>
+<li>问题又来了?如果我不调用inline action,那么是不是我不用授权给eosio.code就可以实现转账呢?答案是可以的,本篇文章主要是为了看到具体的转账结果,所以用了inline action,相当于也给大家复习一下这个权限吧.至于这个不使用inline action的,这个可以交由各位同学自己去实现了哈</li>
+<li>问题又来了?那我要怎么拿取转账的信息呢?</li>
+</ul>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
+<p>email: <a href="mailto:&#115;&#107;&#117;&#110;&#110;&#x79;&#64;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#110;&#110;&#x79;&#64;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#109;</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/12/eos中inline action的理解4/" rel="next" title="eos的dispatcher的使用(1)">
+                <i class="fa fa-chevron-left"></i> eos的dispatcher的使用(1)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/26/eos中inline action的理解6/" rel="prev" title="eos的dispatcher的使用(3 完结)">
+                eos的dispatcher的使用(3 完结) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">shaokun</p>
+              <p class="site-description motion-element" itemprop="description">记录自己对相关技术的点点滴滴和一些思考，希望能够帮助来到这里的你，如果你喜欢我的文章，可以加个微信共同探讨</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多说两句"><span class="nav-number">2.</span> <span class="nav-text">多说两句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义dispatcher-方式2"><span class="nav-number">3.</span> <span class="nav-text">自定义dispatcher 方式2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结果验证"><span class="nav-number">4.</span> <span class="nav-text">结果验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结果分析"><span class="nav-number">5.</span> <span class="nav-text">结果分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#再次验证分析结果"><span class="nav-number">6.</span> <span class="nav-text">再次验证分析结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结论"><span class="nav-number">7.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">8.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">shaokun</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+ <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 访问总量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

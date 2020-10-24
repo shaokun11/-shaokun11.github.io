@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言 到此我这里发现了多个问题，这里列出来，希望帮到遇到同样问题的同学  目前eoscdt git已经更新到1.4版本了，其中的结构，语法更改了很多，我这边mac系统是10.12.6，弄了一周还是没办法升级到13，而新的cdt最低需求已经要13了，忧伤。。。而我从源码编译，总是clone不下来，试过各种方法均失败了。这里提醒一下，最好按照他的系统要求去安装，已经有打包好的二进制文件了  目前的官网">
+<meta name="keywords" content="eos,eth,tron,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="eos dapp开发学习 第二课 续">
+<meta property="og:url" content="http://yoursite.com/2018/10/21/eos dapp开发 官方教程学习3/index.html">
+<meta property="og:site_name" content="hello shaokun">
+<meta property="og:description" content="前言 到此我这里发现了多个问题，这里列出来，希望帮到遇到同样问题的同学  目前eoscdt git已经更新到1.4版本了，其中的结构，语法更改了很多，我这边mac系统是10.12.6，弄了一周还是没办法升级到13，而新的cdt最低需求已经要13了，忧伤。。。而我从源码编译，总是clone不下来，试过各种方法均失败了。这里提醒一下，最好按照他的系统要求去安装，已经有打包好的二进制文件了  目前的官网">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/img_eos1/eos8.png">
+<meta property="og:image" content="http://yoursite.com/img_eos1/eos9.png">
+<meta property="og:image" content="http://yoursite.com/img_eos1/eos_react3.gif">
+<meta property="og:updated_time" content="2020-10-16T15:03:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="eos dapp开发学习 第二课 续">
+<meta name="twitter:description" content="前言 到此我这里发现了多个问题，这里列出来，希望帮到遇到同样问题的同学  目前eoscdt git已经更新到1.4版本了，其中的结构，语法更改了很多，我这边mac系统是10.12.6，弄了一周还是没办法升级到13，而新的cdt最低需求已经要13了，忧伤。。。而我从源码编译，总是clone不下来，试过各种方法均失败了。这里提醒一下，最好按照他的系统要求去安装，已经有打包好的二进制文件了  目前的官网">
+<meta name="twitter:image" content="http://yoursite.com/img_eos1/eos8.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/10/21/eos dapp开发 官方教程学习3/">
+
+
+
+
+
+  <title>eos dapp开发学习 第二课 续 | hello shaokun</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">hello shaokun</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">code is law</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/21/eos dapp开发 官方教程学习3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">eos dapp开发学习 第二课 续</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-21T13:16:25+08:00">
+                2018-10-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 浏览
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>到此我这里发现了多个问题，这里列出来，希望帮到遇到同样问题的同学</p>
+<ol>
+<li>目前eoscdt git已经更新到1.4版本了，其中的结构，语法更改了很多，我这边mac系统是10.12.6，弄了一周还是没办法升级到13，而新的cdt最低需求已经要13了，忧伤。。。<br>而我从源码编译，总是clone不下来，试过各种方法均失败了。这里提醒一下，最好按照他的系统要求去安装，已经有打包好的二进制文件了 </li>
+<li>目前的官网的版本使用的eoscdt1.2，而经过上面的方式失败了，我再次尝试了这个，成功了</li>
+<li>这里如果按照昨天的cpp文件使用eosio-cpp进行编译，是没有问题的。但是无法部署合约，这里需要将table name 由user_info 改为 userinfo   注意 不能改成userInfo,UserInfo等等，即所有的需要写入abi的action和table name必须 仅能包含<br><code>.12345abcdefghijklmnopqrstuvwxyz</code><br>这些字符</li>
+<li>莫名的感觉忧伤而兴奋，忧伤是跟不上新版本的步伐，兴奋的是开发越来越规范，现在可以接着上一篇文章继续写作了</li>
+<li>带着梯子办事，总会减少很多很多没有必要的问题</li>
+</ol>
+</blockquote>
+<h4 id="编译、部署合约"><a href="#编译、部署合约" class="headerlink" title="编译、部署合约"></a>编译、部署合约</h4><blockquote>
+<p>不同的版本有着不同的变化，这里仅以eoscdt1.2进行操作，如果后续使用eoscdt1.3或者使用之前的eosiocpp来编译出来的abi和wasm文件肯定是用不了的</p>
+</blockquote>
+<ul>
+<li><p>更改cardgame.hpp<br><img src="/img_eos1/eos8.png" alt="contract">  </p>
+<pre><code>///@abi action  =&gt; [[eosio::action]]
+///@abi table =&gt; [[eosio::table]]
+user_info =&gt; userinfo
+</code></pre></li>
+<li><p>再次生成abi和wasm文件，这里要切换到c++文件所在的目录</p>
+<pre><code>eosio-cpp -o cardgame.wasm cardgame.cpp --abigen
+</code></pre></li>
+<li><p>部署合约，这里在任何目录执行都可以，合约的目录输入绝对路径</p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888 set contract shaokun11113 /Users/shaokun/Desktop/eoslearning/cardgame -p shaokun11113@active
+</code></pre></li>
+<li><p>当部署遇到图中红色的提示时，请注意table,action,class，struct的名字所含字符<br><img src="/img_eos1/eos9.png" alt="contract"><br>由之前的结论可以看到，我们合约成功部署了</p>
+</li>
+</ul>
+<h4 id="与前端共同交互合约"><a href="#与前端共同交互合约" class="headerlink" title="与前端共同交互合约"></a>与前端共同交互合约</h4><ul>
+<li><p>这里使用了最新的eosjs,请更新 <a href="https://github.com/EOSIO/eosjs" target="_blank" rel="noopener">eosjs</a></p>
+<pre><code>npm install eosjs@beta    
+</code></pre></li>
+<li><p>更新后package.json ,请注意eosjs的版本</p>
+<pre><code>{
+  &quot;dependencies&quot;: {
+    &quot;eosjs&quot;: &quot;^20.0.0-beta2&quot;,
+    &quot;react&quot;: &quot;^16.5.2&quot;,
+    &quot;react-dom&quot;: &quot;^16.5.2&quot;,
+    &quot;react-redux&quot;: &quot;^5.0.7&quot;,
+    &quot;react-scripts&quot;: &quot;2.0.5&quot;,
+    &quot;redux&quot;: &quot;^4.0.1&quot;,
+    &quot;redux-logger&quot;: &quot;^3.0.6&quot;
+  },
+}
+</code></pre></li>
+<li><p>新版的eosjs的引入有更改，请仔细对比</p>
+</li>
+<li>由于此处的合约只要是合法的注册到jungle上的account 都可以登录，所以前端框的private key的输入框可以随意输入，这里请注意风险 </li>
+<li>登录成功后，跳转界面！！！本篇文章的代码<a href="https://github.com/shaokun11/eoslearning/tree/eos-dev02-update" target="_blank" rel="noopener">lesson2 code</a><br><img src="/img_eos1/eos_react3.gif" alt="contract">  </li>
+</ul>
+<p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
+<h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><blockquote>
+<p>总算完成了之前的坑。^o^<br>中间有很多前端的知识，这不是这个课程讲解的重点，只能靠各位同学自己去补习了。这个系列使用react，redux也是一个很庞大的工程，所以可以简单一点，展示一下交互就好。<br>应该说到此，区块链与前端的交互已经完成，接下来就是充实智能合约的功能了。如果你做到了这一步，建议去<a href="https://developers.eos.io/eosio-cpp/reference" target="_blank" rel="noopener">eos c++ api</a>这里了解一下api，这样对于后面的合约编写会有一个更深层次的掌握</p>
+</blockquote>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
+<p>email: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#111;&#109;</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/20/eos dapp开发 官方教程学习2/" rel="next" title="eos dapp开发学习 第二课">
+                <i class="fa fa-chevron-left"></i> eos dapp开发学习 第二课
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/27/eos dapp开发 官方教程学习4/" rel="prev" title="eos dapp开发学习 第三课">
+                eos dapp开发学习 第三课 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">shaokun</p>
+              <p class="site-description motion-element" itemprop="description">记录自己对相关技术的点点滴滴和一些思考，希望能够帮助来到这里的你，如果你喜欢我的文章，可以加个微信共同探讨</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编译、部署合约"><span class="nav-number">2.</span> <span class="nav-text">编译、部署合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#与前端共同交互合约"><span class="nav-number">3.</span> <span class="nav-text">与前端共同交互合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结尾"><span class="nav-number">4.</span> <span class="nav-text">结尾</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">5.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">shaokun</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+ <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 访问总量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
