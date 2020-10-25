@@ -233,6 +233,168 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/25/uniswap 源码解读2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/10/25/uniswap 源码解读2/" itemprop="url">一步一步教你打造自己的defi-xswap(2)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-25T11:22:06+08:00">
+                2020-10-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="welcome"><a href="#welcome" class="headerlink" title="welcome"></a>welcome</h4><blockquote>
+<p>本篇文章主要看看uniswap的合约的源码和结构,以及如何找到源码的入口(当然也可以直接阅读uniswap的doc来达到目的)</p>
+</blockquote>
+<h4 id="获取源码"><a href="#获取源码" class="headerlink" title="获取源码"></a>获取源码</h4><p>从<a href="https://github.com/Uniswap/uniswap-v2-core" target="_blank" rel="noopener">uniswap合约源码 github</a>把源码colne到本地,进入contract目录  </p>
+<ul>
+<li>可以看到合约的代码量不多,那么我们该如何开始呢?</li>
+<li>从目录的命名来看,我们貌似只需要关注暴露在外面的三个合约 UniswapV2ERC20.sol, UniswapV2Factory.sol, UniswapV2Pair.sol即可,其他的文件夹的内容为interface和libraries</li>
+</ul>
+<blockquote>
+<p>这里如果不熟悉的同学可以试着run一下这个这个test,然后根据test去查看项目如何执行的</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">-rw-r--r--  1 kun  staff  3435 10 25 11:14 UniswapV2ERC20.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  1867 10 25 11:14 UniswapV2Factory.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  9788 10 25 11:14 UniswapV2Pair.sol</span><br><span class="line">drwxr-xr-x  7 kun  staff   238 10 25 11:14 interfaces</span><br><span class="line">drwxr-xr-x  5 kun  staff   170 10 25 11:14 libraries</span><br><span class="line">drwxr-xr-x  3 kun  staff   102 10 25 11:14 <span class="built_in">test</span></span><br><span class="line"></span><br><span class="line">./interfaces:</span><br><span class="line">total 40</span><br><span class="line">-rw-r--r--  1 kun  staff   823 10 25 11:14 IERC20.sol</span><br><span class="line">-rw-r--r--  1 kun  staff   159 10 25 11:14 IUniswapV2Callee.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  1148 10 25 11:14 IUniswapV2ERC20.sol</span><br><span class="line">-rw-r--r--  1 kun  staff   661 10 25 11:14 IUniswapV2Factory.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  2424 10 25 11:14 IUniswapV2Pair.sol</span><br><span class="line"></span><br><span class="line">./libraries:</span><br><span class="line">total 24</span><br><span class="line">-rw-r--r--  1 kun  staff  602 10 25 11:14 Math.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  563 10 25 11:14 SafeMath.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  578 10 25 11:14 UQ112x112.sol</span><br><span class="line"></span><br><span class="line">./<span class="built_in">test</span>:</span><br><span class="line">total 8</span><br><span class="line">-rw-r--r--  1 kun  staff  187 10 25 11:14 ERC20.sol</span><br></pre></td></tr></table></figure>
+<h4 id="试玩uniswap"><a href="#试玩uniswap" class="headerlink" title="试玩uniswap"></a>试玩uniswap</h4><ol>
+<li><a href="https://rinkeby.etherscan.io/tx/0x4f1551395b26afa5b270c42bf165e9a013db010b3e585bf9419a63e83866081d" target="_blank" rel="noopener">eth兑换uni</a>,从etherscan中可以看到函数签名为<strong>swapExactETHForTokens</strong>   </li>
+<li><a href="https://rinkeby.etherscan.io/tx/0x4f1551395b26afa5b270c42bf165e9a013db010b3e585bf9419a63e83866081d" target="_blank" rel="noopener">添加uni-&gt;eth的资金池</a>,调用的函数签名为<strong>addLiquidityETH</strong>,(中间approve了两次此合约可以转移我钱包中的uni的操作,第二次是重复的)  </li>
+<li>那么我们可以从这两个函数开始阅读其合约代码   </li>
+</ol>
+<p><img src="/xswap/ether2.gif" alt="demo"></p>
+<h4 id="router合约"><a href="#router合约" class="headerlink" title="router合约"></a>router合约</h4><ol>
+<li>在我们试玩找入口时,我们发现其调用的函数签名并没有在我们Colne的项目中有找到,那是怎么回事呢?</li>
+<li>那我们根据<a href="https://rinkeby.etherscan.io/tx/0x4f1551395b26afa5b270c42bf165e9a013db010b3e585bf9419a63e83866081d" target="_blank" rel="noopener">eth兑换uni</a>这笔交易,找到其在etherscan上验证过的的合约,发现其实际调用的是<em>UniswapV2Router02</em>这个函数名的合约,全局搜索找到其函数签名如下  </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)</span><br><span class="line">     external</span><br><span class="line">     virtual</span><br><span class="line">     override</span><br><span class="line">     payable</span><br><span class="line">     ensure(deadline)</span><br><span class="line">     returns (uint[] memory amounts)</span><br><span class="line"> &#123;</span><br><span class="line">     require(path[0] == WETH, &apos;UniswapV2Router: INVALID_PATH&apos;);</span><br><span class="line">     amounts = UniswapV2Library.getAmountsOut(factory, msg.value, path);</span><br><span class="line">     require(amounts[amounts.length - 1] &gt;= amountOutMin, &apos;UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT&apos;);</span><br><span class="line">     IWETH(WETH).deposit&#123;value: amounts[0]&#125;();</span><br><span class="line">     assert(IWETH(WETH).transfer(UniswapV2Library.pairFor(factory, path[0], path[1]), amounts[0]));</span><br><span class="line">     _swap(amounts, path, to);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>先忽略<strong>UniswapV2Library</strong>方法,观察此合约,其核心方法集中在<strong>_swap(amounts, path, to)</strong>这个方法上,继续搜索可以发现很多方法都调用了此方法</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// **** SWAP ****</span><br><span class="line">// requires the initial amount to have already been sent to the first pair</span><br><span class="line">function _swap(uint[] memory amounts, address[] memory path, address _to) internal virtual &#123;</span><br><span class="line">    for (uint i; i &lt; path.length - 1; i++) &#123;</span><br><span class="line">        (address input, address output) = (path[i], path[i + 1]);</span><br><span class="line">        (address token0,) = UniswapV2Library.sortTokens(input, output);</span><br><span class="line">        uint amountOut = amounts[i + 1];</span><br><span class="line">        (uint amount0Out, uint amount1Out) = input == token0 ? (uint(0), amountOut) : (amountOut, uint(0));</span><br><span class="line">        address to = i &lt; path.length - 2 ? UniswapV2Library.pairFor(factory, output, path[i + 2]) : _to;</span><br><span class="line">        IUniswapV2Pair(UniswapV2Library.pairFor(factory, input, output)).swap(</span><br><span class="line">            amount0Out, amount1Out, to, new bytes(0)</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>发现其最终落在了**IUniswapV2Pair(UniswapV2Library.pairFor(factory, input, output)).swap(<pre><code>    amount0Out, amount1Out, to, new bytes(0)
+);**这个方法上,这个方法就在我们的clone项目中了,那么其核心方法我们就只要关心**IUniswapV2Pair. swap()**  
+5. 为什么我们colne项目中没有这个router的合约? (本系列结束后回答)  
+</code></pre></li>
+</ol>
+<blockquote>
+<p>只有在etherscan上验证过的合约才能够找到其合约元am,这也是最真实的,如果做defi,一般会将其验证,增加其去中心化的公信力</p>
+</blockquote>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ol>
+<li><p>通过一系列的操作,我们总算找到了合约入口啦,接下来应该进入到正式的合约阅读步骤啦,是不是很激动?</p>
+</li>
+<li><p>其中有些细节我觉得通过文字来描述就有点啰嗦了,然后就跳过了,如果你感觉到其中哪些地方迷糊,可以给我发邮件</p>
+</li>
+</ol>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/24/uniswap 源码解读1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -612,7 +774,7 @@
 <li>原来在tsconfig.json中,我使用include属性将其声明文件包含到编译中了,故可使用.查看ts-node文档,只需要在执行ts-node 加上–files选项,这样将会加载tcconfig.json的include属性,这样就移除ts-ignore这个选项了</li>
 </ul>
 <h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>  最开始自己写*.d.ts,后续发现了居然还有dts-gen这样的工具.回头想想,利用这些工具,真香 ^0^,</p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#x33;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#x33;&#x2e;&#x63;&#x6f;&#109;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1227,7 +1389,7 @@
 <li>还有一点,如果你使用eosiocpp编译wasm,abi文件,写合约的时候,有时候需要参考源码<a href="https://sourcegraph.com/github.com/EOSIO/eos" target="_blank" rel="noopener">eosio</a>,如果使用eosio.cdt编译的合约,<a href="https://github.com/EOSIO/eosio.cdt/tree/master/libraries/eosiolib" target="_blank" rel="noopener">eosio.cdt eoslib</a>要去这里找(ps:这个地方受过很多伤…)</li>
 <li>最后,祝大家学的开心</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#107;&#117;&#110;&#110;&#121;&#x40;&#x31;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#110;&#110;&#121;&#x40;&#x31;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#54;&#51;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#54;&#51;&#x2e;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -1397,7 +1559,7 @@
 <li>有时候有新的业务需求,我们完全可以根据自己的需求来更改token内部的某些业务逻辑,毕竟它只是一份部署在你账号的一个智能合约而已,而且这个合约你完全有权限随时更改呢</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email <a href="mailto:&#115;&#107;&#x75;&#x6e;&#110;&#x79;&#64;&#x31;&#54;&#x33;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#110;&#x79;&#64;&#x31;&#54;&#x33;&#x2e;&#x63;&#x6f;&#109;</a></p>
+<p>email <a href="mailto:&#115;&#107;&#x75;&#110;&#110;&#121;&#x40;&#49;&#54;&#51;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#110;&#121;&#x40;&#49;&#54;&#51;&#46;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1584,186 +1746,7 @@ send_summary(user, &quot; successfully erased record from addressbook&quot;);
 <li>换个方向想,何尝不是又给了我们人生中多一次选择的机会呢?</li>
 <li>这应该是年前的最后一篇文章了,希望年后能够继续给大家分享一些dapp开发的知识,谢谢你的阅读</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/19/eos中inline action的理解5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/01/19/eos中inline action的理解5/" itemprop="url">eos的dispatcher的使用(2)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-19T20:25:13+08:00">
-                2019-01-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
-<p>希望阅读本篇文章的同学去看一下上一篇文章,不然思路断了接不上就有点麻烦了    </p>
-</blockquote>
-<h4 id="多说两句"><a href="#多说两句" class="headerlink" title="多说两句"></a>多说两句</h4><ul>
-<li>话说以太坊的分叉计划又延期了,而此次的升级主要是针对底层的安全机制,所以可见写智能合约的最关键点还是安全第一吧,</li>
-<li>eos一直被攻击,从未被停止.最近的eos因为一个derferred action的问题的漏洞又被黑客利用了,哎… 受伤的总是开发者</li>
-<li>大家写的合约还有一个点,就是安全.这里一个朋友已经开发了一款应用,也已经上线到主网,各种测试也做了,什么逻辑,压力,数据,前端页面的跳转等等… 然而当项目上线后,他找到我对我说,别人可以绕过前端代码直接调用的它的合约…  我只能说,这就是智能合约,你所写的合约是全世界的人(当然,如果你的项目很成功,那么黑客也是由兴趣来光顾的)都可以调用的,除非你做一些权限的验证.在eos上还好,可以通过升级合约来弥补,而且code还不用开源.但是在eth,code is law,code还要开源,所以各位同学想想这个合约安全的重要性.eos底层虽然还有bug,我们无法避免,但是我们还是应该对我们的应用层的逻辑进行严格的测试,这样开发的智能合约才经得住世界人民的考验,你说是不是呢?</li>
-</ul>
-<h4 id="自定义dispatcher-方式2"><a href="#自定义dispatcher-方式2" class="headerlink" title="自定义dispatcher 方式2"></a>自定义dispatcher 方式2</h4><blockquote>
-<p>按照上篇文章的做法,那么我们实现了自己定义apply函数来取代EOSIO_DISPATCHER,但是实现的功能是一模一样的,那我们这样做的目的是什么呢?</p>
-</blockquote>
-<ul>
-<li>那么接下来我们继续按照官方的教程走,通过另外一种方式来实现.</li>
-<li>那么此种方式相对于上一中方式有什么区别呢?</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">This pattern provides more control over security at the expense of maintainability. Utilizing if...else if statements as opposed to a switch inherently provides more granularity.</span><br><span class="line">此模式以可维护性为代价提供了对安全性的更多控制。利用if ... else if语句而不是switch提供更精细的控制。</span><br></pre></td></tr></table></figure>
-<p>好吧,既然看起来优点这么多,那么我们就看看是怎么样实现的吧</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">extern &quot;C&quot; &#123;</span><br><span class="line">  void apply(uint64_t receiver, uint64_t code, uint64_t action) &#123;</span><br><span class="line">    addressbook _addressbook(receiver);</span><br><span class="line">    if(code==receiver &amp;&amp; action==name(&quot;upsert&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::upsert );</span><br><span class="line">    &#125;</span><br><span class="line">    else if(code==receiver &amp;&amp; action==name(&quot;notify&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::notify );</span><br><span class="line">    &#125;</span><br><span class="line">    else if(code==receiver &amp;&amp; action==name(&quot;erase&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::erase );</span><br><span class="line">    &#125;</span><br><span class="line">    else if(code==name(&quot;eosio.token&quot;).value &amp;&amp; action==name(&quot;transfer&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::transfer );</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>初看和上一篇文章简直是一模一样,就是把switch换成了if…else,看来官方真实说的大实话呢</li>
-<li>不过,最后一个else多了一个判断,addressbook去调用transfer方法,可是我们没有啊,既然是这样,那我们就依样画葫芦,待会写一个吧</li>
-<li>第二点,最后一个else判断变成了code == eosio.token,这就是我们上篇文章说的这个code的意义了.而eosio.token是系统的账号,当发生eos或者其他代币时才会调用这个方法呢,那么我猜测一下这个判断是当发生eosio.token执行transfer的时候,将会执行我们合约transfer方法</li>
-</ul>
-<h4 id="结果验证"><a href="#结果验证" class="headerlink" title="结果验证"></a>结果验证</h4><blockquote>
-<p>按照上面说的,我们就按照我们得思路先写一个吧,那么就加一个transfer方法如下.</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void transfer(uint64_t receiver, uint64_t code)&#123;</span><br><span class="line">   send_summary(name(code), &quot;eosio.token transfer&quot;);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>很简单,当发生transfer时,我们出发一个inline action来记录一下数据</li>
-<li>那我们看下结果,结果报错了???? </li>
-<li>why? 我们仅仅是转账啊,自己转出去或者别人转进来,现在都失败了</li>
-</ul>
-<h4 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h4><p><em>Authorization failure with inline action sent to self</em></p>
-<ul>
-<li>权限不允许给自己发送内联action?</li>
-<li>这是什么情况?给自己发送内联action还要权限?</li>
-<li>想想想… 对了,要让自己的合约调用其他合约需要给eosio.code发送权限,那我们接下来试试看看是不是这个原因呢</li>
-</ul>
-<p><img src="/img_eos1/eos_react9.gif" alt="shaokun"></p>
-<h4 id="再次验证分析结果"><a href="#再次验证分析结果" class="headerlink" title="再次验证分析结果"></a>再次验证分析结果</h4><ul>
-<li>使用owner权限,给eosio.code授予active权限</li>
-<li>执行相互转账</li>
-<li>查看是否能够出发我们自定义的内联action(经过上一步的操作,和我们之前的经验,它应该是调用了我们得inline action,不过还是得看事实说话呢)</li>
-<li>去kylin,确实达到了我们的结果,无论转账转出或者转入,那么我们都发送了一个inline action<br><img src="/img_eos1/eos_react10.gif" alt="shaokun"></li>
-</ul>
-<p><a href="https://github.com/shaokun11/eosabout/tree/eos-dispatcher-02" target="_blank" rel="noopener">本课源码</a>  </p>
-<ul>
-<li>这里说一下这个源码,我已经编译好的abi和wasm文件,各位同学可以直接部署,如果要修改源码,就得自己编译了.不同的编译版本可能会有不同的eos语法,我这里用的是cdt1.3.2</li>
-<li>还有,部署的时候,最好文件夹名字和主合约的名字一样,这样可以可以避免一些想不到的奇奇怪怪的错误.</li>
-</ul>
-<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><ul>
-<li>关于上一篇文章开篇提到的类似以太坊中payable关键字的功能,我想各位同学应该知道怎么实现了吧</li>
-<li>通过我们目前自己实现apply的方式,不用eosio.code授予权限,我们是可以拒绝或者转出eos的,当然这样的方式达到了目的,但是不够优雅</li>
-<li>通过结果,我们发现了我们也可以在合约中检查监听到eos的转出和转入,那么我们是否可以通过此做出相应的动作呢?答案是可以的,具体怎么使用我们以后的文章再说</li>
-<li>那么我们怎么优雅的实现拒绝账户eos的交易呢,我觉得最简单的方法就是调用eosio_assert(1==2);哈哈,^_^</li>
-<li>问题又来了?如果我不调用inline action,那么是不是我不用授权给eosio.code就可以实现转账呢?答案是可以的,本篇文章主要是为了看到具体的转账结果,所以用了inline action,相当于也给大家复习一下这个权限吧.至于这个不使用inline action的,这个可以交由各位同学自己去实现了哈</li>
-<li>问题又来了?那我要怎么拿取转账的信息呢?</li>
-</ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#54;&#x33;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#x6e;&#x79;&#x40;&#x31;&#54;&#x33;&#x2e;&#99;&#111;&#109;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#117;&#110;&#110;&#121;&#x40;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#117;&#110;&#110;&#121;&#x40;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1849,7 +1832,7 @@ send_summary(user, &quot; successfully erased record from addressbook&quot;);
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">29</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="welcome 本篇文章主要看看uniswap的合约的源码和结构,以及如何找到源码的入口(当然也可以直接阅读uniswap的doc来达到目的)  获取源码从uniswap合约源码 github把源码colne到本地,进入contract目录    可以看到合约的代码量不多,那么我们该如何开始呢? 从目录的命名来看,我们貌似只需要关注暴露在外面的三个合约 UniswapV2ERC20.sol, Un">
+<meta name="keywords" content="eos,eth,tron,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一步一步教你打造自己的defi-xswap(2)">
+<meta property="og:url" content="http://yoursite.com/2020/10/25/uniswap 源码解读2/index.html">
+<meta property="og:site_name" content="hello shaokun">
+<meta property="og:description" content="welcome 本篇文章主要看看uniswap的合约的源码和结构,以及如何找到源码的入口(当然也可以直接阅读uniswap的doc来达到目的)  获取源码从uniswap合约源码 github把源码colne到本地,进入contract目录    可以看到合约的代码量不多,那么我们该如何开始呢? 从目录的命名来看,我们貌似只需要关注暴露在外面的三个合约 UniswapV2ERC20.sol, Un">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/xswap/ether2.gif">
+<meta property="og:updated_time" content="2020-10-25T04:52:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一步一步教你打造自己的defi-xswap(2)">
+<meta name="twitter:description" content="welcome 本篇文章主要看看uniswap的合约的源码和结构,以及如何找到源码的入口(当然也可以直接阅读uniswap的doc来达到目的)  获取源码从uniswap合约源码 github把源码colne到本地,进入contract目录    可以看到合约的代码量不多,那么我们该如何开始呢? 从目录的命名来看,我们貌似只需要关注暴露在外面的三个合约 UniswapV2ERC20.sol, Un">
+<meta name="twitter:image" content="http://yoursite.com/xswap/ether2.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/10/25/uniswap 源码解读2/">
+
+
+
+
+
+  <title>一步一步教你打造自己的defi-xswap(2) | hello shaokun</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">hello shaokun</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">code is law</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/25/uniswap 源码解读2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一步一步教你打造自己的defi-xswap(2)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-25T11:22:06+08:00">
+                2020-10-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 浏览
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="welcome"><a href="#welcome" class="headerlink" title="welcome"></a>welcome</h4><blockquote>
+<p>本篇文章主要看看uniswap的合约的源码和结构,以及如何找到源码的入口(当然也可以直接阅读uniswap的doc来达到目的)</p>
+</blockquote>
+<h4 id="获取源码"><a href="#获取源码" class="headerlink" title="获取源码"></a>获取源码</h4><p>从<a href="https://github.com/Uniswap/uniswap-v2-core" target="_blank" rel="noopener">uniswap合约源码 github</a>把源码colne到本地,进入contract目录  </p>
+<ul>
+<li>可以看到合约的代码量不多,那么我们该如何开始呢?</li>
+<li>从目录的命名来看,我们貌似只需要关注暴露在外面的三个合约 UniswapV2ERC20.sol, UniswapV2Factory.sol, UniswapV2Pair.sol即可,其他的文件夹的内容为interface和libraries</li>
+</ul>
+<blockquote>
+<p>这里如果不熟悉的同学可以试着run一下这个这个test,然后根据test去查看项目如何执行的</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">-rw-r--r--  1 kun  staff  3435 10 25 11:14 UniswapV2ERC20.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  1867 10 25 11:14 UniswapV2Factory.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  9788 10 25 11:14 UniswapV2Pair.sol</span><br><span class="line">drwxr-xr-x  7 kun  staff   238 10 25 11:14 interfaces</span><br><span class="line">drwxr-xr-x  5 kun  staff   170 10 25 11:14 libraries</span><br><span class="line">drwxr-xr-x  3 kun  staff   102 10 25 11:14 <span class="built_in">test</span></span><br><span class="line"></span><br><span class="line">./interfaces:</span><br><span class="line">total 40</span><br><span class="line">-rw-r--r--  1 kun  staff   823 10 25 11:14 IERC20.sol</span><br><span class="line">-rw-r--r--  1 kun  staff   159 10 25 11:14 IUniswapV2Callee.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  1148 10 25 11:14 IUniswapV2ERC20.sol</span><br><span class="line">-rw-r--r--  1 kun  staff   661 10 25 11:14 IUniswapV2Factory.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  2424 10 25 11:14 IUniswapV2Pair.sol</span><br><span class="line"></span><br><span class="line">./libraries:</span><br><span class="line">total 24</span><br><span class="line">-rw-r--r--  1 kun  staff  602 10 25 11:14 Math.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  563 10 25 11:14 SafeMath.sol</span><br><span class="line">-rw-r--r--  1 kun  staff  578 10 25 11:14 UQ112x112.sol</span><br><span class="line"></span><br><span class="line">./<span class="built_in">test</span>:</span><br><span class="line">total 8</span><br><span class="line">-rw-r--r--  1 kun  staff  187 10 25 11:14 ERC20.sol</span><br></pre></td></tr></table></figure>
+<h4 id="试玩uniswap"><a href="#试玩uniswap" class="headerlink" title="试玩uniswap"></a>试玩uniswap</h4><ol>
+<li><a href="https://rinkeby.etherscan.io/tx/0x4f1551395b26afa5b270c42bf165e9a013db010b3e585bf9419a63e83866081d" target="_blank" rel="noopener">eth兑换uni</a>,从etherscan中可以看到函数签名为<strong>swapExactETHForTokens</strong>   </li>
+<li><a href="https://rinkeby.etherscan.io/tx/0x4f1551395b26afa5b270c42bf165e9a013db010b3e585bf9419a63e83866081d" target="_blank" rel="noopener">添加uni-&gt;eth的资金池</a>,调用的函数签名为<strong>addLiquidityETH</strong>,(中间approve了两次此合约可以转移我钱包中的uni的操作,第二次是重复的)  </li>
+<li>那么我们可以从这两个函数开始阅读其合约代码   </li>
+</ol>
+<p><img src="/xswap/ether2.gif" alt="demo"></p>
+<h4 id="router合约"><a href="#router合约" class="headerlink" title="router合约"></a>router合约</h4><ol>
+<li>在我们试玩找入口时,我们发现其调用的函数签名并没有在我们Colne的项目中有找到,那是怎么回事呢?</li>
+<li>那我们根据<a href="https://rinkeby.etherscan.io/tx/0x4f1551395b26afa5b270c42bf165e9a013db010b3e585bf9419a63e83866081d" target="_blank" rel="noopener">eth兑换uni</a>这笔交易,找到其在etherscan上验证过的的合约,发现其实际调用的是<em>UniswapV2Router02</em>这个函数名的合约,全局搜索找到其函数签名如下  </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)</span><br><span class="line">     external</span><br><span class="line">     virtual</span><br><span class="line">     override</span><br><span class="line">     payable</span><br><span class="line">     ensure(deadline)</span><br><span class="line">     returns (uint[] memory amounts)</span><br><span class="line"> &#123;</span><br><span class="line">     require(path[0] == WETH, &apos;UniswapV2Router: INVALID_PATH&apos;);</span><br><span class="line">     amounts = UniswapV2Library.getAmountsOut(factory, msg.value, path);</span><br><span class="line">     require(amounts[amounts.length - 1] &gt;= amountOutMin, &apos;UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT&apos;);</span><br><span class="line">     IWETH(WETH).deposit&#123;value: amounts[0]&#125;();</span><br><span class="line">     assert(IWETH(WETH).transfer(UniswapV2Library.pairFor(factory, path[0], path[1]), amounts[0]));</span><br><span class="line">     _swap(amounts, path, to);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>先忽略<strong>UniswapV2Library</strong>方法,观察此合约,其核心方法集中在<strong>_swap(amounts, path, to)</strong>这个方法上,继续搜索可以发现很多方法都调用了此方法</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// **** SWAP ****</span><br><span class="line">// requires the initial amount to have already been sent to the first pair</span><br><span class="line">function _swap(uint[] memory amounts, address[] memory path, address _to) internal virtual &#123;</span><br><span class="line">    for (uint i; i &lt; path.length - 1; i++) &#123;</span><br><span class="line">        (address input, address output) = (path[i], path[i + 1]);</span><br><span class="line">        (address token0,) = UniswapV2Library.sortTokens(input, output);</span><br><span class="line">        uint amountOut = amounts[i + 1];</span><br><span class="line">        (uint amount0Out, uint amount1Out) = input == token0 ? (uint(0), amountOut) : (amountOut, uint(0));</span><br><span class="line">        address to = i &lt; path.length - 2 ? UniswapV2Library.pairFor(factory, output, path[i + 2]) : _to;</span><br><span class="line">        IUniswapV2Pair(UniswapV2Library.pairFor(factory, input, output)).swap(</span><br><span class="line">            amount0Out, amount1Out, to, new bytes(0)</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>发现其最终落在了**IUniswapV2Pair(UniswapV2Library.pairFor(factory, input, output)).swap(<pre><code>    amount0Out, amount1Out, to, new bytes(0)
+);**这个方法上,这个方法就在我们的clone项目中了,那么其核心方法我们就只要关心**IUniswapV2Pair. swap()**  
+5. 为什么我们colne项目中没有这个router的合约? (本系列结束后回答)  
+</code></pre></li>
+</ol>
+<blockquote>
+<p>只有在etherscan上验证过的合约才能够找到其合约元am,这也是最真实的,如果做defi,一般会将其验证,增加其去中心化的公信力</p>
+</blockquote>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ol>
+<li><p>通过一系列的操作,我们总算找到了合约入口啦,接下来应该进入到正式的合约阅读步骤啦,是不是很激动?</p>
+</li>
+<li><p>其中有些细节我觉得通过文字来描述就有点啰嗦了,然后就跳过了,如果你感觉到其中哪些地方迷糊,可以给我发邮件</p>
+</li>
+</ol>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/24/uniswap 源码解读1/" rel="next" title="一步一步教你打造自己的defi-xswap(1)">
+                <i class="fa fa-chevron-left"></i> 一步一步教你打造自己的defi-xswap(1)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">shaokun</p>
+              <p class="site-description motion-element" itemprop="description">记录自己对相关技术的点点滴滴和一些思考，希望能够帮助来到这里的你，如果你喜欢我的文章，可以加个微信共同探讨</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#welcome"><span class="nav-number">1.</span> <span class="nav-text">welcome</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取源码"><span class="nav-number">2.</span> <span class="nav-text">获取源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#试玩uniswap"><span class="nav-number">3.</span> <span class="nav-text">试玩uniswap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#router合约"><span class="nav-number">4.</span> <span class="nav-text">router合约</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">6.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">shaokun</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+ <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 访问总量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -233,6 +233,185 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/19/eos中inline action的理解5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/19/eos中inline action的理解5/" itemprop="url">eos的dispatcher的使用(2)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-19T20:25:13+08:00">
+                2019-01-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>希望阅读本篇文章的同学去看一下上一篇文章,不然思路断了接不上就有点麻烦了    </p>
+</blockquote>
+<h4 id="多说两句"><a href="#多说两句" class="headerlink" title="多说两句"></a>多说两句</h4><ul>
+<li>话说以太坊的分叉计划又延期了,而此次的升级主要是针对底层的安全机制,所以可见写智能合约的最关键点还是安全第一吧,</li>
+<li>eos一直被攻击,从未被停止.最近的eos因为一个derferred action的问题的漏洞又被黑客利用了,哎… 受伤的总是开发者</li>
+<li>大家写的合约还有一个点,就是安全.这里一个朋友已经开发了一款应用,也已经上线到主网,各种测试也做了,什么逻辑,压力,数据,前端页面的跳转等等… 然而当项目上线后,他找到我对我说,别人可以绕过前端代码直接调用的它的合约…  我只能说,这就是智能合约,你所写的合约是全世界的人(当然,如果你的项目很成功,那么黑客也是由兴趣来光顾的)都可以调用的,除非你做一些权限的验证.在eos上还好,可以通过升级合约来弥补,而且code还不用开源.但是在eth,code is law,code还要开源,所以各位同学想想这个合约安全的重要性.eos底层虽然还有bug,我们无法避免,但是我们还是应该对我们的应用层的逻辑进行严格的测试,这样开发的智能合约才经得住世界人民的考验,你说是不是呢?</li>
+</ul>
+<h4 id="自定义dispatcher-方式2"><a href="#自定义dispatcher-方式2" class="headerlink" title="自定义dispatcher 方式2"></a>自定义dispatcher 方式2</h4><blockquote>
+<p>按照上篇文章的做法,那么我们实现了自己定义apply函数来取代EOSIO_DISPATCHER,但是实现的功能是一模一样的,那我们这样做的目的是什么呢?</p>
+</blockquote>
+<ul>
+<li>那么接下来我们继续按照官方的教程走,通过另外一种方式来实现.</li>
+<li>那么此种方式相对于上一中方式有什么区别呢?</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">This pattern provides more control over security at the expense of maintainability. Utilizing if...else if statements as opposed to a switch inherently provides more granularity.</span><br><span class="line">此模式以可维护性为代价提供了对安全性的更多控制。利用if ... else if语句而不是switch提供更精细的控制。</span><br></pre></td></tr></table></figure>
+<p>好吧,既然看起来优点这么多,那么我们就看看是怎么样实现的吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">extern &quot;C&quot; &#123;</span><br><span class="line">  void apply(uint64_t receiver, uint64_t code, uint64_t action) &#123;</span><br><span class="line">    addressbook _addressbook(receiver);</span><br><span class="line">    if(code==receiver &amp;&amp; action==name(&quot;upsert&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::upsert );</span><br><span class="line">    &#125;</span><br><span class="line">    else if(code==receiver &amp;&amp; action==name(&quot;notify&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::notify );</span><br><span class="line">    &#125;</span><br><span class="line">    else if(code==receiver &amp;&amp; action==name(&quot;erase&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::erase );</span><br><span class="line">    &#125;</span><br><span class="line">    else if(code==name(&quot;eosio.token&quot;).value &amp;&amp; action==name(&quot;transfer&quot;).value) &#123;</span><br><span class="line">      execute_action(name(receiver), name(code), &amp;addressbook::transfer );</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>初看和上一篇文章简直是一模一样,就是把switch换成了if…else,看来官方真实说的大实话呢</li>
+<li>不过,最后一个else多了一个判断,addressbook去调用transfer方法,可是我们没有啊,既然是这样,那我们就依样画葫芦,待会写一个吧</li>
+<li>第二点,最后一个else判断变成了code == eosio.token,这就是我们上篇文章说的这个code的意义了.而eosio.token是系统的账号,当发生eos或者其他代币时才会调用这个方法呢,那么我猜测一下这个判断是当发生eosio.token执行transfer的时候,将会执行我们合约transfer方法</li>
+</ul>
+<h4 id="结果验证"><a href="#结果验证" class="headerlink" title="结果验证"></a>结果验证</h4><blockquote>
+<p>按照上面说的,我们就按照我们得思路先写一个吧,那么就加一个transfer方法如下.</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void transfer(uint64_t receiver, uint64_t code)&#123;</span><br><span class="line">   send_summary(name(code), &quot;eosio.token transfer&quot;);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>很简单,当发生transfer时,我们出发一个inline action来记录一下数据</li>
+<li>那我们看下结果,结果报错了???? </li>
+<li>why? 我们仅仅是转账啊,自己转出去或者别人转进来,现在都失败了</li>
+</ul>
+<h4 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h4><p><em>Authorization failure with inline action sent to self</em></p>
+<ul>
+<li>权限不允许给自己发送内联action?</li>
+<li>这是什么情况?给自己发送内联action还要权限?</li>
+<li>想想想… 对了,要让自己的合约调用其他合约需要给eosio.code发送权限,那我们接下来试试看看是不是这个原因呢</li>
+</ul>
+<p><img src="/img_eos1/eos_react9.gif" alt="shaokun"></p>
+<h4 id="再次验证分析结果"><a href="#再次验证分析结果" class="headerlink" title="再次验证分析结果"></a>再次验证分析结果</h4><ul>
+<li>使用owner权限,给eosio.code授予active权限</li>
+<li>执行相互转账</li>
+<li>查看是否能够出发我们自定义的内联action(经过上一步的操作,和我们之前的经验,它应该是调用了我们得inline action,不过还是得看事实说话呢)</li>
+<li>去kylin,确实达到了我们的结果,无论转账转出或者转入,那么我们都发送了一个inline action<br><img src="/img_eos1/eos_react10.gif" alt="shaokun"></li>
+</ul>
+<p><a href="https://github.com/shaokun11/eosabout/tree/eos-dispatcher-02" target="_blank" rel="noopener">本课源码</a>  </p>
+<ul>
+<li>这里说一下这个源码,我已经编译好的abi和wasm文件,各位同学可以直接部署,如果要修改源码,就得自己编译了.不同的编译版本可能会有不同的eos语法,我这里用的是cdt1.3.2</li>
+<li>还有,部署的时候,最好文件夹名字和主合约的名字一样,这样可以可以避免一些想不到的奇奇怪怪的错误.</li>
+</ul>
+<h4 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h4><ul>
+<li>关于上一篇文章开篇提到的类似以太坊中payable关键字的功能,我想各位同学应该知道怎么实现了吧</li>
+<li>通过我们目前自己实现apply的方式,不用eosio.code授予权限,我们是可以拒绝或者转出eos的,当然这样的方式达到了目的,但是不够优雅</li>
+<li>通过结果,我们发现了我们也可以在合约中检查监听到eos的转出和转入,那么我们是否可以通过此做出相应的动作呢?答案是可以的,具体怎么使用我们以后的文章再说</li>
+<li>那么我们怎么优雅的实现拒绝账户eos的交易呢,我觉得最简单的方法就是调用eosio_assert(1==2);哈哈,^_^</li>
+<li>问题又来了?如果我不调用inline action,那么是不是我不用授权给eosio.code就可以实现转账呢?答案是可以的,本篇文章主要是为了看到具体的转账结果,所以用了inline action,相当于也给大家复习一下这个权限吧.至于这个不使用inline action的,这个可以交由各位同学自己去实现了哈</li>
+<li>问题又来了?那我要怎么拿取转账的信息呢?</li>
+</ul>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
+<p>email: <a href="mailto:&#115;&#107;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#109;</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/12/eos中inline action的理解4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -454,7 +633,7 @@ bool execute_action( T* obj, void (Q::*func)(Args...)  ) {
 <li>谢谢大家的浏览,希望有发现错误的同学可以加上我微信帮我指出来,再次感谢.</li>
 </ol>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#110;&#121;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#110;&#121;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#107;&#117;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -693,7 +872,7 @@ function withPayable() public payable {
 <li>如果哪位同学有更好的关于转账的方法,请告知一下,个人觉得在合约中进行转账还是很常见的需求</li>
 <li>官方的eos dice合约现在已经移除了,但是可以在历史中找到<a href="https://github.com/EOSIO/eos/blob/v1.0.0/contracts/dice/dice.cpp" target="_blank" rel="noopener">eos dice</a> 有兴趣的同学可以研究一下</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#110;&#121;&#64;&#49;&#54;&#x33;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#110;&#121;&#64;&#49;&#54;&#x33;&#46;&#x63;&#111;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#107;&#x75;&#110;&#110;&#121;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#110;&#121;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1004,7 +1183,7 @@ EOSIO_DISPATCH(adcounter,(count));
 <li>还有一点,哪位同学知道eos中有类似eth中的event的功能,即合约主动推送信息给我们,我觉得这很重要.我觉得eosjs应该提供类似的功能呢.知道的同学麻烦告知一声</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#117;&#110;&#110;&#x79;&#x40;&#49;&#54;&#x33;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#117;&#110;&#110;&#x79;&#x40;&#49;&#54;&#x33;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<p>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#x36;&#51;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#x36;&#51;&#46;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -1250,7 +1429,7 @@ yarn add eosjs scatterjs-core scatterjs-plugin-eosjs
 </ul>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -1606,7 +1785,7 @@ EOSIO_DISPATCH( learnper2, (add))
 </blockquote>
 <p><a href="https://github.com/shaokun11/eos-permission" target="_blank" rel="noopener">本课源码</a></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1936,7 +2115,7 @@ EOSIO_DISPATCH(todolist, (create)(complete)(destroy))
 </blockquote>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#x6d;</a></p>
 
           
         
@@ -2139,7 +2318,7 @@ void cardgame::endgame(eosio::name user) {
 <p>目前我的文章基本上都是比较简单的demo或者概念性的文章，这样看多了也没有意思，我写着也觉得没有意思了。所以接下来准备找一些具有代表性的基于以太坊，波场和eos合约与大家分享了。</p>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#110;&#121;&#64;&#49;&#54;&#51;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#110;&#121;&#64;&#49;&#54;&#51;&#46;&#99;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#x75;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -2443,7 +2622,7 @@ EOSIO_DISPATCH(cardgame,(login)(startgame)(playcard))
 <li><a href="https://github.com/shaokun11/eoslearning/tree/eos-dve4-update" target="_blank" rel="noopener">更新的合约源码</a>，这次就没有更新前端的mock数据了，相信聪明的你一定知道怎样调整过来</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#46;&#99;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#51;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#51;&#46;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -2774,236 +2953,7 @@ void cardgame::draw_one_card(vector&lt;uint8_t&gt; &amp;deck,vector&lt;uint8_t&g
      deck.erase(deck.began() + deck_card_index);
  }
 </code></pre><h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#111;&#x6d;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/27/eos dapp开发 官方教程学习4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/27/eos dapp开发 官方教程学习4/" itemprop="url">eos dapp开发学习 第三课</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-27T13:12:11+08:00">
-                2018-10-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
-<p>上一篇文章登录的时候，你如果做了，虽然也未报错，按照结论貌似登录上了，但是，其实是没有登录上的，这里给大家说一声对不起，因为其中的某些参数未完全按照官方的例子敲，所以造成了参数不对。<br>既然上篇文章登录错了，那么这篇文章还是得纠正过来，并且找到错在哪里</p>
-</blockquote>
-<h4 id="教程内容"><a href="#教程内容" class="headerlink" title="教程内容"></a>教程内容</h4><blockquote>
-<p>在本课中，我们将学习如何从区块链中获取数据。数据通过来自前端的交易进入区块链，我们在第2.2课和第2.3课中查看了这一点。调用操作可以更改状态，该状态存储在多索引表中。此外，此操作记录在区块链中。</p>
-</blockquote>
-<h4 id="教程结果"><a href="#教程结果" class="headerlink" title="教程结果"></a>教程结果</h4><blockquote>
-<p>首先声明，所有的结果均未完全百分之百按照官方教程走，省略了其中的ui，而只涉及了其中正常开发所必须掌握的内容，如果觉得页面不够美丽，建议你可以按照官方的例子去学，这是地址<a href="https://battles.eos.io/" target="_blank" rel="noopener">elemental battles</a><br>本次调整了部分逻辑，方便我操作，如果你觉得不合适，可以修改<br>再来强调一下你需要哪些知识才能看懂：</p>
-<blockquote>
-<ul>
-<li>区块链共识算法，这是区块链的核心</li>
-<li>eos 账户,权限，cpu,net,ram等相关知识</li>
-<li>eos 本地环境，得安装在电脑上，安装方式自行查找（也就是部署合约用，如果你没有而又想走捷径，这里有个好东西，拿去不谢，<a href="https://github.com/itleaks/js4eos" target="_blank" rel="noopener">eos4js</a>，这个库开源出来才2天，也许后面还有更多类似的优秀的库，你都可以使用）</li>
-<li>eoscdt 得安装，去下载，然后下一步就好。（这个东西是用来编译成wasm和abi的，单独抽出来的，建议使用，当前时间我使用的eoscdt1.2，语法是旧的，如果你后续用了高版本，按照这篇文章敲语法会有问题的，但是思想是不变的）</li>
-<li>react 这是一个前端的库，为什么要用这个？因为第一，我会，第二，官方也是用的他，第三，用起来很爽，你如果用的别的如vue活着原生来写，只要你把流程搞懂了，也是一样的</li>
-<li>react-redux 这东西有点难懂，可能会看得你一脸蒙蔽，和上面一点是配套使用的，数据流的管理方式。简单理解就是数据的传递方式，写起来很复杂，理解起来还是很烧脑。我一时半会也说不完，来这里去看看吧<a href="https://cn.redux.js.org/docs/react-redux/" target="_blank" rel="noopener">react-redux</a>。（我也考虑过不用这个写，这样简单很多，对大家的理解也会有帮助，但是考虑到官方用了，我也就顺便用了） </li>
-<li>c++ 这个东西我也是为了写eos智能合约才开始学的，还好我之前有java的基础，学点基础够我们用了，难点的在它的指针上面，（话说，写合约貌似不怎么用指针了，eos已经帮我们封装的够多了，用得多的是引用），这个就看自己了  </li>
-<li>node 基础 够用就好  </li>
-<li>当然 js基础  同样够用就好</li>
-<li>梯子</li>
-<li>系统，反正不能是Windows系统</li>
-</ul>
-</blockquote>
-</blockquote>
-<p>为了避免上一篇文章犯错，这次先把结果展示了<br><a href="https://github.com/shaokun11/eoslearning/tree/eos-dev03" target="_blank" rel="noopener">eos第三课源码</a></p>
-<blockquote>
-<p>这里尽量放git图片了，先看图后看文字解释。  </p>
-</blockquote>
-<p><img src="/img_eos1/eos_react4.gif" alt="eos"> </p>
-<h4 id="布局更新"><a href="#布局更新" class="headerlink" title="布局更新"></a>布局更新</h4><ul>
-<li>更改了采取内置账号和秘钥的方式，直接点击不用输入了</li>
-<li>当登录成功，去区块链上拿到用户的信息，刷新ui</li>
-<li><p>下面的代码已经有注释了</p>
-<pre><code>import {Api, JsonRpc, JsSignatureProvider} from &apos;eosjs&apos;;
-
-async function takeAction(action, account, pk, dataValue) {
-    console.log(&quot;takeAction&quot;, action, dataValue)
-    const rpc = new JsonRpc(process.env.REACT_APP_EOS_HTTP_ENDPOINT);
-    const signatureProvider = new JsSignatureProvider([pk]);
-    const api = new Api({rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder()});
-    try {
-        return await api.transact({
-            actions: [{
-                account: &quot;shaokun11113&quot;,  // 合约的拥有者
-                name: action,             // 执行的合约方法
-                authorization: [{
-                    actor: account,       // 执行合约的账户
-                    permission: &apos;active&apos;, // 执行合约的账户所需要的权限
-                }],
-                data: dataValue,          // 所需要的参数,以json字符串进行传递，注意key为合约中定义的参数的名字，也可以通过abi进行查看
-
-        }]
-    }, {
-        blocksBehind: 3,              // 多少个块后确认
-        expireSeconds: 30,            // 超时时间
-    });
-} catch (err) {
-    throw(err)
-}
-}
-
-class ApiService {
-
-static async getUserByName(username) {
-    const rpc = new JsonRpc(process.env.REACT_APP_EOS_HTTP_ENDPOINT);
-    const res = await rpc.get_table_rows({
-        code: process.env.REACT_APP_EOS_CONTRACT_NAME,             //由于在合约中写死了，这里也可以写死
-        scope: process.env.REACT_APP_EOS_CONTRACT_NAME,             //由于在合约中写死了，这里也可以写死
-        table: &quot;userinfo&quot;,                                           //由于在合约中写死了，这里也可以写死
-        json: true,                                                // 默认值 ，可以不填
-        lower_bound: username,                                      // 匹配规则，不填默认返回全部
-    })
-    return res.rows[0];
-}
-
-static login({name, key}) {
-    return new Promise((resolve, reject) =&gt; {
-        takeAction(&quot;login&quot;, name, key, {user: name}).then(res =&gt; {
-            // 执行成功会返回默认的交易hash
-            console.log(&quot;login success&quot;, res);
-            resolve();
-        }).catch(err =&gt; {
-            console.log(err)
-            reject(err);
-        })
-    });
-}
-}
-
-export default ApiService;
-</code></pre></li>
-<li><p>当登录成功显示的组件,这是当跳转后立即获取最新数据。结合上面的代码，就知道了。</p>
-<p>  <img src="/img_eos1/eos10.png" alt="eos"> </p>
-</li>
-<li><p>上面最后，我使用postman拿取了合约中所有的数据，可以看到，目前的数据储存是两条，当然，你在代码中也可以实现，至于怎么实现，我想你应该知道的。至于上一篇文章错在哪里，你仔细看了上面的代码就知道了。</p>
-</li>
-</ul>
-<p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
-<h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><blockquote>
-<p>对个人的总结：<br>目前分享的经验不是很足，严格算起来，就一个多月而已,还是经过一个外国老哥的建议才开始写的，目前文章也比较粗糙。<br>但我还是会尽力来记录这些。一来这样记录下来可以让自己对知识把握得更牢靠，二来也可以帮助到他人。<br>从零开始搭博客，学习markdown语法，搜集图片，上传图片，传动图或者视频，都是一步一步摸索出来，中间坑很多，但是乐趣也在此.</p>
-</blockquote>
-<p>至于后续的文章，尽量跟着官方的教程走，所以到这里，第三课结束了。<br>小小的总结一下前三课的内容    </p>
-<ul>
-<li>第一课  搭环境  </li>
-<li>第二课  搭ui与合约的编写</li>
-<li>第二课续 部署，测试合约（合约部署成功，连接合约是失败的）</li>
-<li>第三课  更改上课的错误，连接合约，增加新的展示界面</li>
-</ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#x31;&#54;&#51;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#x31;&#54;&#51;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#x6e;&#121;&#x40;&#x31;&#54;&#51;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#x6e;&#121;&#x40;&#x31;&#54;&#51;&#46;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -3089,7 +3039,7 @@ export default ApiService;
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">29</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
