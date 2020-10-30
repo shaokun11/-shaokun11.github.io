@@ -233,6 +233,337 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/02/eos dapp开发 官方教程学习5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/02/eos dapp开发 官方教程学习5/" itemprop="url">eos dapp开发学习 第四课</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-02T21:02:05+08:00">
+                2018-11-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>官方又发布新版本了，目前写的合约也部署不上了，新版本的语法变了确实蛮多的，目前仅按照官网的教程把流程过一遍了<br>很幸运，目前的官方的游戏第一次和第二次已经被我玩了，这里也把第二次的游戏流程分享给大家，对于接下来编写代码心里有点底，因为本课主要是智能合约的编写。<br>Elemental Battles是一款单人纸牌游戏，其中包括元素之间的战斗。对手将通过在EOSIO上运行的智能合约来代表。<br><img src="/img_eos1/eos_react5.gif" alt="eos"></p>
+</blockquote>
+<h4 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h4><blockquote>
+<p>在本课中，我们将准备我们的游戏。我们还将在智能合约中构建startgame和playcard动作，并从前端触发。在本课程结束时，您将能够开始玩元素战斗并迈出第一步！  </p>
+</blockquote>
+<h4 id="合约编写"><a href="#合约编写" class="headerlink" title="合约编写"></a>合约编写</h4><blockquote>
+<p>这里我暂时无法部署上去，只能先把代码放在这里了。看了上面的游戏玩法，各位同学结合注释应该看得明白了。<br>玩家和ai进行卡片游戏对战，都从各自的待选17张牌中选出四张，每张牌有不同的攻击力。根据攻击力进行判断一次对决的胜负，各有5条命，输一次减少一条命，谁先到达0谁就输了。游戏简单，主要是了解一下智能合约的开发流程<br>这里并没有成功布置到链上，以后补上了<br><a href="https://github.com/shaokun11/eoslearning/tree/eos-dev4" target="_blank" rel="noopener">第四课源码</a></p>
+</blockquote>
+<p><code>cardgame.hpp</code></p>
+<pre><code>#include &lt;eosiolib/eosio.hpp&gt;
+using namespace std;
+class cardgame : public eosio::contract {
+// 继承contract
+  public:
+    //构造方法,并实例化了multi_index表users
+    cardgame( account_name self):contract(self),
+                                _users(self,self),
+                                _seed(self,self){};
+
+    // table和action 必须加上@abi 的注解，这样才能生存对应的abi，
+    // 在eosio.cdt中，使用 [[eosio::action]] 更加简洁 
+    [[eosio::action]]
+    void login(account_name user);
+
+    // 开始游戏，分发手里牌
+    [[eosio::action]]
+    void startgame(account_name user);
+
+    //从手上牌选择卡片进行对战
+    [[eosio::action]]
+    void playcard(account_name user,uint8_t player_card_index);
+
+  private:
+    enum game_status:int8_t
+    {
+      ONGOING = 0,      // 游戏正在进行中
+      PLAYER_WON = 1,   // 游戏已经结束，玩家获得胜利
+      PLAYER_LOST = -1 // 游戏结束， 完结失败
+    };
+    enum card_type : uint8_t  // 卡片的类型 总共五种属性类型,总共17张卡牌
+    {
+      EMPTY = 0,    // 不存在的卡片
+      FIRE = 1,     // 火属性， 克木  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
+      WOOD = 2,     // 木属性， 克水  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
+      WATER = 3,    // 水属性   克火  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
+      NEUTRAL = 4,  // 中立属性       攻击力为3 总共1张 
+      VOID = 5      // 平局属性       共计力为0 总共1张
+    };
+    struct card
+    {
+      uint8_t type;   // 卡片类型
+      uint8_t attack_point; // 卡片的攻击力
+    };
+    typedef uint8_t card_id;
+    const map&lt;card_id,card&gt; card_dict = {
+        {0 , {EMPTY , 0}},
+        {1 , {EMPTY , 1}},
+        {2 , {EMPTY , 1}},
+        {3 , {EMPTY , 2}},
+        {4 , {EMPTY , 2}},
+        {5 , {EMPTY , 3}},
+        {6 , {EMPTY , 1}},
+        {7 , {EMPTY , 1}},
+        {8 , {EMPTY , 2}},
+        {9 , {EMPTY , 2}},
+        {10 , {EMPTY , 3}},
+        {11 , {EMPTY , 1}},
+        {12 , {EMPTY , 1}},
+        {13 , {EMPTY , 2}},
+        {14 , {EMPTY , 2}},
+        {15 , {EMPTY , 3}},
+        {16 , {EMPTY , 3}},
+        {17 , {EMPTY , 0}},
+    };
+    struct game
+    {
+     int8_t status = ONGOING;   // 只要登录 默认游戏正在进行
+     int8_t life_player = 5;    // 游戏玩家 5条生命
+     int8_t ai_player = 5;      // 游戏玩家 5条生命
+     vector&lt;card_id&gt;  deck_player = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17}; // 玩家待选的卡牌id
+     vector&lt;card_id&gt; deck_ai = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};     // ai待选的卡牌id
+     vector&lt;card_id&gt; hand_player = {0,0,0,0}; // 玩家的手里牌
+     vector&lt;card_id&gt; hand_ai = {0,0,0,0};     // ai的手里牌
+     card_id selected_card_player = 0;          // 从待选牌中选中的牌
+     card_id selected_card_ai = 0;              // 从待选牌中选中的牌
+    };
+
+      [[eosio::table]]
+      struct userinfo
+      {
+          account_name name;            //玩家的名字    account_name 是uint64_t的一个别名
+          uint16_t win_count = 0;        
+          uint16_t lost_count = 0;
+      game game_data;         // game 
+
+          auto primary_key() const {return name;}  
+          //多索引表查找名为primary_key（）的getter函数。这必须使用结构中的第一个字段，编译器将使用它来添加主键。让我们定义这个功能。
+      };
+    [[eosio::table]]
+    struct seed // 这个是用来生成随机数的，全局储存，只要有人玩就会改变，没办法，eos里只能用table来持久化数据在链上
+    {
+      uint64_t key = 1;
+      uint32_t value = 1;
+
+      auto primary_key(){return key;};
+    }
+
+      typedef eosio::multi_index&lt;N(userinfo),userinfo&gt; user_index;
+      //多索引表定义，它有两个参数： 表名 
+      //                         结构定义了我们打算在多索引表中存储的数据。 
+      // 新类型名称作为我们的多索引表定义的别名
+      // 
+      // 多索引表中的数据由四条信息标识： code（account_name） 
+      //                              scop 
+      //                              table name
+      //                              primary key 
+    typedef multi_index&lt;N(seed),seed&gt; seed_index;
+    user_index _users; //声明表的实例
+    seed_index _seed;
+
+    int random(const int range);
+    void draw_one_card(vector&lt;uint8_t&gt;&amp; deck,vector&lt;uint8_t&gt;&amp; hand);
+};    
+</code></pre><p><code>cardgame.cpp</code> </p>
+<pre><code>#include &quot;cardgame.hpp&quot;
+void cardgame::login(account_name user)
+{
+    require_auth(user); 
+    //确保这个用户已经被授权
+    // 这里我理解了很久，把我的想法记录在这里
+    // 这里是调用此合约的account name，即提供私钥的account，这里传入的这个account必须拥有它的active权限，
+    // 当然，这里还可以要求有其他的权限，这样就可以给特殊的账号特殊的权限
+    auto user_iterator = _users.find(user);  // 查找
+    if (user_iterator == _users.end()) {
+        user_iterator = _users.emplace(user, [&amp;](auto&amp; new_user){
+            new_user.name = user;
+        });
+    }
+    // 这里使用multi_index的find 和 emplace(插入)两种方法，
+    // 这些方法的形式都是一样的，记住就好，可以去官网查看详细的方法说明
+}
+
+void cardgame::startgame(account_name name) {
+    require_auth(name);
+    auto&amp; info = _users.get(name, &quot;user not exist&quot;);
+    _users.modify(info,name,[&amp;](auto&amp; _to_modify_user){
+        game game_data;
+        for(uint8_t i = 0; i &lt; 4; i++){
+            draw_one_card(game_data.deck_player,game_data.hand_player);
+            draw_one_card(game_data.deck_ai,game_data.hand_ai);
+        }
+        _to_modify_user.game_data = game_data;
+    });
+}
+
+void cardgame::playcard(account_name user,uint8_t player_card_index){
+    require_auth(user);
+    eosio.assert(player_card_index &lt; 4,&quot;invalid hand index&quot;); // 手上牌最多四张
+    // 通过user找到数据表中数据
+    auto&amp; player = _users.get(user,&quot;User not exist&quot;);
+    eosio_assert(player.game_data.status == ONGONING,&quot;game have ended&quot;); // 确保本轮游戏没有结束
+    eosio_assert(player.game_data.selected_card_player == 0,&quot;the player have selected car in this turn&quot;); // 确保手上没有选牌
+    // 修改数据表
+    _users.modify(player,user,[&amp;](auto&amp; _to_modify_user){
+        game&amp; game_data = _to_modify_user.game_data;
+        // 设定选中的卡片id
+        game_data.selected_card_player = game_data.hand_player[player_card_index];
+        // 将手中卡片对应位置置位empty
+        game_data.hand_player[player_card_index] = 0;
+    });
+}
+EOSIO_ABI(cardgame,(login)(playcard))
+</code></pre><p><code>gameplay.cpp</code></p>
+<pre><code>#include &quot;cardgame.hpp&quot;
+int cardgame::random(const int range) {
+    auto seed_itr = _seed.begin();
+    if (seed_itr  == _seed.end())
+    {    // 如果没有随机数据，就用默认值初始化
+        seed_itr = _seed.emplace(_self,[&amp;](auto&amp; seed){})
+    };
+    int prime = 65535;
+    // 新值得范围 0 ~ 65535
+    auto new_seed_value = (seed_itr.value + now()) % prime;
+    _seed.modify(seed_itr,_self,[&amp;](auto&amp; s){
+            s.value = new_seed_value;
+    });
+    // 随机范围  0 ~ range
+    int random_res = new_seed_value % range;
+    return random_res;
+}
+// 根据待选卡片和手上已有的卡片，随机进行选择新的卡片
+void cardgame::draw_one_card(vector&lt;uint8_t&gt; &amp;deck,vector&lt;uint8_t&gt; &amp;hand){
+    // 0 ~ 16
+     int deck_card_index = random(deck.size());
+     int first_emprty_slot = -1;
+     for (int i = 0; i &lt; hand.size; ++i)
+     {    
+         auto id = hand[i];
+         if (card_dict.at(id).type == EMPTY){
+             first_emprty_slot = i;
+             break;
+         }
+     }
+     eosio_assert(first_emprty_slot !=- 1, &quot;No empty slot in the players hand&quot;);
+     // 如果手上的牌 有空位，进行随机赋值
+     hand[first_emprty_slot] = deck[deck_card_index];
+     // 待选牌中移除掉已经被赋值给手上的牌
+     deck.erase(deck.began() + deck_card_index);
+ }
+</code></pre><h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
+<p>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#110;&#x79;&#x40;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#110;&#x79;&#x40;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#109;</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/27/eos dapp开发 官方教程学习4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -413,7 +744,7 @@ export default ApiService;
 <li>第三课  更改上课的错误，连接合约，增加新的展示界面</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#x6e;&#121;&#64;&#x31;&#54;&#x33;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#x6e;&#121;&#64;&#x31;&#54;&#x33;&#46;&#99;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#x6e;&#x79;&#64;&#49;&#x36;&#51;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#x6e;&#x79;&#64;&#49;&#x36;&#51;&#46;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -588,7 +919,7 @@ user_info =&gt; userinfo
 <p>总算完成了之前的坑。^o^<br>中间有很多前端的知识，这不是这个课程讲解的重点，只能靠各位同学自己去补习了。这个系列使用react，redux也是一个很庞大的工程，所以可以简单一点，展示一下交互就好。<br>应该说到此，区块链与前端的交互已经完成，接下来就是充实智能合约的功能了。如果你做到了这一步，建议去<a href="https://developers.eos.io/eosio-cpp/reference" target="_blank" rel="noopener">eos c++ api</a>这里了解一下api，这样对于后面的合约编写会有一个更深层次的掌握</p>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#49;&#54;&#51;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#49;&#54;&#51;&#46;&#x63;&#111;&#x6d;</a></p>
+<p>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -739,7 +1070,7 @@ user_info =&gt; userinfo
 <h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>这篇文章写的很不顺，没有完成最关键的上链一步给大家演示，真是抱歉了。那么只能够走思路了。附上本篇文章所用到的源码 <a href="https://github.com/shaokun11/eoslearning/tree/eos-dev02" target="_blank" rel="noopener">elementel battels dev2</a></p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -894,7 +1225,7 @@ gameplay.cpp  // 包含智能合约中使用的内部帮助函数的C++源文件
 <h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>额，第0课和第一课就到这里结束了，可以看到和我们之前的流程是类似的。同样需要你掌握web和c++的知识，这些知识点都可以通过网络找到，需要自己积累。<br>第0课主要讲解了eosio开发环境的搭建，自备梯子很重要<br>第1课主要讲解的整个项目的结构</p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#110;&#121;&#64;&#49;&#54;&#x33;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#110;&#121;&#64;&#49;&#54;&#x33;&#x2e;&#x63;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#x75;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#109;</a></p>
 
           
         
@@ -1314,7 +1645,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
 </ul>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#x31;&#x36;&#51;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#x31;&#x36;&#51;&#46;&#99;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#107;&#117;&#x6e;&#x6e;&#x79;&#64;&#49;&#54;&#51;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#x6e;&#x79;&#64;&#49;&#54;&#51;&#x2e;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -1454,7 +1785,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
 <p><img src="/images/scatter17.png" alt="jungle"><br>进入scatter，选择身份。点击左下角的编辑的icon<br>如果你关闭过浏览器，请输入最开始的密码进入就好，如果忘记了，请输入助记词找回，如果丢了，就从头来一遍就好.<br><img src="/images/scatter18.png" alt="jungle"><br>这里我们注意一下 账户选项中的内容就好<br><img src="/images/scatter19.png" alt="jungle"><br>这里都是选择题，账户的第一项勾选我们创建网络时输入的名字，第二项勾选我们生成密匙对的名字就好，点击导入<br><img src="/images/scatter23.png" alt="jungle"><br>如果你看到了这个结果，不好意思，我也不知道你哪一步有问题。你可以从头开始再来一遍就好<br><img src="/images/scatter20.png" alt="jungle"><br>当然，我希望的是你看到的这个界面，通常我们选择active账号，然后点击右上角保存按钮<br><img src="/images/scatter21.png" alt="jungle"><br>回到这个界面，可以看到我们刚才创建的账户已经导入成功了，这里多一步的设置，把此账户设置为scatter的默认账户，这样以后调用scatter的时候就会默认选择此账户进行智能合约的调用了  勾选左下角的那个小圆圈的icon<br><img src="/images/scatter22.png" alt="jungle"><br>我们就可以看到我们账户的信息啦</p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <p><strong>这样一点点的敲下来，内容还是蛮多的。本打算一次写完，结果遇到网络的问题，暂停了一会，这篇文章算是对第一篇的补充吧。到目前为止，我们只是创建好了账户，还没有涉及到dapp的开发，接下来的具体怎么开发dapp估计要等到下周了吧。</strong></p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#x6b;&#x75;&#110;&#x6e;&#x79;&#64;&#49;&#x36;&#x33;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#x6e;&#x79;&#64;&#49;&#x36;&#x33;&#46;&#99;&#111;&#109;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#110;&#x79;&#x40;&#49;&#54;&#51;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#110;&#x79;&#x40;&#49;&#54;&#51;&#46;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -1649,7 +1980,7 @@ sudo ./install.sh
 <li><img src="/images/jungle03.png" alt="jungle net account "><br>这次我就这样填写，然后人机验证，通过后点击左下角的create,确保网络质量优良  </li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#46;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -2055,7 +2386,7 @@ function transferToParent(address _from, address _toContract, uint256 _toTokenId
 <h5 id="ERC998实际运用"><a href="#ERC998实际运用" class="headerlink" title="ERC998实际运用"></a>ERC998实际运用</h5><p><a href="https://www.bitguild.com/presale/bitizens" target="_blank" rel="noopener">Bitizens</a>在这里，你可以找到第一个基于ERC998创建的一款3D游戏，你可以免费创建一个只属于你自己的bitizen.</p>
 <h5 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h5><p>这篇文章仅仅分析了ERC998的标准接口，当然其中也涉及到ERC721和ERC20的一些知识，希望能够给将要进入dapp的开发者提供一点点帮助。</p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#121;&#x40;&#x31;&#54;&#x33;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#121;&#x40;&#x31;&#54;&#x33;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#54;&#51;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#54;&#51;&#46;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -2141,7 +2472,7 @@ function transferToParent(address _from, address _toContract, uint256 _toTokenId
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

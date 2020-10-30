@@ -233,6 +233,193 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/26/eos中inline action的理解6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/01/26/eos中inline action的理解6/" itemprop="url">eos的dispatcher的使用(3 完结)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-26T15:08:04+08:00">
+                2019-01-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>经过前面两篇文章的练习,相信各位同学都已经对自定义dispatcher已经有了自己的看法了,那么今天我们继续跟着官方的教程走,把接下来的知识点完整一下</p>
+<h4 id="自定义dispatcher-方式3"><a href="#自定义dispatcher-方式3" class="headerlink" title="自定义dispatcher 方式3"></a>自定义dispatcher 方式3</h4><ul>
+<li>这种方式官方说了,不能用于eosio-cpp生成abi,所以我也不详细去探究了,有兴趣的同学可以自己研究一下.官方最后总结这是最为灵活的一种方式呢</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">This dispatcher places most of the security logic and control inside the action handler, however, cannot use eosio-cpp&apos;s ABI generator.</span><br><span class="line">此调度程序将大多数安全逻辑和控件放在操作处理程序中，但是，不能使用eosio-cpp的ABI生成器。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">extern &quot;C&quot; void apply(uint64_t receiver, uint64_t code, uint64_t action) &#123; </span><br><span class="line">  switch(action) &#123;</span><br><span class="line">      case name(&quot;upsert&quot;).value: return upsert(receiver, code);</span><br><span class="line">      case name(&quot;notify&quot;).value: return notify(receiver, code);</span><br><span class="line">      case name(&quot;erase&quot;).value: return erase(receiver, code);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">To handle these requests, we move security logic that was otherwise in the dispatcher, into the action. This can provide more control, but may introduce redundancy, particularly for larger contracts. In the end, it accomplishes all the same points as the above patterns while allowing more information into the scope (namely code). Having access to code inside your action may be useful in some situations. This pattern provides the most flexibility in both the dispatcher and the action, hence &quot;Fully Flexible.&quot;</span><br><span class="line">为了处理这些请求，我们将调度程序中的安全逻辑移动到操作中。这可以提供更多控制，但可能会引入冗余，特别是对于大型合同。最后，它完成了与上述模式相同的所有点，同时允许更多信息进入范围（即代码）。在某些情况下，访问操作中的代码可能很有用。这种模式在调度程序和操作中提供了最大的灵活性，因此“完全灵活”。</span><br></pre></td></tr></table></figure>
+<h4 id="自定义dispatcher-方式4"><a href="#自定义dispatcher-方式4" class="headerlink" title="自定义dispatcher 方式4"></a>自定义dispatcher 方式4</h4><ul>
+<li>官方说,上面自定义apply函数的时候,如果action少还是可以接受的,如果很多呢?就编程了体力劳动了,而且有可能出现漏洞.这显然和我们程序猿的做法不一致,所以官方最后给我们推荐了新的方法,功能类似,且减少体力劳动,不得不说还是很贴心的</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#define EOSIO_DISPATCH_CUSTOM( TYPE, MEMBERS ) \</span><br><span class="line">extern &quot;C&quot; &#123; \</span><br><span class="line">   void apply( uint64_t receiver, uint64_t code, uint64_t action ) &#123; \</span><br><span class="line">      if( code == receiver ) &#123; \</span><br><span class="line">         switch( action ) &#123; \</span><br><span class="line">            EOSIO_DISPATCH_HELPER( TYPE, MEMBERS ) \</span><br><span class="line">         &#125; \</span><br><span class="line">         /* does not allow destructor of thiscontract to run: eosio_exit(0); */ \</span><br><span class="line">      &#125; \</span><br><span class="line">   &#125; \</span><br><span class="line">&#125; \</span><br></pre></td></tr></table></figure>
+<ul>
+<li>就是这么简单,虽然简单,但是我们还是得看看有什么魔法(以下内容为官方的介绍)</li>
+</ul>
+<ol>
+<li>一定要使用这个 code == receiver的判断,而这个可以自动允许eosio.token进行transfer的方法呢</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Checks if code==receiverand that the action is not transfer. If this condition is omitted, you may introduce a vulnerability into your contract. It allows the action through if the code is eosio.token and the action is transfer. This check prevents another contract with a transfer function from exploiting your contract.</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">2. 合约的实例化,可以看出和之前的apply方法是一样的,之前是在apply函数中实例化,这里直接传入一个实例</span><br></pre></td></tr></table></figure>
+<p>Instantiates the TYPE (this would be your standard C++11 class)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">3. 说内部调用了execute_action方法,和我们之前的设计一样</span><br></pre></td></tr></table></figure></p>
+<p>Use the EOSIO_DISPATCH_HELPER macro, which inserts a case for each MEMBER into your switch. Inside this case, it calls execute_action using a pattern very similar to the one demonstrated in the Flexible/Compatible Dispatcher defined above.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">4. 直接替换就可以了.不用做任何改变</span><br></pre></td></tr></table></figure></p>
+<p>You can then use this macro the same way you would with the provided EOSIO_DISPATCH macro.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 既然这样,这里多了一个EOSIO_DISPATCH_HELPER的宏,我们还是得去源码看看它究竟做了什么我们才能放心呢</span><br><span class="line">* 这里出现了一个小的惊喜,由于我目前的源码都是在eos去找,我居然没有找到EOSIO_DISPATCH_HELPER这个宏,这就尴尬了,转而我转向cdt的源码,总算找到了这个宏</span><br></pre></td></tr></table></figure></p>
+<p>// Helper macro for EOSIO_DISPATCH</p>
+<p>#define EOSIO_DISPATCH_HELPER( TYPE,  MEMBERS ) \<br>   BOOST_PP_SEQ_FOR_EACH( EOSIO_DISPATCH_INTERNAL, TYPE, MEMBERS )</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>// Helper macro for EOSIO_DISPATCH_INTERNAL</p>
+<p>#define EOSIO_DISPATCH_INTERNAL( r, OP, elem ) \<br>   case eosio::name( BOOST_PP_STRINGIZE(elem) ).value: \<br>      eosio::execute_action( eosio::name(receiver), eosio::name(code), &amp;OP::elem ); \<br>      break;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<p>#define EOSIO_DISPATCH( TYPE, MEMBERS ) \<br>extern “C” { \<br>   void apply( uint64_t receiver, uint64_t code, uint64_t action ) { \<br>      if( code == receiver ) { \<br>         switch( action ) { \<br>            EOSIO_DISPATCH_HELPER( TYPE, MEMBERS ) \<br>         } \<br>         /<em> does not allow destructor of thiscontract to run: eosio_exit(0); </em>/ \<br>      } \<br>   } \<br>} \<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">* 这里一下子三个宏了,我们关心的EOSIO_DISPATCH其实内部也是调用了EOSIO_DISPATCH_HELPER,所以这第三种方式定义的宏我觉得没有必要了哈,</span><br><span class="line">* 哎,官方的文档貌似又落后了,不过已经习以为常了呢.</span><br><span class="line"></span><br><span class="line">####  Security, Security, Security...</span><br></pre></td></tr></table></figure></p>
+<p>Your contract’s first line of security begins at your dispatcher. Understanding how the dispatching of actions to your contracts is handled is imperative to limiting exposure to logic inside your actions. Always take great caution when writing a custom dispatcher, and be aware of the security implications of each individual implementation method.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 安全第一,所以应该小心使用apply函数,所以官方最后建议还是直接使用EOSIO_DISPATCHER就可以了,至于原因则如下</span><br></pre></td></tr></table></figure></p>
+<p>For simple contracts that only execute internal public actions, the EOSIO_DISPATCH is more than suitable, eliminates cruft and greatly decrease the chance of introducing logical errors.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#### 猜想</span><br><span class="line">* 既然使用cdt中的EOSIO_DISPATCH就能够达到需求了,那我们该如何实现前面课程的监听呢?</span><br><span class="line">* 通过查看EOSIO_DISPATCHER的判断,这里是不允许code为eosio.token的的操作的记录的,既然这样那我们改造一下EOSIO_DISPATCHER如下所示</span><br></pre></td></tr></table></figure></p>
+<p>#define EOSIO_DISPATCH_CUSTOM( TYPE, MEMBERS ) \<br>extern “C” { \<br>   void apply( uint64_t receiver, uint64_t code, uint64_t action ) { \<br>      if( code == receiver || code == “eosio.token”_n.value &amp;&amp; action == “transfer”_n.value) { \<br>         switch( action ) { \<br>            EOSIO_DISPATCH_HELPER( TYPE, MEMBERS ) \<br>         } \<br>         /<em> does not allow destructor of thiscontract to run: eosio_exit(0); </em>/ \<br>      } \<br>   } \<br>} \<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">* 那么最终结果和上篇文章的内容是一样的,只是我们也没有自己实现apply函数了,而是借助于helper这个宏帮助我们完成</span><br></pre></td></tr></table></figure></p>
+<p>#include &lt;eosiolib/eosio.hpp&gt;</p>
+<p>#include &lt;eosiolib/print.hpp&gt;</p>
+<p>using namespace eosio;</p>
+<p>class [[eosio::contract]] addressbook : public eosio::contract {</p>
+<p>public:<br>  using contract::contract;</p>
+<p>  addressbook(name receiver, name code,  datastream<const char*> ds): contract(receiver, code, ds) {}</const></p>
+<p>  [[eosio::action]]<br>  void upsert(name user, std::string first_name, std::string last_name) {<br>    require_auth(user);<br>    address_index addresses(_code, _code.value);<br>    auto iterator = addresses.find(user.value);<br>    if( iterator == addresses.end() )<br>    {<br>      addresses.emplace(user, <a href="auto&amp; row">&amp;</a> {<br>       row.key = user;<br>       row.first_name = first_name;<br>       row.last_name = last_name;<br>      });<br>      send_summary(user, “ successfully emplaced record to addressbook”);<br>    }<br>    else {<br>      std::string changes;<br>      addresses.modify(iterator, user, <a href="auto&amp; row">&amp;</a> {<br>        row.key = user;<br>        row.first_name = first_name;<br>        row.last_name = last_name;<br>      });<br>      send_summary(user, “ successfully modified record to addressbook”);<br>    }<br>  }</p>
+<p>  [[eosio::action]]<br>  void erase(name user) {<br>    require_auth(user);</p>
+<pre><code>address_index addresses(_self, _code.value);
+
+auto iterator = addresses.find(user.value);
+eosio_assert(iterator != addresses.end(), &quot;Record does not exist&quot;);
+addresses.erase(iterator);
+send_summary(user, &quot; successfully erased record from addressbook&quot;);
+</code></pre><p>  }</p>
+<p>  void transfer(uint64_t receiver, uint64_t code){<br>    send_summary(name(code), “eosio.token transfer”);<br>  }</p>
+<p>private:<br>  struct [[eosio::table]] person {<br>    name key;<br>    std::string first_name;<br>    std::string last_name;<br>    uint64_t primary_key() const { return key.value; }<br>  };</p>
+<p>  void send_summary(name user, std::string message) {<br>    action(<br>      permission_level{get_self(),”active”_n},<br>      get_self(),<br>      “notify”_n,<br>      std::make_tuple(user, name{user}.to_string() + message)<br>    ).send();<br>  };</p>
+<p>  typedef eosio::multi_index&lt;”people”_n, person&gt; address_index;<br>};</p>
+<p>#define EOSIO_DISPATCH_CUSTOM( TYPE, MEMBERS ) \<br>extern “C” { \<br>   void apply( uint64_t receiver, uint64_t code, uint64_t action ) { \<br>      if( code == receiver || code == “eosio.token”_n.value &amp;&amp; action == “transfer”_n.value) { \<br>         switch( action ) { \<br>            EOSIO_DISPATCH_HELPER( TYPE, MEMBERS ) \<br>         } \<br>         /<em> does not allow destructor of thiscontract to run: eosio_exit(0); </em>/ \<br>      } \<br>   } \<br>} \</p>
+<p>EOSIO_DISPATCH_CUSTOM( addressbook, (upsert)(erase)(transfer) )<br><code>`</code></p>
+<h4 id="结果验证"><a href="#结果验证" class="headerlink" title="结果验证"></a>结果验证</h4><ul>
+<li>通过我们自定义的dispatcher,我们已经实现了和上篇文章同样的功能,且不用自己实现apply函数,极大的简化了操作</li>
+<li>当然,目前的方式我们允许的是eosio.token执行transfer操作,那么我们也可以仿照实现其他特殊合约的记录,比如说eosio.system(用来操作cpu,ram)的或者其他我们自定义的合约</li>
+</ul>
+<p><img src="/img_eos1/eos_gif_1.gif" alt="shaokun"></p>
+<p><a href="https://github.com/shaokun11/eosabout/tree/eos-dispatcher-03" target="_blank" rel="noopener">本课源码</a></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
+<li>上一篇最后一个问题,我们已经记录了当我们账户上eos的交易的数据,但是具体的数据我们还不知道呢?比如说转给谁?谁转的?转了多少?还有memo(这个也很重要的,有时候很多数据的有效性可以通过它来进行验证)</li>
+<li>第二个问题,我们怎么在链上发我们的自己的代币呢?而且这个代币要符合eos代币的标准标准(这里为什么要抛出这个问题呢?因为我只在本地的环境按照教程走,发过行过代币,但是在测试网,我没有eosio.token的账号,我居然懵逼了,不知道怎么发了),过程很简单,但是留给各位同学自己也思考一下</li>
+<li>三篇文章下来,可以看到跟着官网走,有好处,权威,也有坑,文档总是落后实际情况,那么我们能做点什么吗?我觉得能的,虽然语法变了,但是核心不变,所以我们掌握它的基础性内容,变来变去我们只需要去补一点它变化的内容就好了,如果你之前有基础,这应该就是手到擒来的事情了,只是,看我们还能否学得动哈^_^</li>
+</ul>
+<h4 id="啰嗦一句"><a href="#啰嗦一句" class="headerlink" title="啰嗦一句"></a>啰嗦一句</h4><ul>
+<li>莫名其妙,就叫收拾东西走人了,具体原因都没有,寒冬的果实也落在了我的头上了…(ps:猜测是俺站错了队吧,整个团队一起走人了…)</li>
+<li>换个方向想,何尝不是又给了我们人生中多一次选择的机会呢?</li>
+<li>这应该是年前的最后一篇文章了,希望年后能够继续给大家分享一些dapp开发的知识,谢谢你的阅读</li>
+</ul>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#x6e;&#121;&#x40;&#x31;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#x6e;&#121;&#x40;&#x31;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/19/eos中inline action的理解5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -363,7 +550,7 @@
 <li>问题又来了?那我要怎么拿取转账的信息呢?</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -633,7 +820,7 @@ bool execute_action( T* obj, void (Q::*func)(Args...)  ) {
 <li>谢谢大家的浏览,希望有发现错误的同学可以加上我微信帮我指出来,再次感谢.</li>
 </ol>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#117;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#x6b;&#x75;&#x6e;&#110;&#x79;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#x6e;&#110;&#x79;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -872,7 +1059,7 @@ function withPayable() public payable {
 <li>如果哪位同学有更好的关于转账的方法,请告知一下,个人觉得在合约中进行转账还是很常见的需求</li>
 <li>官方的eos dice合约现在已经移除了,但是可以在历史中找到<a href="https://github.com/EOSIO/eos/blob/v1.0.0/contracts/dice/dice.cpp" target="_blank" rel="noopener">eos dice</a> 有兴趣的同学可以研究一下</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#107;&#x75;&#110;&#110;&#121;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#110;&#121;&#x40;&#49;&#x36;&#x33;&#46;&#99;&#x6f;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -1183,7 +1370,7 @@ EOSIO_DISPATCH(adcounter,(count));
 <li>还有一点,哪位同学知道eos中有类似eth中的event的功能,即合约主动推送信息给我们,我觉得这很重要.我觉得eosjs应该提供类似的功能呢.知道的同学麻烦告知一声</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#x36;&#51;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#x36;&#51;&#46;&#x63;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#x33;&#x2e;&#99;&#111;&#x6d;</a></p>
 
           
         
@@ -1429,7 +1616,7 @@ yarn add eosjs scatterjs-core scatterjs-plugin-eosjs
 </ul>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1785,7 +1972,7 @@ EOSIO_DISPATCH( learnper2, (add))
 </blockquote>
 <p><a href="https://github.com/shaokun11/eos-permission" target="_blank" rel="noopener">本课源码</a></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<p>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -2115,7 +2302,7 @@ EOSIO_DISPATCH(todolist, (create)(complete)(destroy))
 </blockquote>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#46;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -2318,7 +2505,7 @@ void cardgame::endgame(eosio::name user) {
 <p>目前我的文章基本上都是比较简单的demo或者概念性的文章，这样看多了也没有意思，我写着也觉得没有意思了。所以接下来准备找一些具有代表性的基于以太坊，波场和eos合约与大家分享了。</p>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#107;&#x75;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#64;&#49;&#54;&#x33;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#64;&#49;&#54;&#x33;&#46;&#99;&#111;&#x6d;</a></p>
 
           
         
@@ -2622,338 +2809,7 @@ EOSIO_DISPATCH(cardgame,(login)(startgame)(playcard))
 <li><a href="https://github.com/shaokun11/eoslearning/tree/eos-dve4-update" target="_blank" rel="noopener">更新的合约源码</a>，这次就没有更新前端的mock数据了，相信聪明的你一定知道怎样调整过来</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#51;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#51;&#46;&#99;&#x6f;&#109;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/02/eos dapp开发 官方教程学习5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/02/eos dapp开发 官方教程学习5/" itemprop="url">eos dapp开发学习 第四课</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-02T21:02:05+08:00">
-                2018-11-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
-<p>官方又发布新版本了，目前写的合约也部署不上了，新版本的语法变了确实蛮多的，目前仅按照官网的教程把流程过一遍了<br>很幸运，目前的官方的游戏第一次和第二次已经被我玩了，这里也把第二次的游戏流程分享给大家，对于接下来编写代码心里有点底，因为本课主要是智能合约的编写。<br>Elemental Battles是一款单人纸牌游戏，其中包括元素之间的战斗。对手将通过在EOSIO上运行的智能合约来代表。<br><img src="/img_eos1/eos_react5.gif" alt="eos"></p>
-</blockquote>
-<h4 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h4><blockquote>
-<p>在本课中，我们将准备我们的游戏。我们还将在智能合约中构建startgame和playcard动作，并从前端触发。在本课程结束时，您将能够开始玩元素战斗并迈出第一步！  </p>
-</blockquote>
-<h4 id="合约编写"><a href="#合约编写" class="headerlink" title="合约编写"></a>合约编写</h4><blockquote>
-<p>这里我暂时无法部署上去，只能先把代码放在这里了。看了上面的游戏玩法，各位同学结合注释应该看得明白了。<br>玩家和ai进行卡片游戏对战，都从各自的待选17张牌中选出四张，每张牌有不同的攻击力。根据攻击力进行判断一次对决的胜负，各有5条命，输一次减少一条命，谁先到达0谁就输了。游戏简单，主要是了解一下智能合约的开发流程<br>这里并没有成功布置到链上，以后补上了<br><a href="https://github.com/shaokun11/eoslearning/tree/eos-dev4" target="_blank" rel="noopener">第四课源码</a></p>
-</blockquote>
-<p><code>cardgame.hpp</code></p>
-<pre><code>#include &lt;eosiolib/eosio.hpp&gt;
-using namespace std;
-class cardgame : public eosio::contract {
-// 继承contract
-  public:
-    //构造方法,并实例化了multi_index表users
-    cardgame( account_name self):contract(self),
-                                _users(self,self),
-                                _seed(self,self){};
-
-    // table和action 必须加上@abi 的注解，这样才能生存对应的abi，
-    // 在eosio.cdt中，使用 [[eosio::action]] 更加简洁 
-    [[eosio::action]]
-    void login(account_name user);
-
-    // 开始游戏，分发手里牌
-    [[eosio::action]]
-    void startgame(account_name user);
-
-    //从手上牌选择卡片进行对战
-    [[eosio::action]]
-    void playcard(account_name user,uint8_t player_card_index);
-
-  private:
-    enum game_status:int8_t
-    {
-      ONGOING = 0,      // 游戏正在进行中
-      PLAYER_WON = 1,   // 游戏已经结束，玩家获得胜利
-      PLAYER_LOST = -1 // 游戏结束， 完结失败
-    };
-    enum card_type : uint8_t  // 卡片的类型 总共五种属性类型,总共17张卡牌
-    {
-      EMPTY = 0,    // 不存在的卡片
-      FIRE = 1,     // 火属性， 克木  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
-      WOOD = 2,     // 木属性， 克水  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
-      WATER = 3,    // 水属性   克火  攻击力为 1 和 2 的各两张  攻击力为3的一张    总共5张
-      NEUTRAL = 4,  // 中立属性       攻击力为3 总共1张 
-      VOID = 5      // 平局属性       共计力为0 总共1张
-    };
-    struct card
-    {
-      uint8_t type;   // 卡片类型
-      uint8_t attack_point; // 卡片的攻击力
-    };
-    typedef uint8_t card_id;
-    const map&lt;card_id,card&gt; card_dict = {
-        {0 , {EMPTY , 0}},
-        {1 , {EMPTY , 1}},
-        {2 , {EMPTY , 1}},
-        {3 , {EMPTY , 2}},
-        {4 , {EMPTY , 2}},
-        {5 , {EMPTY , 3}},
-        {6 , {EMPTY , 1}},
-        {7 , {EMPTY , 1}},
-        {8 , {EMPTY , 2}},
-        {9 , {EMPTY , 2}},
-        {10 , {EMPTY , 3}},
-        {11 , {EMPTY , 1}},
-        {12 , {EMPTY , 1}},
-        {13 , {EMPTY , 2}},
-        {14 , {EMPTY , 2}},
-        {15 , {EMPTY , 3}},
-        {16 , {EMPTY , 3}},
-        {17 , {EMPTY , 0}},
-    };
-    struct game
-    {
-     int8_t status = ONGOING;   // 只要登录 默认游戏正在进行
-     int8_t life_player = 5;    // 游戏玩家 5条生命
-     int8_t ai_player = 5;      // 游戏玩家 5条生命
-     vector&lt;card_id&gt;  deck_player = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17}; // 玩家待选的卡牌id
-     vector&lt;card_id&gt; deck_ai = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};     // ai待选的卡牌id
-     vector&lt;card_id&gt; hand_player = {0,0,0,0}; // 玩家的手里牌
-     vector&lt;card_id&gt; hand_ai = {0,0,0,0};     // ai的手里牌
-     card_id selected_card_player = 0;          // 从待选牌中选中的牌
-     card_id selected_card_ai = 0;              // 从待选牌中选中的牌
-    };
-
-      [[eosio::table]]
-      struct userinfo
-      {
-          account_name name;            //玩家的名字    account_name 是uint64_t的一个别名
-          uint16_t win_count = 0;        
-          uint16_t lost_count = 0;
-      game game_data;         // game 
-
-          auto primary_key() const {return name;}  
-          //多索引表查找名为primary_key（）的getter函数。这必须使用结构中的第一个字段，编译器将使用它来添加主键。让我们定义这个功能。
-      };
-    [[eosio::table]]
-    struct seed // 这个是用来生成随机数的，全局储存，只要有人玩就会改变，没办法，eos里只能用table来持久化数据在链上
-    {
-      uint64_t key = 1;
-      uint32_t value = 1;
-
-      auto primary_key(){return key;};
-    }
-
-      typedef eosio::multi_index&lt;N(userinfo),userinfo&gt; user_index;
-      //多索引表定义，它有两个参数： 表名 
-      //                         结构定义了我们打算在多索引表中存储的数据。 
-      // 新类型名称作为我们的多索引表定义的别名
-      // 
-      // 多索引表中的数据由四条信息标识： code（account_name） 
-      //                              scop 
-      //                              table name
-      //                              primary key 
-    typedef multi_index&lt;N(seed),seed&gt; seed_index;
-    user_index _users; //声明表的实例
-    seed_index _seed;
-
-    int random(const int range);
-    void draw_one_card(vector&lt;uint8_t&gt;&amp; deck,vector&lt;uint8_t&gt;&amp; hand);
-};    
-</code></pre><p><code>cardgame.cpp</code> </p>
-<pre><code>#include &quot;cardgame.hpp&quot;
-void cardgame::login(account_name user)
-{
-    require_auth(user); 
-    //确保这个用户已经被授权
-    // 这里我理解了很久，把我的想法记录在这里
-    // 这里是调用此合约的account name，即提供私钥的account，这里传入的这个account必须拥有它的active权限，
-    // 当然，这里还可以要求有其他的权限，这样就可以给特殊的账号特殊的权限
-    auto user_iterator = _users.find(user);  // 查找
-    if (user_iterator == _users.end()) {
-        user_iterator = _users.emplace(user, [&amp;](auto&amp; new_user){
-            new_user.name = user;
-        });
-    }
-    // 这里使用multi_index的find 和 emplace(插入)两种方法，
-    // 这些方法的形式都是一样的，记住就好，可以去官网查看详细的方法说明
-}
-
-void cardgame::startgame(account_name name) {
-    require_auth(name);
-    auto&amp; info = _users.get(name, &quot;user not exist&quot;);
-    _users.modify(info,name,[&amp;](auto&amp; _to_modify_user){
-        game game_data;
-        for(uint8_t i = 0; i &lt; 4; i++){
-            draw_one_card(game_data.deck_player,game_data.hand_player);
-            draw_one_card(game_data.deck_ai,game_data.hand_ai);
-        }
-        _to_modify_user.game_data = game_data;
-    });
-}
-
-void cardgame::playcard(account_name user,uint8_t player_card_index){
-    require_auth(user);
-    eosio.assert(player_card_index &lt; 4,&quot;invalid hand index&quot;); // 手上牌最多四张
-    // 通过user找到数据表中数据
-    auto&amp; player = _users.get(user,&quot;User not exist&quot;);
-    eosio_assert(player.game_data.status == ONGONING,&quot;game have ended&quot;); // 确保本轮游戏没有结束
-    eosio_assert(player.game_data.selected_card_player == 0,&quot;the player have selected car in this turn&quot;); // 确保手上没有选牌
-    // 修改数据表
-    _users.modify(player,user,[&amp;](auto&amp; _to_modify_user){
-        game&amp; game_data = _to_modify_user.game_data;
-        // 设定选中的卡片id
-        game_data.selected_card_player = game_data.hand_player[player_card_index];
-        // 将手中卡片对应位置置位empty
-        game_data.hand_player[player_card_index] = 0;
-    });
-}
-EOSIO_ABI(cardgame,(login)(playcard))
-</code></pre><p><code>gameplay.cpp</code></p>
-<pre><code>#include &quot;cardgame.hpp&quot;
-int cardgame::random(const int range) {
-    auto seed_itr = _seed.begin();
-    if (seed_itr  == _seed.end())
-    {    // 如果没有随机数据，就用默认值初始化
-        seed_itr = _seed.emplace(_self,[&amp;](auto&amp; seed){})
-    };
-    int prime = 65535;
-    // 新值得范围 0 ~ 65535
-    auto new_seed_value = (seed_itr.value + now()) % prime;
-    _seed.modify(seed_itr,_self,[&amp;](auto&amp; s){
-            s.value = new_seed_value;
-    });
-    // 随机范围  0 ~ range
-    int random_res = new_seed_value % range;
-    return random_res;
-}
-// 根据待选卡片和手上已有的卡片，随机进行选择新的卡片
-void cardgame::draw_one_card(vector&lt;uint8_t&gt; &amp;deck,vector&lt;uint8_t&gt; &amp;hand){
-    // 0 ~ 16
-     int deck_card_index = random(deck.size());
-     int first_emprty_slot = -1;
-     for (int i = 0; i &lt; hand.size; ++i)
-     {    
-         auto id = hand[i];
-         if (card_dict.at(id).type == EMPTY){
-             first_emprty_slot = i;
-             break;
-         }
-     }
-     eosio_assert(first_emprty_slot !=- 1, &quot;No empty slot in the players hand&quot;);
-     // 如果手上的牌 有空位，进行随机赋值
-     hand[first_emprty_slot] = deck[deck_card_index];
-     // 待选牌中移除掉已经被赋值给手上的牌
-     deck.erase(deck.began() + deck_card_index);
- }
-</code></pre><h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#x6e;&#121;&#x40;&#x31;&#54;&#51;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#x6e;&#121;&#x40;&#x31;&#54;&#51;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#110;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#110;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#99;&#111;&#x6d;</a></p>
 
           
         
@@ -3039,7 +2895,7 @@ void cardgame::draw_one_card(vector&lt;uint8_t&gt; &amp;deck,vector&lt;uint8_t&g
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
