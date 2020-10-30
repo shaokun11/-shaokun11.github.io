@@ -88,7 +88,7 @@
 <meta property="og:description" content="welcome 本篇文章主要看看UniswapV2Pair的父类合约UniswapV2ERC20,主要学习一下eip712  UniswapV2ERC20 此合约如果熟悉ERC20 token的同学一定知道,她其实是标准的erc20合约(其标准的erc20合约的内容此处就不再详细介绍了)但是相对标准的erc20合约多了一个permit方法,那么这个方法的作用是什么什么呢?其实是eip721的一个实">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/xswap/ether3.git">
-<meta property="og:updated_time" content="2020-10-30T14:03:29.000Z">
+<meta property="og:updated_time" content="2020-10-30T14:09:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="一步一步教你打造自己的defi-xswap(3)">
 <meta name="twitter:description" content="welcome 本篇文章主要看看UniswapV2Pair的父类合约UniswapV2ERC20,主要学习一下eip712  UniswapV2ERC20 此合约如果熟悉ERC20 token的同学一定知道,她其实是标准的erc20合约(其标准的erc20合约的内容此处就不再详细介绍了)但是相对标准的erc20合约多了一个permit方法,那么这个方法的作用是什么什么呢?其实是eip721的一个实">
@@ -346,7 +346,7 @@
 <li>从链上读出当前签名所用的nonce</li>
 <li>根据nonce与amount使用账号进行签名,并发送到链上</li>
 <li>当交易执行成功,获取新的nonce和amount,验证结果</li>
-<li>再次执行签名,将获取的签名数据(其中如果数量为50,发送将会提醒失败,改为签名的数据25则正常弹出metamask)通过remix发送,等待交易结果后返回页面查询数据已经更改  </li>
+<li>再次执行签名,将获取的签名数据(其中如果数量为25,发送将会提醒失败,改为签名的数据19则正常弹出metamask)通过remix发送,等待交易结果后返回页面查询数据已经更改  </li>
 </ol>
 <p><img src="/xswap/ether3.git" alt="demo"></p>
 <h4 id="js签名流程"><a href="#js签名流程" class="headerlink" title="js签名流程"></a>js签名流程</h4><blockquote>
