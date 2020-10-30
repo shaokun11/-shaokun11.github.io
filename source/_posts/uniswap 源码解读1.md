@@ -3,7 +3,8 @@ title: 一步一步教你打造自己的defi-xswap(1)
 date: 2020-10-24 18:31:22
 ---
 #### welcome
->[uniswap合约源码](https://etherscan.io/address/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f#code)  
+>[uniswap合约源码 etherscan](https://etherscan.io/address/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f#code)    
+>[uniswap合约源码 github](https://github.com/Uniswap/uniswap-v2-core)  
 >由于在工作中已经基于uniswap实现了更多玩法的defi,在此把其中的流程再梳理一下  
 >本系列文章仅作为uniswap的源码理解以及带你如何实现一个自己的xswap,其他玩法请各位同学自己发挥了
 
