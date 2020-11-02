@@ -233,6 +233,162 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/31/uniswap 源码解读4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/10/31/uniswap 源码解读4/" itemprop="url">一步一步教你打造自己的defi-xswap(5)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-31T09:58:35+08:00">
+                2020-10-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="welcome"><a href="#welcome" class="headerlink" title="welcome"></a>welcome</h4><blockquote>
+<p>本篇文章编写智能合约中的create2的使用,也就是uniswap中的<strong>UniswapV2Factory</strong>合约中的createPair方法.具体的信息可参考<a href="https://eips.ethereum.org/EIPS/eip-1014" target="_blank" rel="noopener">eip1014</a>与<a href="https://blog.ricmoo.com/wisps-the-magical-world-of-create2-5c2177027604" target="_blank" rel="noopener">the-magical-world-of-create2</a>.</p>
+</blockquote>
+<h4 id="create2的使用方式"><a href="#create2的使用方式" class="headerlink" title="create2的使用方式"></a>create2的使用方式</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">bytes memory bytecode = type(UniswapV2Pair).creationCode;</span><br><span class="line">bytes32 salt = keccak256(abi.encodePacked(token0, token1));</span><br><span class="line">    assembly &#123;</span><br><span class="line">         pair := create2(<span class="number">0</span>, add(bytecode, <span class="number">32</span>), mload(bytecode), salt)</span><br><span class="line">   &#125;</span><br><span class="line">     IUniswapV2Pair(pair).initialize(token0, token1);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>此处主要注意看以上两行代码,按照字面意思我们需要<strong>UniswapV2Pair</strong>的合约, <strong>token0, token1</strong>组成的salt,最后面再调用UniswapV2Pair的初始化函数,即完成了整个create2的使用,</li>
+<li>对的,就是这么简单.那么这样单独抽出一个<strong>UniswapV2Factory</strong>的作用是什么呢?</li>
+<li><p>因为我们是批量创建相同的合约,只是每个合约的里面记录的数据不同而已,所以这里我们还得引入另一个合约函数来配合使用,他就是<br><a href="https://github.com/Uniswap/uniswap-v2-periphery/blob/master/contracts/libraries/UniswapV2Library.sol" target="_blank" rel="noopener">UniswapV2Library</a>中的pairFor方法,此方法可以根据创建的参数返回正确的合约地址.其中factory参数就是上述使用create2的合约地址</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// calculates the CREATE2 address for a pair without making any external calls</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pairFor</span>(<span class="params">address factory, address tokenA, address tokenB</span>) <span class="title">internal</span> <span class="title">pure</span> <span class="title">returns</span> (<span class="params">address pair</span>) </span>&#123;</span><br><span class="line">    (address token0, address token1) = sortTokens(tokenA, tokenB);</span><br><span class="line">    pair = address(uint(keccak256(abi.encodePacked(</span><br><span class="line">            hex<span class="string">'ff'</span>,			<span class="comment">// 固定值</span></span><br><span class="line">            factory,			<span class="comment">// 使用create2的合约地址</span></span><br><span class="line">            keccak256(abi.encodePacked(token0, token1)), <span class="comment">// 确定唯一的合约</span></span><br><span class="line">            hex<span class="string">'96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f'</span> <span class="comment">// init code hash</span></span><br><span class="line">        ))));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="学以致用"><a href="#学以致用" class="headerlink" title="学以致用"></a>学以致用</h4><blockquote>
+<p>此处我们使用create2实现一个功能,记录Apple手机的制作流程,具体使用AppleFactory定义手机的信息,然后把指定具体的工厂来加工生产出Apple,并将数据保存在区块链上</p>
+</blockquote>
+<ol>
+<li>一台手机包括唯一序列号,外观颜色,运行内存大小,以及存储空间,这里加了一个加工次数来记录整个流程,其中核心方法<strong>initialize</strong>为初始化此产品的基本信息,<br><strong>processAction</strong>记录加工流程, <strong>updatePlayer</strong>交接给下一个工厂完成继续制造</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SPDX-License-Identifier: MIT</span></span><br><span class="line">pragma solidity ^<span class="number">0.7</span><span class="number">.0</span>;</span><br><span class="line">pragma experimental ABIEncoderV2;</span><br><span class="line"></span><br><span class="line">contract Apple &#123;</span><br><span class="line">    struct Action &#123;</span><br><span class="line">        uint step;</span><br><span class="line">        string <span class="keyword">from</span>;</span><br><span class="line">        string to;</span><br><span class="line">        uint256 time;</span><br><span class="line">        address player;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    uint256 public id;                      <span class="comment">// 序列号</span></span><br><span class="line">    string public color;                    <span class="comment">//颜色</span></span><br><span class="line">    uint256 public flashMemory;             <span class="comment">// 运行内存大小 4g</span></span><br><span class="line">    uint256 public diskMemory;              <span class="comment">//  储存空间大小 256g</span></span><br><span class="line">    address public player;                  <span class="comment">// 可以更新此合约数据的用户</span></span><br><span class="line">    uint256 public actionCount;             <span class="comment">// 总共加工次数</span></span><br><span class="line">    Action[] public actions;</span><br><span class="line">    address public factory;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getApple</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    <span class="title">public</span></span></span><br><span class="line"><span class="function">    <span class="title">view</span></span></span><br><span class="line"><span class="function">    <span class="title">returns</span> (<span class="params">uint _id, uint _memory, uint _disk, uint _count, address _player, string memory _color</span>)</span>&#123;</span><br><span class="line">        _id = id;</span><br><span class="line">        _memory = flashMemory;</span><br><span class="line">        _disk = diskMemory;</span><br><span class="line">        _count = actionCount;</span><br><span class="line">        _player = player;</span><br><span class="line">        _color = color;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constructor</span>() &#123;</span><br><span class="line">        factory = msg.sender;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    event Trace(address player, string <span class="keyword">from</span>, string to, uint256 time);</span><br><span class="line">    event PlayerUpdate(address _pre, address newPlayer, uint256 time);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">initialize</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">        address _player,</span></span></span><br><span class="line"><span class="function"><span class="params">        uint256 _id,</span></span></span><br><span class="line"><span class="function"><span class="params">        uint256 _memory,</span></span></span><br><span class="line"><span class="function"><span class="params">        uint256 _disk,</span></span></span><br><span class="line"><span class="function"><span class="params">        string memory _color</span>)</span></span><br><span class="line"><span class="function">    <span class="title">external</span> </span>&#123;</span><br><span class="line">        <span class="built_in">require</span>(msg.sender == factory, <span class="string">"permission deny"</span>);</span><br><span class="line">        player = _player;</span><br><span class="line">        id = _id;</span><br><span class="line">        color = _color;</span><br><span class="line">        flashMemory = _memory;</span><br><span class="line">        diskMemory = _disk;</span><br><span class="line">        _processAction(<span class="string">"apple"</span>, <span class="string">"init"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getActions</span>(<span class="params">uint _start, uint _end</span>) <span class="title">public</span> <span class="title">view</span> <span class="title">returns</span> (<span class="params">Action[] memory atcs</span>)</span>&#123;</span><br><span class="line">        uint end = _end + <span class="number">1</span> &gt;=  actions.length ? actions.length : _end;</span><br><span class="line">        atcs = <span class="keyword">new</span> Action[](end - _start);</span><br><span class="line">        <span class="keyword">for</span> (uint i = _start; i &lt; end; i++) &#123;</span><br><span class="line">            atcs[i - _start] = actions[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    modifier onlyPlayer &#123;</span><br><span class="line">        <span class="built_in">require</span>(player == msg.sender, <span class="string">"permission deny"</span>);</span><br><span class="line">        _;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">updatePlayer</span>(<span class="params">address _player</span>) <span class="title">onlyPlayer</span> <span class="title">external</span> </span>&#123;</span><br><span class="line">        address oldPlayer = player;</span><br><span class="line">        player = _player;</span><br><span class="line">        emit PlayerUpdate(oldPlayer, _player, block.timestamp);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">_processAction</span>(<span class="params">string memory _from, string memory _to</span>) <span class="title">internal</span> </span>&#123;</span><br><span class="line">        actionCount += <span class="number">1</span>;</span><br><span class="line">        actions.push(Action(&#123;<span class="attr">from</span> : _from, <span class="attr">to</span> : _to, <span class="attr">time</span> : block.timestamp, <span class="attr">step</span> : actionCount,<span class="attr">player</span>:msg.sender&#125;));</span><br><span class="line">        emit Trace(player, _from, _to, block.timestamp);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">processAction</span>(<span class="params">string memory _from, string memory _to</span>) <span class="title">onlyPlayer</span> <span class="title">public</span> </span>&#123;</span><br><span class="line">        _processAction(_from, _to);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>factory合约应由苹果公司根据实际的生产情况进行管理,并录入基本信息(此处由于测试,任何人都可以创建),此处的<strong>makeApple</strong>即使生产apple, <strong>getApple</strong>可以用来得到生产出来的apple的具体合约地址,</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SPDX-License-Identifier: MIT</span></span><br><span class="line">pragma solidity ^<span class="number">0.7</span><span class="number">.0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"./Apple.sol"</span>;</span><br><span class="line"></span><br><span class="line">interface IApple &#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">initialize</span>(<span class="params">address _player, uint256 _id, uint256 _mem, uint256 _disk, string memory _c</span>) <span class="title">external</span>;</span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">contract</span> <span class="title">AppleFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    address[] public apples;</span><br><span class="line"></span><br><span class="line">    mapping(<span class="function"><span class="params">address</span> =&gt;</span> bool) public checkApple;</span><br><span class="line">    </span><br><span class="line">    bytes32 public hash;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getAllApples</span>(<span class="params">uint _start, uint _end</span>) <span class="title">public</span> <span class="title">view</span> <span class="title">returns</span>(<span class="params">address[] memory _apples</span>)</span>&#123;</span><br><span class="line">        _apples = <span class="keyword">new</span> address[](_end - _start);</span><br><span class="line">        <span class="keyword">for</span>(uint i = _start; i &lt; _end ; i++)&#123;</span><br><span class="line">            _apples[i - _start] = apples[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">totalApple</span>(<span class="params"></span>) <span class="title">external</span> <span class="title">view</span> <span class="title">returns</span> (<span class="params">uint256</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> apples.length;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    event AppleCreated(address maker, uint256 _id, uint256 _memory, uint256 _disk, string _color, address _apple);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">makeApple</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">        uint256 _memory,</span></span></span><br><span class="line"><span class="function"><span class="params">        uint256 _disk,</span></span></span><br><span class="line"><span class="function"><span class="params">        string memory _color</span>)</span></span><br><span class="line"><span class="function">    <span class="title">external</span> <span class="title">returns</span> (<span class="params">address apple</span>) </span>&#123;</span><br><span class="line">        uint256 _id = apples.length + <span class="number">1</span>;</span><br><span class="line">        bytes memory bytecode = type(Apple).creationCode;</span><br><span class="line">        <span class="keyword">if</span> (hash == bytes32(<span class="number">0</span>)) &#123;</span><br><span class="line">            hash = keccak256(bytecode);</span><br><span class="line">        &#125;</span><br><span class="line">        bytes32 salt = keccak256(abi.encodePacked(_id, _memory, _color));</span><br><span class="line">        assembly &#123;</span><br><span class="line">            apple := create2(<span class="number">0</span>, add(bytecode, <span class="number">32</span>), mload(bytecode), salt)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">require</span>(checkApple[apple] == <span class="literal">false</span>, <span class="string">'this apple have been made'</span>);</span><br><span class="line">        IApple(apple).initialize(msg.sender, _id, _memory, _disk, _color);</span><br><span class="line">        apples.push(apple);</span><br><span class="line">        emit AppleCreated(msg.sender, _id, _memory, _disk, _color, apple);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/// 可以通过同样的参数计算出对应的合约地址</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">getApple</span>(<span class="params">int256 _id, uint256 _memory, uint256 _disk, string calldata _color</span>)</span></span><br><span class="line"><span class="function">    <span class="title">external</span></span></span><br><span class="line"><span class="function">    <span class="title">view</span></span></span><br><span class="line"><span class="function">    <span class="title">returns</span> (<span class="params">address apple</span>)</span>&#123;</span><br><span class="line">        apple = address(uint(keccak256(abi.encodePacked(</span><br><span class="line">                hex<span class="string">'ff'</span>,</span><br><span class="line">                address(<span class="keyword">this</span>),</span><br><span class="line">                keccak256(abi.encodePacked(_id, _memory, _disk, _color)),</span><br><span class="line">                hash</span><br><span class="line">            ))));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/xswap/ether4.gif" alt="demo"></p>
+<h4 id="demo演示"><a href="#demo演示" class="headerlink" title="demo演示"></a>demo演示</h4><ul>
+<li>首先制造成产了一台iPhone,填入颜色,内存与储存空间</li>
+<li>进入加工环节,当执行process时,自动进入到下一个加工环节</li>
+<li>…</li>
+<li>跟随者加工流程指导加工生产完成,这样可以记录每一台手机的生产流程,且具体的流程可信</li>
+</ul>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ol>
+<li>可以按照编程语言中的面向对象思想进行理解,create2传入的参数bytecode就是class的字节码,而create2相当于new,而我们又可以根据传入create2加上其factory的地址以及salt恢复找到以这salt为key的合约地址且唯一,而且合约的地址提前可知呢.Ó´</li>
+<li>那么按照介绍使用create2,我们需要两个合约,一个template合约(类),一个factory合约(负责new)即可,是不是很简单的?</li>
+<li>如果使用create2创建了一个合约,再使用同样的参数进行调用,是不能成功的,除非已创建的合约调用selfdestruct(address)释放掉才行</li>
+<li>接下来就可以进入到在第一篇文章中所提到的三个合约中的<strong>UniswapV2Pair</strong>,也即使最后一个合约</li>
+<li>其实到这里来说,合约知识中的难点已经讲解的差不多了,剩下的其实是关于uniswap中的创新思想的复习咯</li>
+</ol>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/27/uniswap 源码解读3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -494,7 +650,7 @@
 </ol>
 <p><img src="/xswap/ether2.gif" alt="demo"></p>
 <h4 id="router合约"><a href="#router合约" class="headerlink" title="router合约"></a>router合约</h4><ol>
-<li>在我们试玩找入口时,我们发现其调用的函数签名并没有在我们Colne的项目中有找到,那是怎么回事呢?</li>
+<li>在我们试玩找入口时,我们发现其调用的函数签名并没有在我们Colne的项目中有找到,那是怎么回事呢?按照文档,这是uniswap为我们的sdk,我们可以根据这基础的合约创建属于我们的swap(是的,我们正在做这件事),而他们自己也做了一个swap <a href="https://github.com/Uniswap/uniswap-v2-periphery" target="_blank" rel="noopener">uniswap合约源码</a>,这个才是他们基于sdk开发的一个应用呢</li>
 <li>那我们根据<a href="https://rinkeby.etherscan.io/tx/0x4f1551395b26afa5b270c42bf165e9a013db010b3e585bf9419a63e83866081d" target="_blank" rel="noopener">eth兑换uni</a>这笔交易,找到其在etherscan上验证过的的合约,发现其实际调用的是<em>UniswapV2Router02</em>这个函数名的合约,全局搜索找到其函数签名如下  </li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)</span><br><span class="line">     external</span><br><span class="line">     virtual</span><br><span class="line">     override</span><br><span class="line">     payable</span><br><span class="line">     ensure(deadline)</span><br><span class="line">     returns (uint[] memory amounts)</span><br><span class="line"> &#123;</span><br><span class="line">     require(path[0] == WETH, &apos;UniswapV2Router: INVALID_PATH&apos;);</span><br><span class="line">     amounts = UniswapV2Library.getAmountsOut(factory, msg.value, path);</span><br><span class="line">     require(amounts[amounts.length - 1] &gt;= amountOutMin, &apos;UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT&apos;);</span><br><span class="line">     IWETH(WETH).deposit&#123;value: amounts[0]&#125;();</span><br><span class="line">     assert(IWETH(WETH).transfer(UniswapV2Library.pairFor(factory, path[0], path[1]), amounts[0]));</span><br><span class="line">     _swap(amounts, path, to);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
@@ -945,7 +1101,7 @@
 <li>原来在tsconfig.json中,我使用include属性将其声明文件包含到编译中了,故可使用.查看ts-node文档,只需要在执行ts-node 加上–files选项,这样将会加载tcconfig.json的include属性,这样就移除ts-ignore这个选项了</li>
 </ul>
 <h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>  最开始自己写*.d.ts,后续发现了居然还有dts-gen这样的工具.回头想想,利用这些工具,真香 ^0^,</p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#107;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#54;&#x33;&#x2e;&#99;&#111;&#x6d;</a></p>
 
           
         
@@ -1560,177 +1716,7 @@
 <li>还有一点,如果你使用eosiocpp编译wasm,abi文件,写合约的时候,有时候需要参考源码<a href="https://sourcegraph.com/github.com/EOSIO/eos" target="_blank" rel="noopener">eosio</a>,如果使用eosio.cdt编译的合约,<a href="https://github.com/EOSIO/eosio.cdt/tree/master/libraries/eosiolib" target="_blank" rel="noopener">eosio.cdt eoslib</a>要去这里找(ps:这个地方受过很多伤…)</li>
 <li>最后,祝大家学的开心</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#x33;&#46;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#x33;&#46;&#99;&#111;&#x6d;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/23/eos测试网发行token/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/23/eos测试网发行token/" itemprop="url">一步一步教你在eos主网上发行自己的tokens</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-23T13:33:56+08:00">
-                2019-02-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><ul>
-<li>2019年来了,祝大家新年快乐</li>
-<li>新的一年我们得继续努力呢,当然我也得继续来填坑</li>
-<li>接着上篇文章来,本篇文章会带着你一步一步在测试网(主网要真金白银呢)上发行自己的token</li>
-<li>本来官网的教程中已经有教怎么样发行自己的token了 <a href="https://developers.eos.io/eosio-home/docs/token-contract" target="_blank" rel="noopener">eosio token issue</a>,为什么我还要再写一遍呢?</li>
-<li>我觉得在我学习的过程中遇到了以下两个问题:<ol>
-<li>我没有eosio.token的账号呢,我怎么发行token呢? </li>
-<li>那我就用自己的account进行发布,那这样的token可以使用吗?</li>
-<li>发布token的合约是怎么样的呢?</li>
-</ol>
-</li>
-<li>请自备有足够ram的kylin的账号呢,不然后面没法走哈</li>
-</ul>
-<h4 id="获取token源码"><a href="#获取token源码" class="headerlink" title="获取token源码"></a>获取token源码</h4><ul>
-<li>相信跟着官网走得同学都是在本地的目录中去看源码的,这个源码版本目前只能使用eosiocpp编译,而我目前需要使用cdt来编译呢.</li>
-<li>所以我们得来这里获取支持cdt的源码<a href="https://github.com/EOSIO/eosio.contracts" target="_blank" rel="noopener">eosio.contracts</a>,这里存了系统的的contract源码,我们需要eosio.token的合约源码,我们第一步先把它download下来</li>
-<li>建议不用修改,除非增加新的业务逻辑</li>
-</ul>
-<h4 id="token源码分析"><a href="#token源码分析" class="headerlink" title="token源码分析"></a>token源码分析</h4><ul>
-<li>文中有注释就不啰嗦了,各位同学自己看就好</li>
-<li>如果有同学看过旧版token的合约,可以发现还有有些变化的.不过我们不用care之前的旧版token合约,使用新版的就好</li>
-<li>token中主要有两个table,account 和 currency_stats  <ol>
-<li>account主要负责记录用户的余额,这个table储存余额很有趣. 使用owner作为scope(这里可以理解为在这个就是一个单独的小table),然后在里面找有没有对应的symbol(前提这symbol得通过currency_stats table的检查,即已经create的)</li>
-<li>currency_stats主要负责记录发行的token的信息,主要包括最大发行量,和已经在市面上流通的token数量</li>
-</ol>
-</li>
-<li>token合约中含有create,issue,retire,transfer,open,close六个action,和get_balance,get_supply两个静态方法.其中创建一个token,只有create, issue, transfer是必须的,其他的可根据需求进行增添<ol>
-<li>retire 燃烧自己的自己的token,这里token燃烧后总量不会变,相当于又返回给issuer了,如果需要此功能建议减少totalSupply而不是suppy</li>
-<li>open和close这两个方法我猜测是为了当issuer token给新账号的时候,可以设置这笔费用,个人觉得没什么鸟用</li>
-<li>get_balance和get_supply可以直接获取账户余额和已经issue的token</li>
-</ol>
-</li>
-</ul>
-<h4 id="编译-部署-验证"><a href="#编译-部署-验证" class="headerlink" title="编译,部署,验证"></a>编译,部署,验证</h4><ul>
-<li>编译,部署</li>
-<li>购买ram</li>
-<li>craete SHAOKUN token,总量10000个,比较值钱哈</li>
-<li>issue 900个给eostoday1235,然后在retire掉(可以理解为销毁,不要这个action也可以) </li>
-<li>后续再转账,都可以在浏览器上查到对应的结果</li>
-<li><img src="/img_eos1/eos_gif_2.gif" alt="演示结果"></li>
-<li><a href="https://github.com/shaokun11/eosabout/tree/create-token" target="_blank" rel="noopener">源码</a></li>
-</ul>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
-<li>按照上面的步骤,我们已经发行了一种token,注意是使用我们自己的账号</li>
-<li>回想一下dispatcher的文章,我们为什么要去判断 code == eosio.token的原因呢? 其实就是确保我们这个token是市面上流通的eos代币,而不是其他某个个人发布的token</li>
-<li>一个账号可以发行很多token的,只要symbol不一致就可以了,当然,这个账号也可以发行以eos为symbol的token</li>
-<li>最终再和以太坊的erc20 token对比一下,其实这都是一个官方的标准,我们如果想直接使用完全不用修改的,直接往主网部署就可以了.</li>
-<li>有时候有新的业务需求,我们完全可以根据自己的需求来更改token内部的某些业务逻辑,毕竟它只是一份部署在你账号的一个智能合约而已,而且这个合约你完全有权限随时更改呢</li>
-</ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email <a href="mailto:&#115;&#x6b;&#x75;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#109;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#107;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#x33;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#x33;&#x2e;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -1770,7 +1756,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1816,7 +1802,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">31</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
