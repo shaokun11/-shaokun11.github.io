@@ -48,7 +48,7 @@ total 8
 ![demo](/xswap/ether2.gif)
 
 #### router合约 
-1. 在我们试玩找入口时,我们发现其调用的函数签名并没有在我们Colne的项目中有找到,那是怎么回事呢?
+1. 在我们试玩找入口时,我们发现其调用的函数签名并没有在我们Colne的项目中有找到,那是怎么回事呢?按照文档,这是uniswap为我们的sdk,我们可以根据这基础的合约创建属于我们的swap(是的,我们正在做这件事),而他们自己也做了一个swap [uniswap合约源码](https://github.com/Uniswap/uniswap-v2-periphery),这个才是他们基于sdk开发的一个应用呢
 2. 那我们根据[eth兑换uni](https://rinkeby.etherscan.io/tx/0x4f1551395b26afa5b270c42bf165e9a013db010b3e585bf9419a63e83866081d)这笔交易,找到其在etherscan上验证过的的合约,发现其实际调用的是*UniswapV2Router02*这个函数名的合约,全局搜索找到其函数签名如下  
 
 ```solidity
