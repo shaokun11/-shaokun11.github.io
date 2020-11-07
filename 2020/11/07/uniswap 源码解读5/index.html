@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="welcome 本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量即使所有  一个名词 liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值  四个变量1234address public token0;			//	交易对中的token0 的地址address publi">
+<meta name="description" content="welcome 本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量,理解完后,实现xswap的add,remove的功能  一个名词 liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值  四个变量1234address public token0;			//	交易对中的">
 <meta name="keywords" content="eos,eth,tron,区块链">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一步一步教你打造自己的defi-xswap(5)">
 <meta property="og:url" content="http://yoursite.com/2020/11/07/uniswap 源码解读5/index.html">
 <meta property="og:site_name" content="hello shaokun">
-<meta property="og:description" content="welcome 本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量即使所有  一个名词 liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值  四个变量1234address public token0;			//	交易对中的token0 的地址address publi">
+<meta property="og:description" content="welcome 本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量,理解完后,实现xswap的add,remove的功能  一个名词 liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值  四个变量1234address public token0;			//	交易对中的">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/xswap/ether5.gif">
-<meta property="og:updated_time" content="2020-11-07T11:38:32.000Z">
+<meta property="og:updated_time" content="2020-11-07T11:42:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="一步一步教你打造自己的defi-xswap(5)">
-<meta name="twitter:description" content="welcome 本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量即使所有  一个名词 liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值  四个变量1234address public token0;			//	交易对中的token0 的地址address publi">
+<meta name="twitter:description" content="welcome 本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量,理解完后,实现xswap的add,remove的功能  一个名词 liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值  四个变量1234address public token0;			//	交易对中的">
 <meta name="twitter:image" content="http://yoursite.com/xswap/ether5.gif">
 
 
@@ -308,7 +308,7 @@
 
       
         <h4 id="welcome"><a href="#welcome" class="headerlink" title="welcome"></a>welcome</h4><blockquote>
-<p>本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量即使所有</p>
+<p>本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量,理解完后,实现xswap的add,remove的功能</p>
 </blockquote>
 <h4 id="一个名词"><a href="#一个名词" class="headerlink" title="一个名词"></a>一个名词</h4><ul>
 <li>liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值</li>
