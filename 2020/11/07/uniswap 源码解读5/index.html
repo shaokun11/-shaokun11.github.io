@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="welcome 本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量即使所有  一个名词 liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值  四个变量1234address public token0;			//	交易对中的token0 的地址address publi">
+<meta name="keywords" content="eos,eth,tron,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一步一步教你打造自己的defi-xswap(5)">
+<meta property="og:url" content="http://yoursite.com/2020/11/07/uniswap 源码解读5/index.html">
+<meta property="og:site_name" content="hello shaokun">
+<meta property="og:description" content="welcome 本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量即使所有  一个名词 liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值  四个变量1234address public token0;			//	交易对中的token0 的地址address publi">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/xswap/ether5.gif">
+<meta property="og:updated_time" content="2020-11-07T11:38:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一步一步教你打造自己的defi-xswap(5)">
+<meta name="twitter:description" content="welcome 本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量即使所有  一个名词 liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值  四个变量1234address public token0;			//	交易对中的token0 的地址address publi">
+<meta name="twitter:image" content="http://yoursite.com/xswap/ether5.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/11/07/uniswap 源码解读5/">
+
+
+
+
+
+  <title>一步一步教你打造自己的defi-xswap(5) | hello shaokun</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">hello shaokun</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">code is law</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/07/uniswap 源码解读5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一步一步教你打造自己的defi-xswap(5)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-07T19:05:23+08:00">
+                2020-11-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 浏览
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="welcome"><a href="#welcome" class="headerlink" title="welcome"></a>welcome</h4><blockquote>
+<p>本篇文章主要介绍UniswapV2Pair中的以及一个名词,三个方法,四个变量即使所有</p>
+</blockquote>
+<h4 id="一个名词"><a href="#一个名词" class="headerlink" title="一个名词"></a>一个名词</h4><ul>
+<li>liquidity (LP)流动性,即pair的token的数量,代表着你所有这个pair价值的量,其价值为你的LP占总LP的百分比乘以pair的总价值</li>
+</ul>
+<h4 id="四个变量"><a href="#四个变量" class="headerlink" title="四个变量"></a>四个变量</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">address public token0;			//	交易对中的token0 的地址</span><br><span class="line">address public token1;			// 交易对中的token1 的地址</span><br><span class="line">uint112 private reserve0;    // 交易对地址中的 token0的数量,即token0的价值    </span><br><span class="line">uint112 private reserve1; 	// 交易对地址中的 token1的数量 ,即token1的价值</span><br></pre></td></tr></table></figure>
+<h4 id="三个方法"><a href="#三个方法" class="headerlink" title="三个方法"></a>三个方法</h4><ul>
+<li>mint 即生产LP,其规则根据你向这个pair中按照<strong>固定比例(第一笔设定比例)</strong>转入一定数量token0,token1.当然你可以不按照这个比例转入,但是你得到的LP是按照这个比例中的小的给你算的,所以不要做这样的事呢</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">function mint(address to) external lock returns (uint liquidity) &#123;</span><br><span class="line">    (uint112 _reserve0, uint112 _reserve1,) = getReserves(); // gas savings</span><br><span class="line">    uint balance0 = IERC20(token0).balanceOf(address(this));</span><br><span class="line">    uint balance1 = IERC20(token1).balanceOf(address(this));</span><br><span class="line">    uint amount0 = balance0.sub(_reserve0);</span><br><span class="line">    uint amount1 = balance1.sub(_reserve1);</span><br><span class="line">    bool feeOn = _mintFee(_reserve0, _reserve1);</span><br><span class="line">    uint _totalSupply = totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee</span><br><span class="line">    if (_totalSupply == 0) &#123;</span><br><span class="line">        liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);</span><br><span class="line">       _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        liquidity = Math.min(amount0.mul(_totalSupply) / _reserve0, amount1.mul(_totalSupply) / _reserve1);</span><br><span class="line">    &#125;</span><br><span class="line">    require(liquidity &gt; 0, &apos;UniswapV2: INSUFFICIENT_LIQUIDITY_MINTED&apos;);</span><br><span class="line">    _mint(to, liquidity);</span><br><span class="line"></span><br><span class="line">    _update(balance0, balance1, _reserve0, _reserve1);</span><br><span class="line">    if (feeOn) kLast = uint(reserve0).mul(reserve1); // reserve0 and reserve1 are up-to-date</span><br><span class="line">    emit Mint(msg.sender, amount0, amount1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>burn 即销毁你转入的LP,即你先把LP转入pair合约中,然后根据你转入的LP数量按照占总量LP的比例返回pair中token0,token1到你指定的地址</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">burn</span>(<span class="params">address to</span>) <span class="title">external</span> <span class="title">lock</span> <span class="title">returns</span> (<span class="params">uint amount0, uint amount1</span>) </span>&#123;</span><br><span class="line">      (uint112 _reserve0, uint112 _reserve1,) = getReserves(); <span class="comment">// gas savings</span></span><br><span class="line">      address _token0 = token0;                                <span class="comment">// gas savings</span></span><br><span class="line">      address _token1 = token1;                                <span class="comment">// gas savings</span></span><br><span class="line">      uint balance0 = IERC20(_token0).balanceOf(address(<span class="keyword">this</span>));</span><br><span class="line">      uint balance1 = IERC20(_token1).balanceOf(address(<span class="keyword">this</span>));</span><br><span class="line">      uint liquidity = balanceOf[address(<span class="keyword">this</span>)];</span><br><span class="line">      bool feeOn = _mintFee(_reserve0, _reserve1);</span><br><span class="line">      uint _totalSupply = totalSupply; <span class="comment">// gas savings, must be defined here since totalSupply can update in _mintFee</span></span><br><span class="line">      amount0 = liquidity.mul(balance0) / _totalSupply; <span class="comment">// using balances ensures pro-rata distribution</span></span><br><span class="line">      amount1 = liquidity.mul(balance1) / _totalSupply; <span class="comment">// using balances ensures pro-rata distribution</span></span><br><span class="line">      <span class="built_in">require</span>(amount0 &gt; <span class="number">0</span> &amp;&amp; amount1 &gt; <span class="number">0</span>, <span class="string">'UniswapV2: INSUFFICIENT_LIQUIDITY_BURNED'</span>);</span><br><span class="line">      _burn(address(<span class="keyword">this</span>), liquidity);</span><br><span class="line">      _safeTransfer(_token0, to, amount0);</span><br><span class="line">      _safeTransfer(_token1, to, amount1);</span><br><span class="line">      balance0 = IERC20(_token0).balanceOf(address(<span class="keyword">this</span>));</span><br><span class="line">      balance1 = IERC20(_token1).balanceOf(address(<span class="keyword">this</span>));</span><br><span class="line"></span><br><span class="line">      _update(balance0, balance1, _reserve0, _reserve1);</span><br><span class="line">      <span class="keyword">if</span> (feeOn) kLast = uint(reserve0).mul(reserve1); <span class="comment">// reserve0 and reserve1 are up-to-date</span></span><br><span class="line">      emit Burn(msg.sender, amount0, amount1, to);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>swap 即使用token0交换token1或者相反交易.注意一下,swap是不会改变pair的LP的量.这个呢会改变当前两种token对应的价格.所以一个token的价格也即是通过这种方式来定义的呢!</p>
+</li>
+<li>这里具体的操作呢?这里设计得非常巧妙!</li>
+<li><em>function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external lock </em> 函数签名中,amount0Out与amount1Out一定有一个值为0,所以首先得转入你需要交易的卖掉的token,如果是token0,那么调用此方法的第二个参数即amount1Out设置为大于0的值即可得到你想要的另一种token,即完成了一次交易,至于这个值填多少? 值为理论转出的99.7%</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">swap</span>(<span class="params">uint amount0Out, uint amount1Out, address to, bytes calldata data</span>) <span class="title">external</span> <span class="title">lock</span> </span>&#123;</span><br><span class="line">    <span class="built_in">require</span>(amount0Out &gt; <span class="number">0</span> || amount1Out &gt; <span class="number">0</span>, <span class="string">'UniswapV2: INSUFFICIENT_OUTPUT_AMOUNT'</span>);</span><br><span class="line">    (uint112 _reserve0, uint112 _reserve1,) = getReserves(); <span class="comment">// gas savings</span></span><br><span class="line">    <span class="built_in">require</span>(amount0Out &lt; _reserve0 &amp;&amp; amount1Out &lt; _reserve1, <span class="string">'UniswapV2: INSUFFICIENT_LIQUIDITY'</span>);</span><br><span class="line"></span><br><span class="line">    uint balance0;</span><br><span class="line">    uint balance1;</span><br><span class="line">    &#123; <span class="comment">// scope for _token&#123;0,1&#125;, avoids stack too deep errors</span></span><br><span class="line">    address _token0 = token0;</span><br><span class="line">    address _token1 = token1;</span><br><span class="line">    <span class="built_in">require</span>(to != _token0 &amp;&amp; to != _token1, <span class="string">'UniswapV2: INVALID_TO'</span>);</span><br><span class="line">    <span class="keyword">if</span> (amount0Out &gt; <span class="number">0</span>) _safeTransfer(_token0, to, amount0Out); <span class="comment">// optimistically transfer tokens</span></span><br><span class="line">    <span class="keyword">if</span> (amount1Out &gt; <span class="number">0</span>) _safeTransfer(_token1, to, amount1Out); <span class="comment">// optimistically transfer tokens</span></span><br><span class="line">    <span class="keyword">if</span> (data.length &gt; <span class="number">0</span>) IUniswapV2Callee(to).uniswapV2Call(msg.sender, amount0Out, amount1Out, data);</span><br><span class="line">    balance0 = IERC20(_token0).balanceOf(address(<span class="keyword">this</span>));</span><br><span class="line">    balance1 = IERC20(_token1).balanceOf(address(<span class="keyword">this</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    uint amount0In = balance0 &gt; _reserve0 - amount0Out ? balance0 - (_reserve0 - amount0Out) : <span class="number">0</span>;</span><br><span class="line">    uint amount1In = balance1 &gt; _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">require</span>(amount0In &gt; <span class="number">0</span> || amount1In &gt; <span class="number">0</span>, <span class="string">'UniswapV2: INSUFFICIENT_INPUT_AMOUNT'</span>);</span><br><span class="line">    &#123; <span class="comment">// scope for reserve&#123;0,1&#125;Adjusted, avoids stack too deep errors</span></span><br><span class="line">    uint balance0Adjusted = balance0.mul(<span class="number">1000</span>).sub(amount0In.mul(<span class="number">3</span>));</span><br><span class="line">    uint balance1Adjusted = balance1.mul(<span class="number">1000</span>).sub(amount1In.mul(<span class="number">3</span>));</span><br><span class="line">    <span class="built_in">require</span>(balance0Adjusted.mul(balance1Adjusted) &gt;= uint(_reserve0).mul(_reserve1).mul(<span class="number">1000</span>**<span class="number">2</span>), <span class="string">'UniswapV2: K'</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    _update(balance0, balance1, _reserve0, _reserve1);</span><br><span class="line">    emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="demo验证"><a href="#demo验证" class="headerlink" title="demo验证"></a>demo验证</h4><ul>
+<li><a href="https://github.com/shaokun11/xswap/tree/v3" target="_blank" rel="noopener">本次演示前端代码</a></li>
+<li>相关合约地址: factory:<strong>0xfed46C22C2C39126F3312fBe739a0D9cD29AD1D1</strong> tokenA: <strong>0x425CBf6caF564FfFe1629ACADBD17Ee421B1f6aE</strong> tokenB: <strong>0x7A759B6cb32Ba3098530909aD5178dc6125A2c26</strong></li>
+<li>由于执行添加或者swap需要一对token,所以顺带创建了2个测试token,<a href="https://github.com/shaokun11/solidity-env-hardhat/blob/v4/contracts/XToken.sol" target="_blank" rel="noopener">xtoken模板</a>提供了<em>faucet</em>方法,每次调用将会空投100个token到操作账户的地址</li>
+<li>这里我初始定价为 2 tokenA = 1 tokenB,</li>
+<li>使用faucet方法分别得到一定数量的tokenA tokenB(这里只演示了获取TokenA)</li>
+<li>add 转账tokenA 都pair合约中,转账tokenB到pair合约中,换取LP到自己的账户 (这里一共执行了三次合约)</li>
+<li>remove 转账LP到pair合约中,再根据转进去的LP按照总的比例取出换回来的tokenA,tokenB<br><img src="/xswap/ether5.gif" alt="xswap">  </li>
+</ul>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
+<li>注意一下,本系列所有的合约仅部署在了rinkeby测试链上,如果需要源码演示请切换网络才</li>
+<li>此合约部署只需要<a href="https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2Factory.sol" target="_blank" rel="noopener">UniswapV2Factory.sol</a>这一个合约即可,这里我flatten一下这个合约,各位同学可以直接使用<a href="https://github.com/shaokun11/solidity-env-hardhat/blob/v4/contracts/XSwapFactory.sol" target="_blank" rel="noopener">faltten UniswapV2Factory.sol</a></li>
+<li>看完pari这个合约,合约代码方面的技术难题了,本篇文章只实现了add的功能,下一篇实现其最后一个功能swap</li>
+</ul>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/02/uniswap 源码解读4/" rel="next" title="一步一步教你打造自己的defi-xswap(4)">
+                <i class="fa fa-chevron-left"></i> 一步一步教你打造自己的defi-xswap(4)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">shaokun</p>
+              <p class="site-description motion-element" itemprop="description">记录自己对相关技术的点点滴滴和一些思考，希望能够帮助来到这里的你，如果你喜欢我的文章，可以加个微信共同探讨</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#welcome"><span class="nav-number">1.</span> <span class="nav-text">welcome</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#一个名词"><span class="nav-number">2.</span> <span class="nav-text">一个名词</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#四个变量"><span class="nav-number">3.</span> <span class="nav-text">四个变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#三个方法"><span class="nav-number">4.</span> <span class="nav-text">三个方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#demo验证"><span class="nav-number">5.</span> <span class="nav-text">demo验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">7.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">shaokun</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+ <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 访问总量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
