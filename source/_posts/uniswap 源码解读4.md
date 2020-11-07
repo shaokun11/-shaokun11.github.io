@@ -1,6 +1,6 @@
 ---
 title: 一步一步教你打造自己的defi-xswap(4) 
-date: 2020-10-31 09:58:35
+date: 2020-11-02 23:17:23
 ---
 #### welcome
 > 本篇文章编写智能合约中的create2的使用,也就是uniswap中的**UniswapV2Factory**合约中的createPair方法.具体的信息可参考[eip1014](https://eips.ethereum.org/EIPS/eip-1014)与[the-magical-world-of-create2](https://blog.ricmoo.com/wisps-the-magical-world-of-create2-5c2177027604).
