@@ -55,7 +55,7 @@ date: 2020-11-08 17:10:49
 	}
 ```
 
-![xswap](/xswap/ether6.gif)  
+![xswap](/xswap/ether7.gif)  
 
 #### 总结
 - xswap到这里已经结束了.
