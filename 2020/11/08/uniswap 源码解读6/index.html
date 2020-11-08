@@ -79,18 +79,20 @@
 
 
 
-<meta name="description" content="前言 ts开发后端项目,考虑到维护的需要,还是需要ts来支持.其中涉及到的lib都能找到对应的types,但是也有例外比如eosjs-ecc  解决方法 简单快速,但是没有任何提示了,IDE基本的提示都没有了,对于直接将.js—&amp;gt;.ts可以使用  12// tsconfig.json中将此字段设为false  &quot;noImplicitAny&quot;: false,  自己写 **d.ts,喜欢的同学">
+<meta name="description" content="welcome 本篇文章主要配合前端实现xswap的最后一个功能swap  swap公式 此公式由 UniswapV2Library提供 getAmountOut 即我付出一定量的token,可以得到另一种token的多少,比如我只有100个tokenA,这个就是查看我这个100tokenA可以换取到多少个tokenB getAmountIn, 即我要得到一定量的token,我得付出多少另一种to">
 <meta name="keywords" content="eos,eth,tron,区块链">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在typescript中使用eosjs-ecc">
-<meta property="og:url" content="http://yoursite.com/2020/02/02/在typescript中使用eosjs-ecc/index.html">
+<meta property="og:title" content="一步一步教你打造自己的defi-xswap(6)">
+<meta property="og:url" content="http://yoursite.com/2020/11/08/uniswap 源码解读6/index.html">
 <meta property="og:site_name" content="hello shaokun">
-<meta property="og:description" content="前言 ts开发后端项目,考虑到维护的需要,还是需要ts来支持.其中涉及到的lib都能找到对应的types,但是也有例外比如eosjs-ecc  解决方法 简单快速,但是没有任何提示了,IDE基本的提示都没有了,对于直接将.js—&amp;gt;.ts可以使用  12// tsconfig.json中将此字段设为false  &quot;noImplicitAny&quot;: false,  自己写 **d.ts,喜欢的同学">
+<meta property="og:description" content="welcome 本篇文章主要配合前端实现xswap的最后一个功能swap  swap公式 此公式由 UniswapV2Library提供 getAmountOut 即我付出一定量的token,可以得到另一种token的多少,比如我只有100个tokenA,这个就是查看我这个100tokenA可以换取到多少个tokenB getAmountIn, 即我要得到一定量的token,我得付出多少另一种to">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-10-16T15:03:16.000Z">
+<meta property="og:image" content="http://yoursite.com/xswap/ether6.gif">
+<meta property="og:updated_time" content="2020-11-08T09:10:54.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="在typescript中使用eosjs-ecc">
-<meta name="twitter:description" content="前言 ts开发后端项目,考虑到维护的需要,还是需要ts来支持.其中涉及到的lib都能找到对应的types,但是也有例外比如eosjs-ecc  解决方法 简单快速,但是没有任何提示了,IDE基本的提示都没有了,对于直接将.js—&amp;gt;.ts可以使用  12// tsconfig.json中将此字段设为false  &quot;noImplicitAny&quot;: false,  自己写 **d.ts,喜欢的同学">
+<meta name="twitter:title" content="一步一步教你打造自己的defi-xswap(6)">
+<meta name="twitter:description" content="welcome 本篇文章主要配合前端实现xswap的最后一个功能swap  swap公式 此公式由 UniswapV2Library提供 getAmountOut 即我付出一定量的token,可以得到另一种token的多少,比如我只有100个tokenA,这个就是查看我这个100tokenA可以换取到多少个tokenB getAmountIn, 即我要得到一定量的token,我得付出多少另一种to">
+<meta name="twitter:image" content="http://yoursite.com/xswap/ether6.gif">
 
 
 
@@ -120,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2020/02/02/在typescript中使用eosjs-ecc/">
+  <link rel="canonical" href="http://yoursite.com/2020/11/08/uniswap 源码解读6/">
 
 
 
 
 
-  <title>在typescript中使用eosjs-ecc | hello shaokun</title>
+  <title>一步一步教你打造自己的defi-xswap(6) | hello shaokun</title>
   
 
 
@@ -233,7 +235,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/02/在typescript中使用eosjs-ecc/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/08/uniswap 源码解读6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="shaokun">
@@ -250,7 +252,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">在typescript中使用eosjs-ecc</h1>
+          <h1 class="post-title" itemprop="name headline">一步一步教你打造自己的defi-xswap(6)</h1>
         
 
         <div class="post-meta">
@@ -262,8 +264,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-02T16:19:14+08:00">
-                2020-02-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-08T17:10:49+08:00">
+                2020-11-08
               </time>
             
 
@@ -305,33 +307,28 @@
       
 
       
-        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><ul>
-<li>ts开发后端项目,考虑到维护的需要,还是需要ts来支持.其中涉及到的lib都能找到对应的types,但是也有例外比如eosjs-ecc</li>
+        <h4 id="welcome"><a href="#welcome" class="headerlink" title="welcome"></a>welcome</h4><blockquote>
+<p>本篇文章主要配合前端实现xswap的最后一个功能swap</p>
+</blockquote>
+<h4 id="swap公式"><a href="#swap公式" class="headerlink" title="swap公式"></a>swap公式</h4><ul>
+<li>此公式由 UniswapV2Library提供</li>
+<li>getAmountOut 即我付出一定量的token,可以得到另一种token的多少,比如我只有100个tokenA,这个就是查看我这个100tokenA可以换取到多少个tokenB</li>
+<li>getAmountIn, 即我要得到一定量的token,我得付出多少另一种token,比如我想要100个tokenA,那么这个就是查看我要付出多少个tokenB</li>
+<li>每次交易,均有千分之三fromToken的损失,这部分费用是按照LP的比例分给提供LP的做市商</li>
 </ul>
-<h4 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h4><ol>
-<li>简单快速,但是没有任何提示了,IDE基本的提示都没有了,对于直接将.js—&gt;.ts可以使用</li>
-</ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// tsconfig.json中将此字段设为false</span></span><br><span class="line">  <span class="string">"noImplicitAny"</span>: <span class="literal">false</span>,</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>自己写 **d.ts,喜欢的同学可以尝试一下</li>
-<li><p>工具自动生成,推荐方式<br> -这里使用微软提供的<a href="https://github.com/microsoft/dts-gen" target="_blank" rel="noopener">dts-gen</a>进行生成,放到项目的任意目录即可,但是还是无法使用,这时需要在最外面包裹一层 declare module ‘eosjs-ecc’{}即可,如果使用ts-node执行项目,需要在导入的时候添加ts-ignore,直接使用tsc编译则可以不用</p>
- <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @ts-ignore</span></span><br><span class="line"><span class="keyword">import</span> ecc <span class="keyword">from</span> <span class="string">'eosjs-ecc'</span></span><br><span class="line">ecc.randomKey(<span class="number">0</span>).then(<span class="function">(<span class="params">privateKey:string</span>) =&gt;</span> &#123;</span><br><span class="line">   	<span class="built_in">console</span>.log(privateKey )</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>优化  </p>
-<ul>
-<li>细心的同学发现,里面的类型全是any,一点用处都没有啊?<br>但是这样可以有IDE的提示了,ts可以正常写代码了呢  </li>
-<li><p>由于一个lib我们不会完全用它的方法,那么我们只需要去修改一下我们需要使用的类型即可.比如randomKey这个方法,我们将它的declare中的按照如下更改即可,再次调用就达到了正常使用lib的目的啦</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// export function randomKey(cpuEntropyBits: number ): Promise&lt;string&gt;;</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">randomKey</span>(<span class="params">cpuEntropyBits?: number </span>): <span class="title">Promise</span>&lt;<span class="title">string</span>&gt;;</span></span><br></pre></td></tr></table></figure>
-</li>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getAmountOut</span>(<span class="params">uint amountIn, uint reserveIn, uint reserveOut</span>) <span class="title">internal</span> <span class="title">pure</span> <span class="title">returns</span> (<span class="params">uint amountOut</span>) </span>&#123;</span><br><span class="line">      <span class="built_in">require</span>(amountIn &gt; <span class="number">0</span>, <span class="string">'UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT'</span>);</span><br><span class="line">      <span class="built_in">require</span>(reserveIn &gt; <span class="number">0</span> &amp;&amp; reserveOut &gt; <span class="number">0</span>, <span class="string">'UniswapV2Library: INSUFFICIENT_LIQUIDITY'</span>);</span><br><span class="line">      uint amountInWithFee = amountIn.mul(<span class="number">997</span>);</span><br><span class="line">      uint numerator = amountInWithFee.mul(reserveOut);</span><br><span class="line">      uint denominator = reserveIn.mul(<span class="number">1000</span>).add(amountInWithFee);</span><br><span class="line">      amountOut = numerator / denominator;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// given an output amount of an asset and pair reserves, returns a required input amount of the other asset</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">getAmountIn</span>(<span class="params">uint amountOut, uint reserveIn, uint reserveOut</span>) <span class="title">internal</span> <span class="title">pure</span> <span class="title">returns</span> (<span class="params">uint amountIn</span>) </span>&#123;</span><br><span class="line">      <span class="built_in">require</span>(amountOut &gt; <span class="number">0</span>, <span class="string">'UniswapV2Library: INSUFFICIENT_OUTPUT_AMOUNT'</span>);</span><br><span class="line">      <span class="built_in">require</span>(reserveIn &gt; <span class="number">0</span> &amp;&amp; reserveOut &gt; <span class="number">0</span>, <span class="string">'UniswapV2Library: INSUFFICIENT_LIQUIDITY'</span>);</span><br><span class="line">      uint numerator = reserveIn.mul(amountOut).mul(<span class="number">1000</span>);</span><br><span class="line">      uint denominator = reserveOut.sub(amountOut).mul(<span class="number">997</span>);</span><br><span class="line">      amountIn = (numerator / denominator).add(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="demo验证"><a href="#demo验证" class="headerlink" title="demo验证"></a>demo验证</h4><ul>
+<li><a href="https://github.com/shaokun11/xswap/tree/v4" target="_blank" rel="noopener">本次演示前端代码</a></li>
+<li>目前有两步操作,一是转入tokenA到pair中,二是根据上述的算法,动态计算出tokenA转入可以得到的tokenB的数量,调用pair的swap方法将tokenB提到自己的钱包中</li>
 </ul>
-</li>
-</ol>
-<h4 id="优化-2020-02-21-15-14-56"><a href="#优化-2020-02-21-15-14-56" class="headerlink" title="优化(2020-02-21 15:14:56)"></a>优化(2020-02-21 15:14:56)</h4><ul>
-<li>上述第二点中,使用ts-node需要加上ts-ignore,而直接使用tsc编译为什么能过呢?</li>
-<li>原来在tsconfig.json中,我使用include属性将其声明文件包含到编译中了,故可使用.查看ts-node文档,只需要在执行ts-node 加上–files选项,这样将会加载tcconfig.json的include属性,这样就移除ts-ignore这个选项了</li>
+<p><img src="/xswap/ether6.gif" alt="xswap">  </p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
+<li>xswap到这里已经结束了.</li>
+<li>本系列只重点着重于合约代码层面的实现,采用react全家桶实现的前端界面(文中做过多介绍前端代码的实现).</li>
+<li>个人觉得uniswap的精髓在其整个的设计与其创新,理论上来讲,是真正实现了一个去中心化的交易所的功能</li>
+<li>目前前端页面只提供了tokenA,与tokenB的操作,且只适用于rinkeby网络,如果各位同学想要进一步发挥,可以完全参考uniswap的实现<a href="https://github.com/Uniswap/uniswap-v2-periphery" target="_blank" rel="noopener">uniswap-peripher</a>,<a href="https://github.com/Uniswap/uniswap-interface" target="_blank" rel="noopener">uniswap前端页面</a>自己实现一套属于自己的swap吧</li>
 </ul>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>  最开始自己写*.d.ts,后续发现了居然还有dts-gen这样的工具.回头想想,利用这些工具,真香 ^0^,</p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong></p>
 
       
     </div>
@@ -356,8 +353,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/09/07/electron开发记录/" rel="next" title="create-react-app + electron开发桌面版应用">
-                <i class="fa fa-chevron-left"></i> create-react-app + electron开发桌面版应用
+              <a href="/2020/11/07/uniswap 源码解读5/" rel="next" title="一步一步教你打造自己的defi-xswap(5)">
+                <i class="fa fa-chevron-left"></i> 一步一步教你打造自己的defi-xswap(5)
               </a>
             
           </div>
@@ -365,10 +362,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/08/16/koa+graphql定义你的接口/" rel="prev" title="koa + graphql的使用">
-                koa + graphql的使用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -509,7 +502,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优化-2020-02-21-15-14-56"><span class="nav-number">3.</span> <span class="nav-text">优化(2020-02-21 15:14:56)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">5.</span> <span class="nav-text">关于我</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#welcome"><span class="nav-number">1.</span> <span class="nav-text">welcome</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#swap公式"><span class="nav-number">2.</span> <span class="nav-text">swap公式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#demo验证"><span class="nav-number">3.</span> <span class="nav-text">demo验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于我"><span class="nav-number">5.</span> <span class="nav-text">关于我</span></a></li></ol></div>
             
 
           </div>
