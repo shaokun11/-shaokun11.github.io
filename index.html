@@ -317,7 +317,9 @@
 <h4 id="demo验证"><a href="#demo验证" class="headerlink" title="demo验证"></a>demo验证</h4><ul>
 <li><a href="https://github.com/shaokun11/xswap/tree/v4" target="_blank" rel="noopener">本次演示前端代码</a></li>
 <li>目前有两步操作,一是转入tokenA到pair中,二是根据上述的算法,动态计算出tokenA转入可以得到的tokenB的数量,调用pair的swap方法将tokenB提到自己的钱包中</li>
+<li>前端需使用bignumber.js这个lib来计算大数,可以看到和合约的实现是一样的,只有这样才能通过验证  </li>
 </ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import BN from &apos;bignumber.js&apos;</span><br><span class="line">function getAmountIn(amountOut: string, reserveIn: string, reserveOut) &#123;</span><br><span class="line">    return new BN(&apos;1000&apos;)</span><br><span class="line">        .times(amountOut)</span><br><span class="line">        .times(reserveIn)</span><br><span class="line">        .div(new BN(reserveOut).minus(amountOut).times(997).plus(1))</span><br><span class="line">        .toFixed()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function getAmountOut(amountIn: string, reserveIn: string, reserveOut: string) &#123;</span><br><span class="line">    let feeIn = new BN(amountIn).times(997)</span><br><span class="line">    return feeIn</span><br><span class="line">        .times(reserveOut)</span><br><span class="line">        .div(feeIn.plus(new BN(1000).times(reserveIn)))</span><br><span class="line">        .toFixed()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p><img src="/xswap/ether6.gif" alt="xswap">  </p>
 <h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
 <li>xswap到这里已经结束了.</li>
@@ -1398,7 +1400,7 @@
 <li>原来在tsconfig.json中,我使用include属性将其声明文件包含到编译中了,故可使用.查看ts-node文档,只需要在执行ts-node 加上–files选项,这样将会加载tcconfig.json的include属性,这样就移除ts-ignore这个选项了</li>
 </ul>
 <h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>  最开始自己写*.d.ts,后续发现了居然还有dts-gen这样的工具.回头想想,利用这些工具,真香 ^0^,</p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#49;&#x36;&#51;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#49;&#x36;&#51;&#46;&#99;&#111;&#109;</a></p>
 
           
         
