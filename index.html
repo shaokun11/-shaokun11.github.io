@@ -233,6 +233,159 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/15/graphql构建服务/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/11/15/graphql构建服务/" itemprop="url">koa + graphql的使用(2)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-15T22:35:14+08:00">
+                2020-11-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h4><blockquote>
+<p><a href="https://shaokun11.github.io/2020/08/16/koa+graphql%E5%AE%9A%E4%B9%89%E4%BD%A0%E7%9A%84%E6%8E%A5%E5%8F%A3/" target="_blank" rel="noopener">koa + graphql的使用</a>在这篇文章中,我们只实现了基本上的如何使用graphql,那么我们来实现业务上的graphql</p>
+</blockquote>
+<h4 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h4><ul>
+<li>目录结构,大体上分为三个目录结构,schema用于定于所有的类型,resolver定义相应类型的实现,models定义一些service的具体实现,如查询数据库,app.ts为项目入口</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">./src:</span><br><span class="line">app.ts		models		resolvers	schema</span><br><span class="line"></span><br><span class="line">./src/models:</span><br><span class="line">index.ts</span><br><span class="line"></span><br><span class="line">./src/resolvers:</span><br><span class="line">index.ts	message.ts	user.ts</span><br><span class="line"></span><br><span class="line">./src/schema:</span><br><span class="line">index.ts	message.ts	user.ts</span><br></pre></td></tr></table></figure>
+<ul>
+<li>项目入口app.ts,可以看到和上诉定义的目录结构一致,引入根数据,注意其中的context,这里用于挂在挂载全局变量,实现一些中间件的挂载,如auth</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Koa <span class="keyword">from</span> <span class="string">"koa"</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; ApolloServer &#125; <span class="keyword">from</span> <span class="string">"apollo-server-koa"</span>;</span><br><span class="line"><span class="keyword">import</span> resolvers <span class="keyword">from</span> <span class="string">"./resolvers"</span>;</span><br><span class="line"><span class="keyword">import</span> typeDefs <span class="keyword">from</span> <span class="string">"./schema"</span>;</span><br><span class="line"><span class="keyword">import</span> models <span class="keyword">from</span> <span class="string">"./models"</span>;</span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> Koa();</span><br><span class="line"><span class="keyword">const</span> server = <span class="keyword">new</span> ApolloServer(&#123;</span><br><span class="line">  typeDefs,</span><br><span class="line">  resolvers,</span><br><span class="line">  context: &#123;</span><br><span class="line">    models,</span><br><span class="line">    me: models.users[<span class="number">1</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">server.applyMiddleware(&#123; app &#125;);</span><br><span class="line"></span><br><span class="line">app.listen(&#123; <span class="attr">port</span>: <span class="number">5000</span> &#125;, () =&gt;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`🚀 Server ready at http://localhost:4000<span class="subst">$&#123;server.graphqlPath&#125;</span>`</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>定义user的schema,注意其中的query加上了extend字段(message.ts内容一致)</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> &#123;gql&#125; <span class="keyword">from</span> <span class="string">"apollo-server-koa"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> User = gql<span class="string">`</span></span><br><span class="line"><span class="string">    extend type Query &#123;</span></span><br><span class="line"><span class="string">        users: [User!]</span></span><br><span class="line"><span class="string">        user(id: ID!): User</span></span><br><span class="line"><span class="string">        me: String!</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    type User &#123;</span></span><br><span class="line"><span class="string">        id: ID!</span></span><br><span class="line"><span class="string">        username: String!</span></span><br><span class="line"><span class="string">        messages: [Message!]</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> User;</span><br><span class="line"><span class="string">``</span><span class="string">`   </span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">-	定义schema的导出文件,定义空的schema,以便具体的实体可以继承,固定写法</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">`</span><span class="string">``</span>javascritp</span><br><span class="line">	<span class="keyword">import</span> &#123; gql &#125; <span class="keyword">from</span> <span class="string">"apollo-server-koa"</span>;</span><br><span class="line">	<span class="keyword">import</span> message <span class="keyword">from</span> <span class="string">"./message"</span>;</span><br><span class="line">	<span class="keyword">import</span> user <span class="keyword">from</span> <span class="string">"./user"</span>;</span><br><span class="line">	<span class="keyword">const</span> linkSchema = gql<span class="string">`</span></span><br><span class="line"><span class="string">	  type Query &#123;</span></span><br><span class="line"><span class="string">	    _: Boolean</span></span><br><span class="line"><span class="string">	  &#125;</span></span><br><span class="line"><span class="string">	</span></span><br><span class="line"><span class="string">	  type Mutation &#123;</span></span><br><span class="line"><span class="string">	    _: Boolean</span></span><br><span class="line"><span class="string">	  &#125;</span></span><br><span class="line"><span class="string">	</span></span><br><span class="line"><span class="string">	  type Subscription &#123;</span></span><br><span class="line"><span class="string">	    _: Boolean</span></span><br><span class="line"><span class="string">	  &#125;</span></span><br><span class="line"><span class="string">	`</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">export</span> <span class="keyword">default</span> [linkSchema, user, message];</span><br></pre></td></tr></table></figure>
+<ul>
+<li>user的resolver具体实现,根据user的schema实现,这里注意resolver接收四个参数,根据官网的说法,我们一般用上前三个就够了,</li>
+</ul>
+<ul>
+<li>分别是parent,即上一个查询的的结果</li>
+<li>args,本次执行的前端页面传过来的参数</li>
+<li>context,即app中的context,即返回的那个object</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;IResolvers&#125; <span class="keyword">from</span> <span class="string">"apollo-server-koa"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> user: IResolvers = &#123;</span><br><span class="line">	Query: &#123;</span><br><span class="line">		users: <span class="function">(<span class="params">parent, args, &#123;models&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="built_in">Object</span>.values(models.users);</span><br><span class="line">		&#125;,</span><br><span class="line">		user: <span class="function">(<span class="params">parent, &#123;id&#125;, &#123;models&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> models.users[id];</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">	User: &#123;</span><br><span class="line">		messages: <span class="function">(<span class="params">user, args, &#123;models&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="built_in">Object</span>.values(models.messages).filter(</span><br><span class="line">				<span class="comment">//@ts-ignore</span></span><br><span class="line">				(message) =&gt; message.userId === user.id</span><br><span class="line">			);</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> user;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>resolver 导出文件,直接导出数组即可  </li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> message <span class="keyword">from</span> <span class="string">"./message"</span>;</span><br><span class="line"><span class="keyword">import</span> user <span class="keyword">from</span> <span class="string">"./user"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> [message, user];</span><br></pre></td></tr></table></figure>
+<ul>
+<li>models 模拟本次程序的数据,现实中用数据库代替即可</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> users = &#123;</span><br><span class="line">  <span class="number">1</span>: &#123;</span><br><span class="line">    id: <span class="string">"1"</span>,</span><br><span class="line">    username: <span class="string">"hello shoakun 1"</span>,</span><br><span class="line">    messageIds: [<span class="number">1</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="number">2</span>: &#123;</span><br><span class="line">    id: <span class="string">"2"</span>,</span><br><span class="line">    username: <span class="string">"hello shaokun2"</span>,</span><br><span class="line">    messageIds: [<span class="number">2</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> messages = &#123;</span><br><span class="line">  <span class="number">1</span>: &#123;</span><br><span class="line">    id: <span class="string">"1"</span>,</span><br><span class="line">    text: <span class="string">"Hello World"</span>,</span><br><span class="line">    userId: <span class="string">"1"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="number">2</span>: &#123;</span><br><span class="line">    id: <span class="string">"2"</span>,</span><br><span class="line">    text: <span class="string">"By World"</span>,</span><br><span class="line">    userId: <span class="string">"2"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  users,</span><br><span class="line">  messages,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h5 id="结果演示"><a href="#结果演示" class="headerlink" title="结果演示"></a>结果演示</h5><p><a href="https://github.com/shaokun11/gql-server" target="_blank" rel="noopener">源码</a><br><img src="/react/graphql2.gif" alt="graphql query demo"> </p>
+<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/08/uniswap 源码解读6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1400,7 +1553,7 @@
 <li>原来在tsconfig.json中,我使用include属性将其声明文件包含到编译中了,故可使用.查看ts-node文档,只需要在执行ts-node 加上–files选项,这样将会加载tcconfig.json的include属性,这样就移除ts-ignore这个选项了</li>
 </ul>
 <h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>  最开始自己写*.d.ts,后续发现了居然还有dts-gen这样的工具.回头想想,利用这些工具,真香 ^0^,</p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#107;&#x75;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#x6e;&#x79;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#110;&#121;&#x40;&#x31;&#54;&#x33;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#110;&#121;&#x40;&#x31;&#54;&#x33;&#x2e;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -1577,147 +1730,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/13/material-ui之自定义字体/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/08/13/material-ui之自定义字体/" itemprop="url">material-ui之自定义字体</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-13T21:02:00+08:00">
-                2019-08-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h5 id="因由"><a href="#因由" class="headerlink" title="因由"></a>因由</h5><blockquote>
-<p>因近期使需项目需要构建前端页面,故用reactjs作为前端的技术框架,ui选择material-ui v4.3.1作为一个基础.使用create-react-app初始化项目,其中踩了一些坑,记录在此,以做后续查看…</p>
-</blockquote>
-<h5 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h5><p>根据项目需求,第一步需使用自定义的字体,根据官方文档<a href="https://material-ui.com/zh/customization/typography/" target="_blank" rel="noopener">typography</a>.按照此方式配置,皆无法使字体问题文件生效.(是本地的字体,不是Google font)在一番搜索后,也许是应为版本原因,或者其他原因,可以在此<a href="https://github.com/google/material-design-icons/issues/205" target="_blank" rel="noopener">github issues</a>看到有很多朋友均遇见了此番问题,参照之后,也没有实际解决</p>
-<h5 id="转机出现"><a href="#转机出现" class="headerlink" title="转机出现"></a>转机出现</h5><p>按照官方使用Roboto的字体,需要在index.html引入此文件  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap&quot; /&gt;</span><br></pre></td></tr></table></figure>
-<p>使用Chrome浏览器看了一下,其加载了一个css文件,内容如下</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* cyrillic-ext */</span></span><br><span class="line">@<span class="keyword">font-face</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">'Roboto'</span>;</span><br><span class="line">  <span class="attribute">font-style</span>: normal;</span><br><span class="line">  <span class="attribute">font-weight</span>: <span class="number">400</span>;</span><br><span class="line">  <span class="attribute">src</span>: <span class="built_in">local</span>(<span class="string">'Roboto'</span>), <span class="built_in">local</span>(<span class="string">'Roboto-Regular'</span>), <span class="built_in">url</span>(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.woff2) <span class="built_in">format</span>(<span class="string">'woff2'</span>);</span><br><span class="line">  <span class="attribute">unicode-range</span>: U+<span class="number">0460</span>-<span class="number">052</span>F, U+<span class="number">1</span>C80-<span class="number">1</span>C88, U+<span class="number">20</span>B4, U+<span class="number">2</span>DE0-<span class="number">2</span>DFF, U+A640-A69F, U+FE2E-FE2F;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* cyrillic */</span></span><br><span class="line">@<span class="keyword">font-face</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">'Roboto'</span>;</span><br><span class="line">  <span class="attribute">font-style</span>: normal;</span><br><span class="line">  <span class="attribute">font-weight</span>: <span class="number">400</span>;</span><br><span class="line">  <span class="attribute">src</span>: <span class="built_in">local</span>(<span class="string">'Roboto'</span>), <span class="built_in">local</span>(<span class="string">'Roboto-Regular'</span>), <span class="built_in">url</span>(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu5mxKKTU1Kvnz.woff2) <span class="built_in">format</span>(<span class="string">'woff2'</span>);</span><br><span class="line">  <span class="attribute">unicode-range</span>: U+<span class="number">0400</span>-<span class="number">045</span>F, U+<span class="number">0490</span>-<span class="number">0491</span>, U+<span class="number">04</span>B0-<span class="number">04</span>B1, U+<span class="number">2116</span>;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p>那我是不是也可以建立一个文件按照此种方式引入呢?</p>
-<p>于是仿照上述,在index.css加入字体的应用,最终实现自定义的字体加入material-ui</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">font-face</span> &#123;</span><br><span class="line">    <span class="attribute">font-family</span>: <span class="string">'Gliber'</span>;</span><br><span class="line">    <span class="attribute">font-style</span>: normal;</span><br><span class="line">    <span class="attribute">font-weight</span>: <span class="number">400</span>;</span><br><span class="line">    <span class="attribute">font-display</span>: swap;</span><br><span class="line">    <span class="attribute">src</span>: <span class="built_in">url</span>(<span class="string">'./theme/Gilbert_Bold-Preview_1004.woff2'</span>) <span class="built_in">format</span>(<span class="string">'woff2'</span>);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
-<li>经过摸索,如在index.css中加入了自定义字体,则在theme中无需按照官方的方法再次在theme.js中引入字体了,按照如下格式引入即可</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> typography = &#123;</span><br><span class="line">  fontFamily: [<span class="string">"Gliber"</span>,<span class="string">"Roboto"</span>].join(<span class="string">","</span>),<span class="comment">//这里引入自定义的字体名字,并放在第一</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>如果需要寻找更多的字体,可在<a href="https://fonts.google.com/" target="_blank" rel="noopener">google fonts(自带梯子)</a>寻找,按照Roboto的字体方式引入即可.经过测试,字体的使用可不用梯子</li>
-<li>顺带在stackoverflow开启了第一个解答<a href="https://stackoverflow.com/questions/57108085/self-host-font-added-in-material-ui-not-working/57450653#57450653" target="_blank" rel="noopener">Self-host font added in Material-UI not working?
-</a></li>
-</ul>
-<h5 id="结果演示"><a href="#结果演示" class="headerlink" title="结果演示"></a>结果演示</h5><p><a href="https://github.com/shaokun11/material-ui-learn/tree/v1.0" target="_blank" rel="noopener">源码</a><br><img src="/react/material-ui-font.gif" alt="material-ui self host font"> </p>
-<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1768,7 +1780,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-count">34</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

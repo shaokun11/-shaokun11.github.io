@@ -233,6 +233,362 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/17/eos 权限的理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/17/eos 权限的理解/" itemprop="url">简单例子带你彻底的理解eos中的权限在dapp中如何使用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-17T21:15:01+08:00">
+                2018-11-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
+<p>相信各位同学看eos白皮书的权限看得很是头疼,而我能搜索到的例子基本上是官方的那个权限图再结合eos.token进行转账的权限介绍.如果不细心跟着走一遍,你是绝对不好理解这个权限怎么用的.由于我头脑比较笨,着实按照大佬的文章走了三四遍才大约摸索清楚,这里给自己做一个备忘录吧<br>而我站在大佬的肩膀上,结合实际的操作给大家聊聊这个权限如何使用吧.<br>这里主要参考的  </p>
+<ul>
+<li><a href="https://eosfans.io/topics/653" target="_blank" rel="noopener">EOS 权限管理之-权限的使用 (你绝对找不到的干货)</a>  <ul>
+<li><a href="https://bihu.com/article/293974" target="_blank" rel="noopener">EOS开发系列目录</a> 松果的文章都是根据源码分析的,建议开发dapp的同学都认真读几遍吧,这样更能帮助理解eos到底是怎样运行的</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h4 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
+<li><p>提前在测试网上申请两个账号,并领取测试币(不知道怎么做的可以翻看我前面的文章),我这里申请了两个.  </p>
+</li>
+<li><p>这次使用cleos操作,就不使用scatter操作了.原理一样.所以得把申请的这两个账号的私钥导入到cleos创建的钱包里面  </p>
+<pre><code>shaokun11121
+Private key: 5KFoeWx69fjPj7mTDbcD9JauYd9LLjikYTa9Qg7N5CVZTqZrzNG
+Public key: EOS69w5V46oUaBD5PSx3AMRxWXPi6b3St2PwbX9kBPY6tZvSs65o1
+
+shaokun11122
+Private key: 5HrJQ9eepF6FuG47eSJprxoFQ6PWRkombbWEwxoSQr6FJ1wQPbg
+Public key: EOS8ZZCicammR45b9tQUSU8VHqX4M8oFM89Cs8tFFWYgUGasegnnV
+</code></pre></li>
+</ul>
+<h4 id="以太坊权限的实现"><a href="#以太坊权限的实现" class="headerlink" title="以太坊权限的实现"></a>以太坊权限的实现</h4><blockquote>
+<p>这里先给贴一段简单的以太坊的权限的管理吧,这个要自己来写,如果你有以太坊的经验,相信更加容易理解.<br>理一理:</p>
+<ol>
+<li>部署合约,部署完成后,owner就是部署者的地址</li>
+<li>查看count的值,此时count为初始值1</li>
+<li>执行add方法</li>
+<li>查看count的值,此时count的值为2</li>
+<li>切换address</li>
+<li>执行add方法,报错,因为不是owner</li>
+<li>查看count的值 还是为2</li>
+<li>再次执行3,4步骤,此时count的值的值为3</li>
+</ol>
+</blockquote>
+<p> <img src="/eospermission/per1.gif" alt="eos"></p>
+<pre><code>pragma solidity ^0.4.24;
+
+contract Ownable {
+  address public owner;
+
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  modifier onlyOwner() {
+    require(msg.sender == owner);
+    _;
+  }
+}
+contract leranper is Ownable {
+
+    uint256 public count = 1;
+
+    function add() external onlyOwner  {
+       count += 1;
+    }
+}
+</code></pre><h4 id="eos的权限的实现"><a href="#eos的权限的实现" class="headerlink" title="eos的权限的实现"></a>eos的权限的实现</h4><blockquote>
+<p>eos的权限不需要写到合约中,底层已经帮我们实现了,我们只需要进行相应的设置即可,以下是设置权限的签名.至于设置的各个参数怎么设置,怎么用,可以看看官方文档吧</p>
+</blockquote>
+<pre><code>Usage: cleos set account permission [OPTIONS] account permission authority [parent]
+
+Positionals:
+  account TEXT                The account to set/delete a permission authority for (required)
+  permission TEXT             The permission name to set/delete an authority for (required)
+  authority TEXT              [delete] NULL, [create/update] public key, JSON string, or filename defining the authority (required)
+  parent TEXT                 [create] The permission name of this parents permission (Defaults to: &quot;Active&quot;)
+</code></pre><p>方法1:使用account设置  </p>
+<pre><code>cleos set account permission shaokun11121 add &apos;{&quot;threshold&quot;:1,&quot;keys&quot;:[],&quot;accounts&quot;:[{&quot;permission&quot;:{&quot;actor&quot;:&quot;shaokun11122&quot;,&quot;permission&quot;:&quot;active&quot;},&quot;weight&quot;:1}]}&apos;
+</code></pre><p>方法二:使用public key进行设置</p>
+<pre><code>cleos set account permission shaokun11121 add &apos;{&quot;threshold&quot;:1,&quot;keys&quot;:[{&quot;permission&quot;:{&quot;key&quot;:&quot;EOS8ZZCicammR45b9tQUSU8VHqX4M8oFM89Cs8tFFWYgUGasegnnV&quot;,&quot;permission&quot;:&quot;active&quot;},&quot;weight&quot;:1}]}&apos;  
+</code></pre><p>当然你可以把两种设置方式都用上,根据个人习惯设定就好,</p>
+<blockquote>
+<p>这里建议后面的permission这段,先使用ide写上正确的json格式.然后在<a href="http://www.bejson.com/" target="_blank" rel="noopener">json格式压缩</a>进行压缩成一行,这样可以避免不必要的麻烦</p>
+</blockquote>
+<pre><code>    {
+    &quot;threshold&quot;: 1,
+    &quot;keys&quot;: [],
+    &quot;accounts&quot;: [
+        {
+            &quot;permission&quot;: {
+                &quot;actor&quot;: &quot;kun2&quot;,
+                &quot;permission&quot;: &quot;active&quot;
+            },
+            &quot;weight&quot;: 1
+        }
+    ]
+}
+</code></pre><h4 id="eos的权限的解读"><a href="#eos的权限的解读" class="headerlink" title="eos的权限的解读"></a>eos的权限的解读</h4><ul>
+<li>当按照上述方式设置好后,可以通过此命令查看设置的权限,注意看这里permissions里多了一个add权限 这个权限的名字是 add,阀值是1 权限值 是1 ,父权限是active. </li>
+<li>这样设置后,也就是说 只要是active shaokun11121的active的权限能够执行的操作,使用shaokun11122的密钥生成的账户的active权限均能做</li>
+<li>一个私钥与一个公钥是一一对应,而这一对钥匙可以作为一个或者多个account中的权限级别</li>
+<li><p>当然你也可以按照上述的方式多设置几个权限看看,它的形式就像Windows的目录展示的形式,很好辨认的</p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888  get account shaokun11121
+</code></pre></li>
+</ul>
+<p>查看的结果  </p>
+<pre><code>bogon:libraries shaokun$ cleos -u http://jungle.cryptolions.io:18888  get account shaokun11121
+created: 2018-11-17T12:46:30.000
+permissions: 
+     owner     1:    1 EOS69w5V46oUaBD5PSx3AMRxWXPi6b3St2PwbX9kBPY6tZvSs65o1
+        active     1:    1 EOS69w5V46oUaBD5PSx3AMRxWXPi6b3St2PwbX9kBPY6tZvSs65o1
+           add     1:    1 shaokun11122@active
+memory: 
+     quota:     260.1 KiB    used:     95.82 KiB  
+
+net bandwidth: 
+     staked:        100.0000 EOS           (total stake delegated from account to self)
+     delegated:       0.0000 EOS           (total staked delegated to account from others)
+     used:             5.534 KiB  
+     available:        18.23 MiB  
+     limit:            18.24 MiB  
+
+cpu bandwidth:
+     staked:        100.0000 EOS           (total stake delegated from account to self)
+     delegated:       0.0000 EOS           (total staked delegated to account from others)
+     used:             9.367 ms   
+     available:        3.629 sec  
+     limit:            3.639 sec  
+
+EOS balances: 
+     liquid:           80.1129 EOS
+     staked:          200.0000 EOS
+     unstaking:         0.0000 EOS
+     total:           280.1129 EOS
+
+producers:     &lt;not voted&gt;
+</code></pre><h4 id="eos权限的使用"><a href="#eos权限的使用" class="headerlink" title="eos权限的使用"></a>eos权限的使用</h4><blockquote>
+<p>上述方法给shaokun11121设置了一个add的权限,得添加到具体的action上才能体现出这个价值.目前能够搜到的文章都是加载 transfer这个操作上面的.为什么呢? 因为有了这个权,就可以不用登陆shaokun11121转账了,直接使用shaokun11122转账了.</p>
+</blockquote>
+<ul>
+<li><p>权限签名 </p>
+<pre><code>Positionals:
+  account TEXT                The account to set/delete a permission authority for (required)
+  code TEXT                   The account that owns the code for the action (required)
+  type TEXT                   the type of the action (required)
+  requirement TEXT            [delete] NULL, [set/update] The permission name require for executing the given action (required)
+</code></pre></li>
+<li><p>给shaokun11121 add action和add 权限关联起来,这样只要是shaokun111121的合约中有add action,那么使用shaokun11122的add权限均可以调用.根据我的测试,一个account目前只能部署一个智能合约,所以这个add方法是唯一的</p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888  set action permission shaokun11121 shaokun11121 add add
+</code></pre></li>
+</ul>
+<h4 id="eos权限合约的编写"><a href="#eos权限合约的编写" class="headerlink" title="eos权限合约的编写"></a>eos权限合约的编写</h4><blockquote>
+<p>合约编写很简单,就是helloworld,注意其中的权限验证那一行,也就是说,只有自己的account 才能添加或者更新自己的这条信息</p>
+</blockquote>
+<pre><code>#include &lt;eosiolib/eosio.hpp&gt;
+
+using namespace eosio;
+
+class [[eosio::contract]] learnper2 : public contract {
+  public:
+    using contract::contract;
+    learnper2(eosio::name reciever,eosio::name code,eosio::datastream&lt;const char*&gt; ds )
+                              :contract(reciever,code,ds),
+                              _students(reciever,code.value){};
+
+    [[eosio::action]]
+    void add(name user, const std::string msg) {
+      require_auth(user); // 权限额验证 
+      auto itr = _students.find(user.value);
+      if (itr == _students.end()){
+        _students.emplace(get_self(),[&amp;](auto&amp; row){
+          row.user = user;
+          row.msg = msg;
+        });
+      } else {
+        _students.modify(itr, get_self(), [&amp;](auto&amp; row){
+          row.msg = msg;
+        });
+      }
+    };
+
+
+  private:
+  struct [[eosio::table]] student 
+  {
+    name user;
+    std::string msg = &quot;hello world&quot;;
+    uint64_t primary_key() const {return user.value;};
+
+  };
+  typedef eosio::multi_index&lt;&quot;student&quot;_n, student&gt; student_index;
+  student_index _students; 
+};
+EOSIO_DISPATCH( learnper2, (add))
+</code></pre><h4 id="eos权限合约的编译-部署"><a href="#eos权限合约的编译-部署" class="headerlink" title="eos权限合约的编译,部署"></a>eos权限合约的编译,部署</h4><ul>
+<li><p>编译:这里有个小插曲,放合约cpp文件的文件夹貌似必须命名和主合约的文件名一致,生成的abi里面没有内容,这着实也困扰了我一会</p>
+<p>  eosio-cpp -abigen learnper2.cpp learnper2.wasm</p>
+</li>
+<li><p>这里部署合约一般需要购买ram  </p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888  system buyram shaokun11121 shaokun11121 -k 256
+</code></pre></li>
+<li><p>部署:  </p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888 set contract shaokun11121 ./learnper2/ -p shaokun11121@active
+</code></pre></li>
+</ul>
+<h4 id="eos权限合约结果展示"><a href="#eos权限合约结果展示" class="headerlink" title="eos权限合约结果展示"></a>eos权限合约结果展示</h4><p><img src="/eospermission/per2.gif" alt="eos"></p>
+<blockquote>
+<p>这里说一下我的操作流程</p>
+</blockquote>
+<ul>
+<li>调用合约的add action 插入一条信息(我这里之前插入信息,故此步未进行演示)  </li>
+<li>首先查看了 shaokun11121的 account信息,可以看到添加了一条add的permission</li>
+<li>再次查看了 shaokun11122的account信息,正常状态,只要你新建一个account都是这样的</li>
+<li>查看了钱包里面的信息,这里显示的是shaokun11122的公钥(大家可以仔细对比一下)</li>
+<li>查看链上table的数据</li>
+<li><p>修改数据,我们仔细来分析这条命令  </p>
+<blockquote>
+<ol>
+<li>这里使用的传入的user是shaokun11121</li>
+<li>传入的permission是 shaokun111121的add这个permission,各位同学可以回想一下之前的合约,调用都是是用的active</li>
+<li>钱包中并没有shaokun11121的私钥</li>
+<li>钱包中占有shaokun11122的私钥  </li>
+</ol>
+</blockquote>
+</li>
+<li><p>再次展示数据,数据修改成功  </p>
+<pre><code>cleos -u http://jungle.cryptolions.io:18888  push action shaokun11121 add &apos;{&quot;user&quot;:&quot;shaokun11121&quot;,&quot;msg&quot;:&quot;i am shaokun&quot;}&apos; -p shaokun11121@add
+</code></pre></li>
+</ul>
+<h4 id="eos权限使用心得"><a href="#eos权限使用心得" class="headerlink" title="eos权限使用心得"></a>eos权限使用心得</h4><blockquote>
+<ul>
+<li>这里只是展示的单个权限的使用在dapp中怎么使用   </li>
+<li>如果只看白皮书还是很难理解的,建议通过实际的操作,加深理解吧  </li>
+</ul>
+</blockquote>
+<h4 id="eos权限的进一步思考"><a href="#eos权限的进一步思考" class="headerlink" title="eos权限的进一步思考"></a>eos权限的进一步思考</h4><blockquote>
+<ul>
+<li>以太坊和eos的多重权限的签名目前我还没遇到过在dapp中实际使用的例子,官方的例子就是基本上是转账需要多个人同意,那么在dapp中如何使用呢?</li>
+<li>本课程只展示了阀值为1,权限值为1的active权限,那么如果按照官方例子,如果阈值为2,同时需要两个权限值都为1的账号的active权限来进行某个action的执行呢? </li>
+<li>接上一条,如果需要的不是active权限,比如本课中的add权限呢?</li>
+</ul>
+</blockquote>
+<p><a href="https://github.com/shaokun11/eos-permission" target="_blank" rel="noopener">本课源码</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
+<p>email: <a href="mailto:&#115;&#x6b;&#x75;&#110;&#x6e;&#121;&#64;&#x31;&#54;&#x33;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#x6e;&#121;&#64;&#x31;&#54;&#x33;&#46;&#99;&#x6f;&#x6d;</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/15/基于eos连接scatter开发dapp(下) 续/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -514,7 +870,7 @@ EOSIO_DISPATCH(todolist, (create)(complete)(destroy))
 </blockquote>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#110;&#x79;&#64;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#110;&#x79;&#64;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#64;&#49;&#54;&#x33;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#64;&#49;&#54;&#x33;&#46;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -717,7 +1073,7 @@ void cardgame::endgame(eosio::name user) {
 <p>目前我的文章基本上都是比较简单的demo或者概念性的文章，这样看多了也没有意思，我写着也觉得没有意思了。所以接下来准备找一些具有代表性的基于以太坊，波场和eos合约与大家分享了。</p>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -1021,7 +1377,7 @@ EOSIO_DISPATCH(cardgame,(login)(startgame)(playcard))
 <li><a href="https://github.com/shaokun11/eoslearning/tree/eos-dve4-update" target="_blank" rel="noopener">更新的合约源码</a>，这次就没有更新前端的mock数据了，相信聪明的你一定知道怎样调整过来</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#x40;&#x31;&#x36;&#51;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#x40;&#x31;&#x36;&#51;&#46;&#99;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -1352,7 +1708,7 @@ void cardgame::draw_one_card(vector&lt;uint8_t&gt; &amp;deck,vector&lt;uint8_t&g
      deck.erase(deck.began() + deck_card_index);
  }
 </code></pre><h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#110;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#110;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -1581,7 +1937,7 @@ export default ApiService;
 <li>第三课  更改上课的错误，连接合约，增加新的展示界面</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#110;&#x79;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#111;&#109;</a></p>
 
           
         
@@ -1756,7 +2112,7 @@ user_info =&gt; userinfo
 <p>总算完成了之前的坑。^o^<br>中间有很多前端的知识，这不是这个课程讲解的重点，只能靠各位同学自己去补习了。这个系列使用react，redux也是一个很庞大的工程，所以可以简单一点，展示一下交互就好。<br>应该说到此，区块链与前端的交互已经完成，接下来就是充实智能合约的功能了。如果你做到了这一步，建议去<a href="https://developers.eos.io/eosio-cpp/reference" target="_blank" rel="noopener">eos c++ api</a>这里了解一下api，这样对于后面的合约编写会有一个更深层次的掌握</p>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#110;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#110;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -1907,7 +2263,7 @@ user_info =&gt; userinfo
 <h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>这篇文章写的很不顺，没有完成最关键的上链一步给大家演示，真是抱歉了。那么只能够走思路了。附上本篇文章所用到的源码 <a href="https://github.com/shaokun11/eoslearning/tree/eos-dev02" target="_blank" rel="noopener">elementel battels dev2</a></p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#x6e;&#x79;&#64;&#49;&#54;&#x33;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#x6e;&#x79;&#64;&#49;&#54;&#x33;&#46;&#99;&#111;&#109;</a></p>
 
           
         
@@ -2062,7 +2418,7 @@ gameplay.cpp  // 包含智能合约中使用的内部帮助函数的C++源文件
 <h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>额，第0课和第一课就到这里结束了，可以看到和我们之前的流程是类似的。同样需要你掌握web和c++的知识，这些知识点都可以通过网络找到，需要自己积累。<br>第0课主要讲解了eosio开发环境的搭建，自备梯子很重要<br>第1课主要讲解的整个项目的结构</p>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#107;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#54;&#x33;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#110;&#x79;&#64;&#x31;&#54;&#x33;&#46;&#99;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#x6b;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#99;&#111;&#109;</a></p>
 
           
         
@@ -2482,147 +2838,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
 </ul>
 <p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#x63;&#111;&#x6d;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/13/基于eos连接scatter开发dapp(上)--补充 23.18.52/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/10/13/基于eos连接scatter开发dapp(上)--补充 23.18.52/" itemprop="url">结合scatter学习eos dapp开发，看这篇就够了（上）--补充</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-13T23:23:17+08:00">
-                2018-10-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="eos智能合约开发-在jungle上创建account-续"><a href="#eos智能合约开发-在jungle上创建account-续" class="headerlink" title="eos智能合约开发 在jungle上创建account 续"></a>eos智能合约开发 在jungle上创建account 续</h4><blockquote>
-<p>之前由于网络的原因，导致中断了，那我们继续接着来。自带梯子最重要</p>
-</blockquote>
-<p><img src="/images/jungle03.png" alt="jungle"><br>打开网站，输入之前的信息如图所示,点击左下角create<br><img src="/images/jungle4.png" alt="jungle"><br>创建成功后，会返回这样的信息，看见最下面有绿色的应该就是成功了吧<br>接下来我们查看一下我们创建的account的信息，回到主页，选择account info，输入刚才创建的account ，我这里输入shaokun11113 ,点击 get<br><img src="/images/jungle5.png" alt="jungle"><br><img src="/images/jungle6.png" alt="jungle"><br>可以看到返回了我们创建账号的信息:    </p>
-<ul>
-<li>balance  什么都没有   </li>
-<li>activity key 和 owner key为我们刚才创建账户的时候输入的key  </li>
-<li>RAM 目前账号的RAM情况，这里可以看到刚创建账号就已经消耗了一部分的RAM,为什么呢？ 因为你的账号信息要占用内存啊，所以说，创建账号得找到一个有eos的账号的用户帮你创建，他要为你支付这部分费用</li>
-<li>net Bandwidth 存了100个eos,目前没有使用</li>
-<li>cpu Bandwidth 存了100个eos，目前没有使用</li>
-</ul>
-<p>由于作为dapp开发者，那么我们得准备点eos,那么接下来我们再去获取一点eos吧<br>回到主页，选择 faucet，输入 你的账号，如图所示，通过验证，选择send coins 就好<br><img src="/images/jungle7.png" alt="jungle"><br>返回的结果如上所示，有兴趣的同学可以仔细看看这些内容。<br>那么我们如何知道我们是否收到了eos呢？<br>还是回到主页，进入 account info查询就好</p>
-<p><img src="/images/jungle8.png" alt="jungle"> </p>
-<p> 这里注意一下 balance 那一项就好，可以看到已经有100个eos和100个jungle token了</p>
-<h4 id="eos智能合约开发-导入Account到scatter中"><a href="#eos智能合约开发-导入Account到scatter中" class="headerlink" title="eos智能合约开发 导入Account到scatter中"></a>eos智能合约开发 导入Account到scatter中</h4><blockquote>
-<p>经过上一步骤，我们已经创建好了账户，接下来就讲账户导入到scatter中吧。在scatter中，这里叫做identity（身份）</p>
-</blockquote>
-<p><img src="/images/scatter17.png" alt="jungle"><br>进入scatter，选择身份。点击左下角的编辑的icon<br>如果你关闭过浏览器，请输入最开始的密码进入就好，如果忘记了，请输入助记词找回，如果丢了，就从头来一遍就好.<br><img src="/images/scatter18.png" alt="jungle"><br>这里我们注意一下 账户选项中的内容就好<br><img src="/images/scatter19.png" alt="jungle"><br>这里都是选择题，账户的第一项勾选我们创建网络时输入的名字，第二项勾选我们生成密匙对的名字就好，点击导入<br><img src="/images/scatter23.png" alt="jungle"><br>如果你看到了这个结果，不好意思，我也不知道你哪一步有问题。你可以从头开始再来一遍就好<br><img src="/images/scatter20.png" alt="jungle"><br>当然，我希望的是你看到的这个界面，通常我们选择active账号，然后点击右上角保存按钮<br><img src="/images/scatter21.png" alt="jungle"><br>回到这个界面，可以看到我们刚才创建的账户已经导入成功了，这里多一步的设置，把此账户设置为scatter的默认账户，这样以后调用scatter的时候就会默认选择此账户进行智能合约的调用了  勾选左下角的那个小圆圈的icon<br><img src="/images/scatter22.png" alt="jungle"><br>我们就可以看到我们账户的信息啦</p>
-<p><strong>文章允许转载，但请注明出处，谢谢</strong></p>
-<p><strong>这样一点点的敲下来，内容还是蛮多的。本打算一次写完，结果遇到网络的问题，暂停了一会，这篇文章算是对第一篇的补充吧。到目前为止，我们只是创建好了账户，还没有涉及到dapp的开发，接下来的具体怎么开发dapp估计要等到下周了吧。</strong></p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#x40;&#x31;&#54;&#x33;&#x2e;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#x6e;&#121;&#x40;&#x31;&#54;&#x33;&#x2e;&#x63;&#111;&#x6d;</a></p>
+<p>email: <a href="mailto:&#115;&#x6b;&#x75;&#110;&#110;&#x79;&#x40;&#49;&#54;&#51;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#110;&#x79;&#x40;&#49;&#54;&#51;&#x2e;&#99;&#111;&#109;</a></p>
 
           
         
@@ -2708,7 +2924,7 @@ this.state.scatter.getIdentity(requiredFields).then(() =&gt; {
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-count">34</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

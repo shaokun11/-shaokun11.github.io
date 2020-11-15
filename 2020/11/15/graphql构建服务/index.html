@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="目标 koa + graphql的使用在这篇文章中,我们只实现了基本上的如何使用graphql,那么我们来实现业务上的graphql  实现 目录结构,大体上分为三个目录结构,schema用于定于所有的类型,resolver定义相应类型的实现,models定义一些service的具体实现,如查询数据库,app.ts为项目入口  1234567891011./src:app.ts		models">
+<meta name="keywords" content="eos,eth,tron,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="koa + graphql的使用(2)">
+<meta property="og:url" content="http://yoursite.com/2020/11/15/graphql构建服务/index.html">
+<meta property="og:site_name" content="hello shaokun">
+<meta property="og:description" content="目标 koa + graphql的使用在这篇文章中,我们只实现了基本上的如何使用graphql,那么我们来实现业务上的graphql  实现 目录结构,大体上分为三个目录结构,schema用于定于所有的类型,resolver定义相应类型的实现,models定义一些service的具体实现,如查询数据库,app.ts为项目入口  1234567891011./src:app.ts		models">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/react/graphql2.gif">
+<meta property="og:updated_time" content="2020-11-15T15:15:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="koa + graphql的使用(2)">
+<meta name="twitter:description" content="目标 koa + graphql的使用在这篇文章中,我们只实现了基本上的如何使用graphql,那么我们来实现业务上的graphql  实现 目录结构,大体上分为三个目录结构,schema用于定于所有的类型,resolver定义相应类型的实现,models定义一些service的具体实现,如查询数据库,app.ts为项目入口  1234567891011./src:app.ts		models">
+<meta name="twitter:image" content="http://yoursite.com/react/graphql2.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/11/15/graphql构建服务/">
+
+
+
+
+
+  <title>koa + graphql的使用(2) | hello shaokun</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">hello shaokun</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">code is law</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/15/graphql构建服务/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">koa + graphql的使用(2)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-15T22:35:14+08:00">
+                2020-11-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 浏览
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h4><blockquote>
+<p><a href="https://shaokun11.github.io/2020/08/16/koa+graphql%E5%AE%9A%E4%B9%89%E4%BD%A0%E7%9A%84%E6%8E%A5%E5%8F%A3/" target="_blank" rel="noopener">koa + graphql的使用</a>在这篇文章中,我们只实现了基本上的如何使用graphql,那么我们来实现业务上的graphql</p>
+</blockquote>
+<h4 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h4><ul>
+<li>目录结构,大体上分为三个目录结构,schema用于定于所有的类型,resolver定义相应类型的实现,models定义一些service的具体实现,如查询数据库,app.ts为项目入口</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">./src:</span><br><span class="line">app.ts		models		resolvers	schema</span><br><span class="line"></span><br><span class="line">./src/models:</span><br><span class="line">index.ts</span><br><span class="line"></span><br><span class="line">./src/resolvers:</span><br><span class="line">index.ts	message.ts	user.ts</span><br><span class="line"></span><br><span class="line">./src/schema:</span><br><span class="line">index.ts	message.ts	user.ts</span><br></pre></td></tr></table></figure>
+<ul>
+<li>项目入口app.ts,可以看到和上诉定义的目录结构一致,引入根数据,注意其中的context,这里用于挂在挂载全局变量,实现一些中间件的挂载,如auth</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Koa <span class="keyword">from</span> <span class="string">"koa"</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; ApolloServer &#125; <span class="keyword">from</span> <span class="string">"apollo-server-koa"</span>;</span><br><span class="line"><span class="keyword">import</span> resolvers <span class="keyword">from</span> <span class="string">"./resolvers"</span>;</span><br><span class="line"><span class="keyword">import</span> typeDefs <span class="keyword">from</span> <span class="string">"./schema"</span>;</span><br><span class="line"><span class="keyword">import</span> models <span class="keyword">from</span> <span class="string">"./models"</span>;</span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> Koa();</span><br><span class="line"><span class="keyword">const</span> server = <span class="keyword">new</span> ApolloServer(&#123;</span><br><span class="line">  typeDefs,</span><br><span class="line">  resolvers,</span><br><span class="line">  context: &#123;</span><br><span class="line">    models,</span><br><span class="line">    me: models.users[<span class="number">1</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line">server.applyMiddleware(&#123; app &#125;);</span><br><span class="line"></span><br><span class="line">app.listen(&#123; <span class="attr">port</span>: <span class="number">5000</span> &#125;, () =&gt;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`🚀 Server ready at http://localhost:4000<span class="subst">$&#123;server.graphqlPath&#125;</span>`</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>定义user的schema,注意其中的query加上了extend字段(message.ts内容一致)</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> &#123;gql&#125; <span class="keyword">from</span> <span class="string">"apollo-server-koa"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> User = gql<span class="string">`</span></span><br><span class="line"><span class="string">    extend type Query &#123;</span></span><br><span class="line"><span class="string">        users: [User!]</span></span><br><span class="line"><span class="string">        user(id: ID!): User</span></span><br><span class="line"><span class="string">        me: String!</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    type User &#123;</span></span><br><span class="line"><span class="string">        id: ID!</span></span><br><span class="line"><span class="string">        username: String!</span></span><br><span class="line"><span class="string">        messages: [Message!]</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> User;</span><br><span class="line"><span class="string">``</span><span class="string">`   </span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">-	定义schema的导出文件,定义空的schema,以便具体的实体可以继承,固定写法</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">`</span><span class="string">``</span>javascritp</span><br><span class="line">	<span class="keyword">import</span> &#123; gql &#125; <span class="keyword">from</span> <span class="string">"apollo-server-koa"</span>;</span><br><span class="line">	<span class="keyword">import</span> message <span class="keyword">from</span> <span class="string">"./message"</span>;</span><br><span class="line">	<span class="keyword">import</span> user <span class="keyword">from</span> <span class="string">"./user"</span>;</span><br><span class="line">	<span class="keyword">const</span> linkSchema = gql<span class="string">`</span></span><br><span class="line"><span class="string">	  type Query &#123;</span></span><br><span class="line"><span class="string">	    _: Boolean</span></span><br><span class="line"><span class="string">	  &#125;</span></span><br><span class="line"><span class="string">	</span></span><br><span class="line"><span class="string">	  type Mutation &#123;</span></span><br><span class="line"><span class="string">	    _: Boolean</span></span><br><span class="line"><span class="string">	  &#125;</span></span><br><span class="line"><span class="string">	</span></span><br><span class="line"><span class="string">	  type Subscription &#123;</span></span><br><span class="line"><span class="string">	    _: Boolean</span></span><br><span class="line"><span class="string">	  &#125;</span></span><br><span class="line"><span class="string">	`</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">export</span> <span class="keyword">default</span> [linkSchema, user, message];</span><br></pre></td></tr></table></figure>
+<ul>
+<li>user的resolver具体实现,根据user的schema实现,这里注意resolver接收四个参数,根据官网的说法,我们一般用上前三个就够了,</li>
+</ul>
+<ul>
+<li>分别是parent,即上一个查询的的结果</li>
+<li>args,本次执行的前端页面传过来的参数</li>
+<li>context,即app中的context,即返回的那个object</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;IResolvers&#125; <span class="keyword">from</span> <span class="string">"apollo-server-koa"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> user: IResolvers = &#123;</span><br><span class="line">	Query: &#123;</span><br><span class="line">		users: <span class="function">(<span class="params">parent, args, &#123;models&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="built_in">Object</span>.values(models.users);</span><br><span class="line">		&#125;,</span><br><span class="line">		user: <span class="function">(<span class="params">parent, &#123;id&#125;, &#123;models&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> models.users[id];</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">	User: &#123;</span><br><span class="line">		messages: <span class="function">(<span class="params">user, args, &#123;models&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="built_in">Object</span>.values(models.messages).filter(</span><br><span class="line">				<span class="comment">//@ts-ignore</span></span><br><span class="line">				(message) =&gt; message.userId === user.id</span><br><span class="line">			);</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> user;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>resolver 导出文件,直接导出数组即可  </li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> message <span class="keyword">from</span> <span class="string">"./message"</span>;</span><br><span class="line"><span class="keyword">import</span> user <span class="keyword">from</span> <span class="string">"./user"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> [message, user];</span><br></pre></td></tr></table></figure>
+<ul>
+<li>models 模拟本次程序的数据,现实中用数据库代替即可</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> users = &#123;</span><br><span class="line">  <span class="number">1</span>: &#123;</span><br><span class="line">    id: <span class="string">"1"</span>,</span><br><span class="line">    username: <span class="string">"hello shoakun 1"</span>,</span><br><span class="line">    messageIds: [<span class="number">1</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="number">2</span>: &#123;</span><br><span class="line">    id: <span class="string">"2"</span>,</span><br><span class="line">    username: <span class="string">"hello shaokun2"</span>,</span><br><span class="line">    messageIds: [<span class="number">2</span>],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> messages = &#123;</span><br><span class="line">  <span class="number">1</span>: &#123;</span><br><span class="line">    id: <span class="string">"1"</span>,</span><br><span class="line">    text: <span class="string">"Hello World"</span>,</span><br><span class="line">    userId: <span class="string">"1"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="number">2</span>: &#123;</span><br><span class="line">    id: <span class="string">"2"</span>,</span><br><span class="line">    text: <span class="string">"By World"</span>,</span><br><span class="line">    userId: <span class="string">"2"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  users,</span><br><span class="line">  messages,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h5 id="结果演示"><a href="#结果演示" class="headerlink" title="结果演示"></a>结果演示</h5><p><a href="https://github.com/shaokun11/gql-server" target="_blank" rel="noopener">源码</a><br><img src="/react/graphql2.gif" alt="graphql query demo"> </p>
+<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/08/uniswap 源码解读6/" rel="next" title="一步一步教你打造自己的defi-xswap(6)">
+                <i class="fa fa-chevron-left"></i> 一步一步教你打造自己的defi-xswap(6)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">shaokun</p>
+              <p class="site-description motion-element" itemprop="description">记录自己对相关技术的点点滴滴和一些思考，希望能够帮助来到这里的你，如果你喜欢我的文章，可以加个微信共同探讨</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#目标"><span class="nav-number">1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#结果演示"><span class="nav-number">2.1.</span> <span class="nav-text">结果演示</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#关于我"><span class="nav-number">2.2.</span> <span class="nav-text">关于我</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">shaokun</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+ <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 访问人数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 访问总量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

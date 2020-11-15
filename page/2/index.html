@@ -233,6 +233,147 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/13/material-ui之自定义字体/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/08/13/material-ui之自定义字体/" itemprop="url">material-ui之自定义字体</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-13T21:02:00+08:00">
+                2019-08-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h5 id="因由"><a href="#因由" class="headerlink" title="因由"></a>因由</h5><blockquote>
+<p>因近期使需项目需要构建前端页面,故用reactjs作为前端的技术框架,ui选择material-ui v4.3.1作为一个基础.使用create-react-app初始化项目,其中踩了一些坑,记录在此,以做后续查看…</p>
+</blockquote>
+<h5 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h5><p>根据项目需求,第一步需使用自定义的字体,根据官方文档<a href="https://material-ui.com/zh/customization/typography/" target="_blank" rel="noopener">typography</a>.按照此方式配置,皆无法使字体问题文件生效.(是本地的字体,不是Google font)在一番搜索后,也许是应为版本原因,或者其他原因,可以在此<a href="https://github.com/google/material-design-icons/issues/205" target="_blank" rel="noopener">github issues</a>看到有很多朋友均遇见了此番问题,参照之后,也没有实际解决</p>
+<h5 id="转机出现"><a href="#转机出现" class="headerlink" title="转机出现"></a>转机出现</h5><p>按照官方使用Roboto的字体,需要在index.html引入此文件  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap&quot; /&gt;</span><br></pre></td></tr></table></figure>
+<p>使用Chrome浏览器看了一下,其加载了一个css文件,内容如下</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* cyrillic-ext */</span></span><br><span class="line">@<span class="keyword">font-face</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">'Roboto'</span>;</span><br><span class="line">  <span class="attribute">font-style</span>: normal;</span><br><span class="line">  <span class="attribute">font-weight</span>: <span class="number">400</span>;</span><br><span class="line">  <span class="attribute">src</span>: <span class="built_in">local</span>(<span class="string">'Roboto'</span>), <span class="built_in">local</span>(<span class="string">'Roboto-Regular'</span>), <span class="built_in">url</span>(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.woff2) <span class="built_in">format</span>(<span class="string">'woff2'</span>);</span><br><span class="line">  <span class="attribute">unicode-range</span>: U+<span class="number">0460</span>-<span class="number">052</span>F, U+<span class="number">1</span>C80-<span class="number">1</span>C88, U+<span class="number">20</span>B4, U+<span class="number">2</span>DE0-<span class="number">2</span>DFF, U+A640-A69F, U+FE2E-FE2F;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* cyrillic */</span></span><br><span class="line">@<span class="keyword">font-face</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">'Roboto'</span>;</span><br><span class="line">  <span class="attribute">font-style</span>: normal;</span><br><span class="line">  <span class="attribute">font-weight</span>: <span class="number">400</span>;</span><br><span class="line">  <span class="attribute">src</span>: <span class="built_in">local</span>(<span class="string">'Roboto'</span>), <span class="built_in">local</span>(<span class="string">'Roboto-Regular'</span>), <span class="built_in">url</span>(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu5mxKKTU1Kvnz.woff2) <span class="built_in">format</span>(<span class="string">'woff2'</span>);</span><br><span class="line">  <span class="attribute">unicode-range</span>: U+<span class="number">0400</span>-<span class="number">045</span>F, U+<span class="number">0490</span>-<span class="number">0491</span>, U+<span class="number">04</span>B0-<span class="number">04</span>B1, U+<span class="number">2116</span>;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>那我是不是也可以建立一个文件按照此种方式引入呢?</p>
+<p>于是仿照上述,在index.css加入字体的应用,最终实现自定义的字体加入material-ui</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">font-face</span> &#123;</span><br><span class="line">    <span class="attribute">font-family</span>: <span class="string">'Gliber'</span>;</span><br><span class="line">    <span class="attribute">font-style</span>: normal;</span><br><span class="line">    <span class="attribute">font-weight</span>: <span class="number">400</span>;</span><br><span class="line">    <span class="attribute">font-display</span>: swap;</span><br><span class="line">    <span class="attribute">src</span>: <span class="built_in">url</span>(<span class="string">'./theme/Gilbert_Bold-Preview_1004.woff2'</span>) <span class="built_in">format</span>(<span class="string">'woff2'</span>);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
+<li>经过摸索,如在index.css中加入了自定义字体,则在theme中无需按照官方的方法再次在theme.js中引入字体了,按照如下格式引入即可</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> typography = &#123;</span><br><span class="line">  fontFamily: [<span class="string">"Gliber"</span>,<span class="string">"Roboto"</span>].join(<span class="string">","</span>),<span class="comment">//这里引入自定义的字体名字,并放在第一</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果需要寻找更多的字体,可在<a href="https://fonts.google.com/" target="_blank" rel="noopener">google fonts(自带梯子)</a>寻找,按照Roboto的字体方式引入即可.经过测试,字体的使用可不用梯子</li>
+<li>顺带在stackoverflow开启了第一个解答<a href="https://stackoverflow.com/questions/57108085/self-host-font-added-in-material-ui-not-working/57450653#57450653" target="_blank" rel="noopener">Self-host font added in Material-UI not working?
+</a></li>
+</ul>
+<h5 id="结果演示"><a href="#结果演示" class="headerlink" title="结果演示"></a>结果演示</h5><p><a href="https://github.com/shaokun11/material-ui-learn/tree/v1.0" target="_blank" rel="noopener">源码</a><br><img src="/react/material-ui-font.gif" alt="material-ui self host font"> </p>
+<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/12/我应该怎样学习eos智能合约的开发/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -517,7 +658,7 @@
 <li>还有一点,如果你使用eosiocpp编译wasm,abi文件,写合约的时候,有时候需要参考源码<a href="https://sourcegraph.com/github.com/EOSIO/eos" target="_blank" rel="noopener">eosio</a>,如果使用eosio.cdt编译的合约,<a href="https://github.com/EOSIO/eosio.cdt/tree/master/libraries/eosiolib" target="_blank" rel="noopener">eosio.cdt eoslib</a>要去这里找(ps:这个地方受过很多伤…)</li>
 <li>最后,祝大家学的开心</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#x6e;&#x79;&#64;&#x31;&#54;&#x33;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#x6e;&#x79;&#64;&#x31;&#54;&#x33;&#46;&#x63;&#111;&#109;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#54;&#51;&#46;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#x6e;&#x79;&#64;&#x31;&#54;&#51;&#46;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -687,7 +828,7 @@
 <li>有时候有新的业务需求,我们完全可以根据自己的需求来更改token内部的某些业务逻辑,毕竟它只是一份部署在你账号的一个智能合约而已,而且这个合约你完全有权限随时更改呢</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email <a href="mailto:&#115;&#x6b;&#117;&#110;&#110;&#x79;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#110;&#x79;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#111;&#109;</a></p>
+<p>email <a href="mailto:&#x73;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -874,7 +1015,7 @@ send_summary(user, &quot; successfully erased record from addressbook&quot;);
 <li>换个方向想,何尝不是又给了我们人生中多一次选择的机会呢?</li>
 <li>这应该是年前的最后一篇文章了,希望年后能够继续给大家分享一些dapp开发的知识,谢谢你的阅读</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#x36;&#x33;&#46;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#110;&#121;&#x40;&#49;&#x36;&#x33;&#46;&#x63;&#x6f;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#110;&#121;&#64;&#49;&#54;&#x33;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#110;&#121;&#64;&#49;&#54;&#x33;&#46;&#99;&#111;&#109;</a></p>
 
           
         
@@ -1053,7 +1194,7 @@ send_summary(user, &quot; successfully erased record from addressbook&quot;);
 <li>问题又来了?那我要怎么拿取转账的信息呢?</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#110;&#x79;&#x40;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#110;&#x79;&#x40;&#49;&#54;&#x33;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#54;&#51;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#110;&#x79;&#64;&#49;&#54;&#51;&#46;&#99;&#111;&#109;</a></p>
 
           
         
@@ -1323,7 +1464,7 @@ bool execute_action( T* obj, void (Q::*func)(Args...)  ) {
 <li>谢谢大家的浏览,希望有发现错误的同学可以加上我微信帮我指出来,再次感谢.</li>
 </ol>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#x6e;&#x6e;&#121;&#x40;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#x6e;&#x6e;&#121;&#x40;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#110;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#110;&#121;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -1562,7 +1703,7 @@ function withPayable() public payable {
 <li>如果哪位同学有更好的关于转账的方法,请告知一下,个人觉得在合约中进行转账还是很常见的需求</li>
 <li>官方的eos dice合约现在已经移除了,但是可以在历史中找到<a href="https://github.com/EOSIO/eos/blob/v1.0.0/contracts/dice/dice.cpp" target="_blank" rel="noopener">eos dice</a> 有兴趣的同学可以研究一下</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#54;&#x33;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#x79;&#x40;&#49;&#54;&#x33;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#110;&#x79;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#x6d;</a></p>
 
           
         
@@ -1873,7 +2014,7 @@ EOSIO_DISPATCH(adcounter,(count));
 <li>还有一点,哪位同学知道eos中有类似eth中的event的功能,即合约主动推送信息给我们,我觉得这很重要.我觉得eosjs应该提供类似的功能呢.知道的同学麻烦告知一声</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#x79;&#x40;&#x31;&#x36;&#51;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#x75;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#x6e;&#x6e;&#121;&#x40;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#109;</a></p>
 
           
         
@@ -2119,363 +2260,7 @@ yarn add eosjs scatterjs-core scatterjs-plugin-eosjs
 </ul>
 </blockquote>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#107;&#x75;&#110;&#110;&#121;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#110;&#121;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#x6f;&#109;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/17/eos 权限的理解/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/11/17/eos 权限的理解/" itemprop="url">简单例子带你彻底的理解eos中的权限在dapp中如何使用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-17T21:15:01+08:00">
-                2018-11-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
-<p>相信各位同学看eos白皮书的权限看得很是头疼,而我能搜索到的例子基本上是官方的那个权限图再结合eos.token进行转账的权限介绍.如果不细心跟着走一遍,你是绝对不好理解这个权限怎么用的.由于我头脑比较笨,着实按照大佬的文章走了三四遍才大约摸索清楚,这里给自己做一个备忘录吧<br>而我站在大佬的肩膀上,结合实际的操作给大家聊聊这个权限如何使用吧.<br>这里主要参考的  </p>
-<ul>
-<li><a href="https://eosfans.io/topics/653" target="_blank" rel="noopener">EOS 权限管理之-权限的使用 (你绝对找不到的干货)</a>  <ul>
-<li><a href="https://bihu.com/article/293974" target="_blank" rel="noopener">EOS开发系列目录</a> 松果的文章都是根据源码分析的,建议开发dapp的同学都认真读几遍吧,这样更能帮助理解eos到底是怎样运行的</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<h4 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h4><ul>
-<li><p>提前在测试网上申请两个账号,并领取测试币(不知道怎么做的可以翻看我前面的文章),我这里申请了两个.  </p>
-</li>
-<li><p>这次使用cleos操作,就不使用scatter操作了.原理一样.所以得把申请的这两个账号的私钥导入到cleos创建的钱包里面  </p>
-<pre><code>shaokun11121
-Private key: 5KFoeWx69fjPj7mTDbcD9JauYd9LLjikYTa9Qg7N5CVZTqZrzNG
-Public key: EOS69w5V46oUaBD5PSx3AMRxWXPi6b3St2PwbX9kBPY6tZvSs65o1
-
-shaokun11122
-Private key: 5HrJQ9eepF6FuG47eSJprxoFQ6PWRkombbWEwxoSQr6FJ1wQPbg
-Public key: EOS8ZZCicammR45b9tQUSU8VHqX4M8oFM89Cs8tFFWYgUGasegnnV
-</code></pre></li>
-</ul>
-<h4 id="以太坊权限的实现"><a href="#以太坊权限的实现" class="headerlink" title="以太坊权限的实现"></a>以太坊权限的实现</h4><blockquote>
-<p>这里先给贴一段简单的以太坊的权限的管理吧,这个要自己来写,如果你有以太坊的经验,相信更加容易理解.<br>理一理:</p>
-<ol>
-<li>部署合约,部署完成后,owner就是部署者的地址</li>
-<li>查看count的值,此时count为初始值1</li>
-<li>执行add方法</li>
-<li>查看count的值,此时count的值为2</li>
-<li>切换address</li>
-<li>执行add方法,报错,因为不是owner</li>
-<li>查看count的值 还是为2</li>
-<li>再次执行3,4步骤,此时count的值的值为3</li>
-</ol>
-</blockquote>
-<p> <img src="/eospermission/per1.gif" alt="eos"></p>
-<pre><code>pragma solidity ^0.4.24;
-
-contract Ownable {
-  address public owner;
-
-  constructor() public {
-    owner = msg.sender;
-  }
-
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-}
-contract leranper is Ownable {
-
-    uint256 public count = 1;
-
-    function add() external onlyOwner  {
-       count += 1;
-    }
-}
-</code></pre><h4 id="eos的权限的实现"><a href="#eos的权限的实现" class="headerlink" title="eos的权限的实现"></a>eos的权限的实现</h4><blockquote>
-<p>eos的权限不需要写到合约中,底层已经帮我们实现了,我们只需要进行相应的设置即可,以下是设置权限的签名.至于设置的各个参数怎么设置,怎么用,可以看看官方文档吧</p>
-</blockquote>
-<pre><code>Usage: cleos set account permission [OPTIONS] account permission authority [parent]
-
-Positionals:
-  account TEXT                The account to set/delete a permission authority for (required)
-  permission TEXT             The permission name to set/delete an authority for (required)
-  authority TEXT              [delete] NULL, [create/update] public key, JSON string, or filename defining the authority (required)
-  parent TEXT                 [create] The permission name of this parents permission (Defaults to: &quot;Active&quot;)
-</code></pre><p>方法1:使用account设置  </p>
-<pre><code>cleos set account permission shaokun11121 add &apos;{&quot;threshold&quot;:1,&quot;keys&quot;:[],&quot;accounts&quot;:[{&quot;permission&quot;:{&quot;actor&quot;:&quot;shaokun11122&quot;,&quot;permission&quot;:&quot;active&quot;},&quot;weight&quot;:1}]}&apos;
-</code></pre><p>方法二:使用public key进行设置</p>
-<pre><code>cleos set account permission shaokun11121 add &apos;{&quot;threshold&quot;:1,&quot;keys&quot;:[{&quot;permission&quot;:{&quot;key&quot;:&quot;EOS8ZZCicammR45b9tQUSU8VHqX4M8oFM89Cs8tFFWYgUGasegnnV&quot;,&quot;permission&quot;:&quot;active&quot;},&quot;weight&quot;:1}]}&apos;  
-</code></pre><p>当然你可以把两种设置方式都用上,根据个人习惯设定就好,</p>
-<blockquote>
-<p>这里建议后面的permission这段,先使用ide写上正确的json格式.然后在<a href="http://www.bejson.com/" target="_blank" rel="noopener">json格式压缩</a>进行压缩成一行,这样可以避免不必要的麻烦</p>
-</blockquote>
-<pre><code>    {
-    &quot;threshold&quot;: 1,
-    &quot;keys&quot;: [],
-    &quot;accounts&quot;: [
-        {
-            &quot;permission&quot;: {
-                &quot;actor&quot;: &quot;kun2&quot;,
-                &quot;permission&quot;: &quot;active&quot;
-            },
-            &quot;weight&quot;: 1
-        }
-    ]
-}
-</code></pre><h4 id="eos的权限的解读"><a href="#eos的权限的解读" class="headerlink" title="eos的权限的解读"></a>eos的权限的解读</h4><ul>
-<li>当按照上述方式设置好后,可以通过此命令查看设置的权限,注意看这里permissions里多了一个add权限 这个权限的名字是 add,阀值是1 权限值 是1 ,父权限是active. </li>
-<li>这样设置后,也就是说 只要是active shaokun11121的active的权限能够执行的操作,使用shaokun11122的密钥生成的账户的active权限均能做</li>
-<li>一个私钥与一个公钥是一一对应,而这一对钥匙可以作为一个或者多个account中的权限级别</li>
-<li><p>当然你也可以按照上述的方式多设置几个权限看看,它的形式就像Windows的目录展示的形式,很好辨认的</p>
-<pre><code>cleos -u http://jungle.cryptolions.io:18888  get account shaokun11121
-</code></pre></li>
-</ul>
-<p>查看的结果  </p>
-<pre><code>bogon:libraries shaokun$ cleos -u http://jungle.cryptolions.io:18888  get account shaokun11121
-created: 2018-11-17T12:46:30.000
-permissions: 
-     owner     1:    1 EOS69w5V46oUaBD5PSx3AMRxWXPi6b3St2PwbX9kBPY6tZvSs65o1
-        active     1:    1 EOS69w5V46oUaBD5PSx3AMRxWXPi6b3St2PwbX9kBPY6tZvSs65o1
-           add     1:    1 shaokun11122@active
-memory: 
-     quota:     260.1 KiB    used:     95.82 KiB  
-
-net bandwidth: 
-     staked:        100.0000 EOS           (total stake delegated from account to self)
-     delegated:       0.0000 EOS           (total staked delegated to account from others)
-     used:             5.534 KiB  
-     available:        18.23 MiB  
-     limit:            18.24 MiB  
-
-cpu bandwidth:
-     staked:        100.0000 EOS           (total stake delegated from account to self)
-     delegated:       0.0000 EOS           (total staked delegated to account from others)
-     used:             9.367 ms   
-     available:        3.629 sec  
-     limit:            3.639 sec  
-
-EOS balances: 
-     liquid:           80.1129 EOS
-     staked:          200.0000 EOS
-     unstaking:         0.0000 EOS
-     total:           280.1129 EOS
-
-producers:     &lt;not voted&gt;
-</code></pre><h4 id="eos权限的使用"><a href="#eos权限的使用" class="headerlink" title="eos权限的使用"></a>eos权限的使用</h4><blockquote>
-<p>上述方法给shaokun11121设置了一个add的权限,得添加到具体的action上才能体现出这个价值.目前能够搜到的文章都是加载 transfer这个操作上面的.为什么呢? 因为有了这个权,就可以不用登陆shaokun11121转账了,直接使用shaokun11122转账了.</p>
-</blockquote>
-<ul>
-<li><p>权限签名 </p>
-<pre><code>Positionals:
-  account TEXT                The account to set/delete a permission authority for (required)
-  code TEXT                   The account that owns the code for the action (required)
-  type TEXT                   the type of the action (required)
-  requirement TEXT            [delete] NULL, [set/update] The permission name require for executing the given action (required)
-</code></pre></li>
-<li><p>给shaokun11121 add action和add 权限关联起来,这样只要是shaokun111121的合约中有add action,那么使用shaokun11122的add权限均可以调用.根据我的测试,一个account目前只能部署一个智能合约,所以这个add方法是唯一的</p>
-<pre><code>cleos -u http://jungle.cryptolions.io:18888  set action permission shaokun11121 shaokun11121 add add
-</code></pre></li>
-</ul>
-<h4 id="eos权限合约的编写"><a href="#eos权限合约的编写" class="headerlink" title="eos权限合约的编写"></a>eos权限合约的编写</h4><blockquote>
-<p>合约编写很简单,就是helloworld,注意其中的权限验证那一行,也就是说,只有自己的account 才能添加或者更新自己的这条信息</p>
-</blockquote>
-<pre><code>#include &lt;eosiolib/eosio.hpp&gt;
-
-using namespace eosio;
-
-class [[eosio::contract]] learnper2 : public contract {
-  public:
-    using contract::contract;
-    learnper2(eosio::name reciever,eosio::name code,eosio::datastream&lt;const char*&gt; ds )
-                              :contract(reciever,code,ds),
-                              _students(reciever,code.value){};
-
-    [[eosio::action]]
-    void add(name user, const std::string msg) {
-      require_auth(user); // 权限额验证 
-      auto itr = _students.find(user.value);
-      if (itr == _students.end()){
-        _students.emplace(get_self(),[&amp;](auto&amp; row){
-          row.user = user;
-          row.msg = msg;
-        });
-      } else {
-        _students.modify(itr, get_self(), [&amp;](auto&amp; row){
-          row.msg = msg;
-        });
-      }
-    };
-
-
-  private:
-  struct [[eosio::table]] student 
-  {
-    name user;
-    std::string msg = &quot;hello world&quot;;
-    uint64_t primary_key() const {return user.value;};
-
-  };
-  typedef eosio::multi_index&lt;&quot;student&quot;_n, student&gt; student_index;
-  student_index _students; 
-};
-EOSIO_DISPATCH( learnper2, (add))
-</code></pre><h4 id="eos权限合约的编译-部署"><a href="#eos权限合约的编译-部署" class="headerlink" title="eos权限合约的编译,部署"></a>eos权限合约的编译,部署</h4><ul>
-<li><p>编译:这里有个小插曲,放合约cpp文件的文件夹貌似必须命名和主合约的文件名一致,生成的abi里面没有内容,这着实也困扰了我一会</p>
-<p>  eosio-cpp -abigen learnper2.cpp learnper2.wasm</p>
-</li>
-<li><p>这里部署合约一般需要购买ram  </p>
-<pre><code>cleos -u http://jungle.cryptolions.io:18888  system buyram shaokun11121 shaokun11121 -k 256
-</code></pre></li>
-<li><p>部署:  </p>
-<pre><code>cleos -u http://jungle.cryptolions.io:18888 set contract shaokun11121 ./learnper2/ -p shaokun11121@active
-</code></pre></li>
-</ul>
-<h4 id="eos权限合约结果展示"><a href="#eos权限合约结果展示" class="headerlink" title="eos权限合约结果展示"></a>eos权限合约结果展示</h4><p><img src="/eospermission/per2.gif" alt="eos"></p>
-<blockquote>
-<p>这里说一下我的操作流程</p>
-</blockquote>
-<ul>
-<li>调用合约的add action 插入一条信息(我这里之前插入信息,故此步未进行演示)  </li>
-<li>首先查看了 shaokun11121的 account信息,可以看到添加了一条add的permission</li>
-<li>再次查看了 shaokun11122的account信息,正常状态,只要你新建一个account都是这样的</li>
-<li>查看了钱包里面的信息,这里显示的是shaokun11122的公钥(大家可以仔细对比一下)</li>
-<li>查看链上table的数据</li>
-<li><p>修改数据,我们仔细来分析这条命令  </p>
-<blockquote>
-<ol>
-<li>这里使用的传入的user是shaokun11121</li>
-<li>传入的permission是 shaokun111121的add这个permission,各位同学可以回想一下之前的合约,调用都是是用的active</li>
-<li>钱包中并没有shaokun11121的私钥</li>
-<li>钱包中占有shaokun11122的私钥  </li>
-</ol>
-</blockquote>
-</li>
-<li><p>再次展示数据,数据修改成功  </p>
-<pre><code>cleos -u http://jungle.cryptolions.io:18888  push action shaokun11121 add &apos;{&quot;user&quot;:&quot;shaokun11121&quot;,&quot;msg&quot;:&quot;i am shaokun&quot;}&apos; -p shaokun11121@add
-</code></pre></li>
-</ul>
-<h4 id="eos权限使用心得"><a href="#eos权限使用心得" class="headerlink" title="eos权限使用心得"></a>eos权限使用心得</h4><blockquote>
-<ul>
-<li>这里只是展示的单个权限的使用在dapp中怎么使用   </li>
-<li>如果只看白皮书还是很难理解的,建议通过实际的操作,加深理解吧  </li>
-</ul>
-</blockquote>
-<h4 id="eos权限的进一步思考"><a href="#eos权限的进一步思考" class="headerlink" title="eos权限的进一步思考"></a>eos权限的进一步思考</h4><blockquote>
-<ul>
-<li>以太坊和eos的多重权限的签名目前我还没遇到过在dapp中实际使用的例子,官方的例子就是基本上是转账需要多个人同意,那么在dapp中如何使用呢?</li>
-<li>本课程只展示了阀值为1,权限值为1的active权限,那么如果按照官方例子,如果阈值为2,同时需要两个权限值都为1的账号的active权限来进行某个action的执行呢? </li>
-<li>接上一条,如果需要的不是active权限,比如本课中的add权限呢?</li>
-</ul>
-</blockquote>
-<p><a href="https://github.com/shaokun11/eos-permission" target="_blank" rel="noopener">本课源码</a></p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#117;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#51;&#x2e;&#99;&#111;&#109;</a></p>
+<p>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#x2e;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -2561,7 +2346,7 @@ EOSIO_DISPATCH( learnper2, (add))
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-count">34</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
