@@ -70,8 +70,7 @@ const User = gql`
 export default User;
 ```   
 
--	定义schema的导出文件,定义空的schema,以便具体的实体可以继承,固定写法
-
+- 定义schema的导出文件,定义空的schema,以便具体的实体可以继承,固定写法
 
 ```javascritp
 	import { gql } from "apollo-server-koa";

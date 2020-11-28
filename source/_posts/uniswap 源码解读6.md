@@ -59,7 +59,7 @@ date: 2020-11-08 17:10:49
 
 #### 总结
 - xswap到这里已经结束了.
-- 本系列只重点着重于合约代码层面的实现,采用react全家桶实现的前端界面(文中做过多介绍前端代码的实现).
+- 本系列只重点着重于合约代码层面的实现,采用react全家桶实现的前端界面(文中未做过多介绍前端代码的实现).
 - 个人觉得uniswap的精髓在其整个的设计与其创新,理论上来讲,是真正实现了一个去中心化的交易所的功能
 - 目前前端页面只提供了tokenA,与tokenB的操作,且只适用于rinkeby网络,如果各位同学想要进一步发挥,可以完全参考uniswap的实现[uniswap-peripher](https://github.com/Uniswap/uniswap-v2-periphery),[uniswap前端页面](https://github.com/Uniswap/uniswap-interface)自己实现一套属于自己的swap吧
 
