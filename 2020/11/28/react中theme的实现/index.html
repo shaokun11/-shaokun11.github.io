@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="目标  在react的开发中,如果使用在antd作为其基础的ui库,根据官方文档,没有提供类似material-ui的themeProvider来非常方便的实现动态的切换当前页面的主题的方式(如果有有方便的方式,请告诉我一下…),那么接下来我们将采用非常规的方式来实现这个目的本篇文章中并不是在介绍如何自定义主题呢,请注意一下  实现流程 首先按照介绍安装antd, 进入antd/dist/中,将a">
+<meta name="description" content="目标 在react的开发中,如果使用在antd作为其基础的ui库,根据官方文档,没有提供类似material-ui的themeProvider来非常方便的实现动态的切换当前页面的主题的方式(如果有有方便的方式,请告诉我一下…),那么接下来我们将采用非常规的方式来实现这个目的 本篇文章中并不是在介绍如何自定义主题呢,请注意一下  实现流程 首先按照介绍安装antd, 进入antd/dist/中,将a">
 <meta name="keywords" content="eos,eth,tron,区块链">
 <meta property="og:type" content="article">
 <meta property="og:title" content="antd实现theme的切换">
 <meta property="og:url" content="http://yoursite.com/2020/11/28/react中theme的实现/index.html">
 <meta property="og:site_name" content="hello shaokun">
-<meta property="og:description" content="目标  在react的开发中,如果使用在antd作为其基础的ui库,根据官方文档,没有提供类似material-ui的themeProvider来非常方便的实现动态的切换当前页面的主题的方式(如果有有方便的方式,请告诉我一下…),那么接下来我们将采用非常规的方式来实现这个目的本篇文章中并不是在介绍如何自定义主题呢,请注意一下  实现流程 首先按照介绍安装antd, 进入antd/dist/中,将a">
+<meta property="og:description" content="目标 在react的开发中,如果使用在antd作为其基础的ui库,根据官方文档,没有提供类似material-ui的themeProvider来非常方便的实现动态的切换当前页面的主题的方式(如果有有方便的方式,请告诉我一下…),那么接下来我们将采用非常规的方式来实现这个目的 本篇文章中并不是在介绍如何自定义主题呢,请注意一下  实现流程 首先按照介绍安装antd, 进入antd/dist/中,将a">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/react/antdTheme.gif">
-<meta property="og:updated_time" content="2020-11-28T12:48:56.000Z">
+<meta property="og:updated_time" content="2020-11-28T12:51:33.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="antd实现theme的切换">
-<meta name="twitter:description" content="目标  在react的开发中,如果使用在antd作为其基础的ui库,根据官方文档,没有提供类似material-ui的themeProvider来非常方便的实现动态的切换当前页面的主题的方式(如果有有方便的方式,请告诉我一下…),那么接下来我们将采用非常规的方式来实现这个目的本篇文章中并不是在介绍如何自定义主题呢,请注意一下  实现流程 首先按照介绍安装antd, 进入antd/dist/中,将a">
+<meta name="twitter:description" content="目标 在react的开发中,如果使用在antd作为其基础的ui库,根据官方文档,没有提供类似material-ui的themeProvider来非常方便的实现动态的切换当前页面的主题的方式(如果有有方便的方式,请告诉我一下…),那么接下来我们将采用非常规的方式来实现这个目的 本篇文章中并不是在介绍如何自定义主题呢,请注意一下  实现流程 首先按照介绍安装antd, 进入antd/dist/中,将a">
 <meta name="twitter:image" content="http://yoursite.com/react/antdTheme.gif">
 
 
@@ -307,9 +307,10 @@
       
 
       
-        <h4 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h4><blockquote>
-<p> 在react的开发中,如果使用在antd作为其基础的ui库,根据官方文档,没有提供类似material-ui的themeProvider来非常方便的实现动态的切换当前页面的主题的方式(如果有有方便的方式,请告诉我一下…),那么接下来我们将采用非常规的方式来实现这个目的<br>本篇文章中并不是在介绍如何自定义主题呢,请注意一下</p>
-</blockquote>
+        <h4 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h4><ul>
+<li>在react的开发中,如果使用在antd作为其基础的ui库,根据官方文档,没有提供类似material-ui的themeProvider来非常方便的实现动态的切换当前页面的主题的方式(如果有有方便的方式,请告诉我一下…),那么接下来我们将采用非常规的方式来实现这个目的</li>
+<li>本篇文章中并不是在介绍如何自定义主题呢,请注意一下</li>
+</ul>
 <h4 id="实现流程"><a href="#实现流程" class="headerlink" title="实现流程"></a>实现流程</h4><ol>
 <li>首先按照介绍安装antd,</li>
 <li>进入antd/dist/中,将<strong>antd.dark.min.css / antd.min.css</strong>文件拷贝到public目录中(一般我们仅需要这两个主题),注意是css</li>
@@ -321,9 +322,11 @@
 </ol>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;Button&#125; <span class="keyword">from</span> <span class="string">'antd'</span>;</span><br><span class="line"><span class="keyword">import</span> React, &#123;useState&#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">switchTheme</span>(<span class="params">theme: number</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">let</span> cssArr = [<span class="string">"antd.min.css"</span>, <span class="string">"antd.dark.min.css"</span>];</span><br><span class="line">	<span class="keyword">let</span> headHTML = <span class="built_in">document</span>.getElementsByTagName(<span class="string">'head'</span>)[<span class="number">0</span>];</span><br><span class="line">	<span class="keyword">let</span> link = <span class="built_in">document</span>.createElement(<span class="string">"link"</span>);</span><br><span class="line">	link.type = <span class="string">"text/css"</span>;</span><br><span class="line">	link.rel = <span class="string">"Stylesheet"</span>;</span><br><span class="line">	link.href = cssArr[theme % <span class="number">2</span>];</span><br><span class="line">	headHTML.append(link);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">App</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">const</span> [theme, updateSet] = useState(<span class="number">0</span>);</span><br><span class="line">	React.useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">		switchTheme(theme);</span><br><span class="line">	&#125;, [theme]);</span><br><span class="line">	<span class="keyword">return</span> (</span><br><span class="line">		&lt;div className=<span class="string">"App"</span>&gt;</span><br><span class="line">			&lt;Button type=&#123;<span class="string">"primary"</span>&#125; onClick=&#123;() =&gt; &#123;</span><br><span class="line">				updateSet(<span class="function"><span class="params">x</span> =&gt;</span> x + <span class="number">1</span>);</span><br><span class="line">			&#125;&#125;&gt; <span class="keyword">switch</span> theme &lt;<span class="regexp">/Button&gt;</span></span><br><span class="line"><span class="regexp">		&lt;/</span>div&gt;</span><br><span class="line">	);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h5 id="结果演示"><a href="#结果演示" class="headerlink" title="结果演示"></a>结果演示</h5><p><img src="/react/antdTheme.gif" alt="graphql query demo"> </p>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><blockquote>
-<p>对没有提供如react-material-ui中themeProvider来实现theme的切换的ui框架,采用此种方式实现虽然操作上不怎么优雅,但是也能够达到目的,在没有更好的方式来实现的时候,可以一试<br>目前验证antd,React Suite均能够实现通过此种方式,理论上提供css样式修改的ui框架均可以采用此方式是来实现实现主题的切换<br>建议将所有的主题提前在header中加载,这样在切换主题时直接从缓存中加载,避免切换的过程中出现闪烁的情况</p>
-</blockquote>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
+<li>对没有提供如react-material-ui中themeProvider来实现theme的切换的ui框架,采用此种方式实现虽然操作上不怎么优雅,但是也能够达到目的,在没有更好的方式来实现的时候,可以一试</li>
+<li>目前验证antd,React Suite均能够实现通过此种方式,理论上提供css样式修改的ui框架均可以采用此方式是来实现实现主题的切换</li>
+<li>建议将所有的主题提前在header中加载,这样在切换主题时直接从缓存中加载,避免切换的过程中出现闪烁的情况</li>
+</ul>
 <h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
 
       
