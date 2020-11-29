@@ -233,6 +233,280 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/16/koa+graphql定义你的接口/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/08/16/koa+graphql定义你的接口/" itemprop="url">koa + graphql的使用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-16T13:13:14+08:00">
+                2020-08-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h4><blockquote>
+<p>完成http请求到graphql的请求改造</p>
+</blockquote>
+<h4 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h4><blockquote>
+<p>内容大部分来自己graphql与apollo-server官网, 内部加上自己的一些理解,至于改造嘛,就自己动手咯</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Koa = <span class="built_in">require</span>(<span class="string">"koa"</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; ApolloServer, gql &#125; = <span class="built_in">require</span>(<span class="string">"apollo-server-koa"</span>);</span><br><span class="line"><span class="keyword">const</span> GraphQLJSON = <span class="built_in">require</span>(<span class="string">"graphql-type-json"</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; GraphQLScalarType &#125; = <span class="built_in">require</span>(<span class="string">"graphql"</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; Kind &#125; = <span class="built_in">require</span>(<span class="string">"graphql/language"</span>);</span><br><span class="line"><span class="keyword">const</span> books = [</span><br><span class="line">  &#123;</span><br><span class="line">    title: <span class="string">"Harry Potter and the Chamber of Secrets"</span>,</span><br><span class="line">    author: <span class="string">"J.K. Rowling"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    title: <span class="string">"Jurassic Park"</span>,</span><br><span class="line">    author: <span class="string">"Michael Crichton"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> users = [</span><br><span class="line">  &#123;</span><br><span class="line">    id: <span class="string">"1"</span>,</span><br><span class="line">    name: <span class="string">"Elizabeth Bennet"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    id: <span class="string">"2"</span>,</span><br><span class="line">    name: <span class="string">"Fitzwilliam Darcy"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> typeDefs = gql<span class="string">`</span></span><br><span class="line"><span class="string">  type Query &#123;</span></span><br><span class="line"><span class="string">    #   返回字符串</span></span><br><span class="line"><span class="string">    hello: String</span></span><br><span class="line"><span class="string">    # 返回数组</span></span><br><span class="line"><span class="string">    books: [Book]</span></span><br><span class="line"><span class="string">    # 通过参数查询</span></span><br><span class="line"><span class="string">    user(id: ID): User</span></span><br><span class="line"><span class="string">    info(date: Date): String</span></span><br><span class="line"><span class="string">    # 读取数据</span></span><br><span class="line"><span class="string">    foo: Foo</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string">  #使用第三方定义的标量 json类型</span></span><br><span class="line"><span class="string">  scalar JSON</span></span><br><span class="line"><span class="string">    # 使用自定义的date类型</span></span><br><span class="line"><span class="string">  scalar Date</span></span><br><span class="line"><span class="string">  type Foo &#123;</span></span><br><span class="line"><span class="string">    user: JSON</span></span><br><span class="line"><span class="string">    created: Date</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  type Book &#123;</span></span><br><span class="line"><span class="string">    title: String</span></span><br><span class="line"><span class="string">    author: String</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  type User &#123;</span></span><br><span class="line"><span class="string">    id: ID</span></span><br><span class="line"><span class="string">    name: String</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> resolvers = &#123;</span><br><span class="line">  <span class="built_in">JSON</span>: GraphQLJSON, <span class="comment">// 使用第三方的json标量</span></span><br><span class="line">  <span class="built_in">Date</span>: <span class="keyword">new</span> GraphQLScalarType(&#123;</span><br><span class="line">    <span class="comment">// 自定义标量</span></span><br><span class="line">    name: <span class="string">"Date"</span>,</span><br><span class="line">    description: <span class="string">"Date custom scalar type"</span>,</span><br><span class="line">    parseValue(value) &#123;</span><br><span class="line">      <span class="comment">// variables 参数解析路径</span></span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>(value);</span><br><span class="line">    &#125;,</span><br><span class="line">    serialize(value) &#123;</span><br><span class="line">      <span class="keyword">return</span> value.getTime();</span><br><span class="line">    &#125;,</span><br><span class="line">    parseLiteral(ast) &#123;</span><br><span class="line">      <span class="comment">// 字面量参数路径</span></span><br><span class="line">      <span class="keyword">if</span> (ast.kind === Kind.INT) &#123;</span><br><span class="line">        <span class="comment">// ast.value 永远是 字符串类型 所以需要转换</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>(+ast.value);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;),</span><br><span class="line">  Query: &#123;</span><br><span class="line">    hello: <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"Hello shaokun!"</span>;</span><br><span class="line">    &#125;,</span><br><span class="line">    books: <span class="function"><span class="params">()</span> =&gt;</span> books, <span class="comment">// 直接返回数据库中的books</span></span><br><span class="line">    user(parent, args, context) &#123;</span><br><span class="line">      <span class="comment">// parent 连续查询 中 上一次查询的结果</span></span><br><span class="line">      <span class="comment">// args 查询参数 如上面的id</span></span><br><span class="line">      <span class="comment">// context 全局数据的拿取</span></span><br><span class="line">      <span class="built_in">console</span>.log(parent, args, context.name, context.age);</span><br><span class="line">      <span class="keyword">return</span> users.find(<span class="function">(<span class="params">user</span>) =&gt;</span> user.id === args.id);</span><br><span class="line">    &#125;,</span><br><span class="line">    foo: <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        user: &#123; <span class="attr">name</span>: <span class="string">"shaokum"</span> &#125;,   <span class="comment">// 如果返回的不是json类型 则为null</span></span><br><span class="line">        created: <span class="keyword">new</span> <span class="built_in">Date</span>(),        <span class="comment">// Date类型 实际返回给前端的是 定义的scalar中的serialize方法</span></span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;,</span><br><span class="line">    info: <span class="function">(<span class="params">_, args</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 查询方式 字面常量方式查询</span></span><br><span class="line">      <span class="comment">// &#123;</span></span><br><span class="line">      <span class="comment">//     info(data:1597552212000)</span></span><br><span class="line">      <span class="comment">// &#125;</span></span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">"---info-"</span>, args); <span class="comment">// 通过Date.parseLiteral 方法拿到解析的数据</span></span><br><span class="line">      <span class="keyword">return</span> <span class="string">"this date is "</span> + args.date.toString();</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = <span class="keyword">new</span> ApolloServer(&#123;</span><br><span class="line">  typeDefs,</span><br><span class="line">  resolvers,</span><br><span class="line">  context: <span class="keyword">async</span> (request) =&gt; &#123;</span><br><span class="line">      <span class="comment">// 可获取到rquest请求</span></span><br><span class="line">    <span class="comment">// 可以全局挂载,如授权token db实例</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      name: <span class="string">"shaokun"</span>,</span><br><span class="line">      age: <span class="number">18</span>,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> Koa();</span><br><span class="line">server.applyMiddleware(&#123; app &#125;);</span><br><span class="line"></span><br><span class="line">app.listen(&#123; <span class="attr">port</span>: <span class="number">4000</span> &#125;, () =&gt;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`🚀 Server ready at http://localhost:4000<span class="subst">$&#123;server.graphqlPath&#125;</span>`</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h5 id="结果演示"><a href="#结果演示" class="headerlink" title="结果演示"></a>结果演示</h5><p><img src="/react/graphql.gif" alt="graphql query demo"> </p>
+<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/02/在typescript中使用eosjs-ecc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/02/02/在typescript中使用eosjs-ecc/" itemprop="url">在typescript中使用eosjs-ecc</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-02T16:19:14+08:00">
+                2020-02-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><ul>
+<li>ts开发后端项目,考虑到维护的需要,还是需要ts来支持.其中涉及到的lib都能找到对应的types,但是也有例外比如eosjs-ecc</li>
+</ul>
+<h4 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h4><ol>
+<li>简单快速,但是没有任何提示了,IDE基本的提示都没有了,对于直接将.js—&gt;.ts可以使用</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// tsconfig.json中将此字段设为false</span></span><br><span class="line">  <span class="string">"noImplicitAny"</span>: <span class="literal">false</span>,</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>自己写 **d.ts,喜欢的同学可以尝试一下</li>
+<li><p>工具自动生成,推荐方式<br> -这里使用微软提供的<a href="https://github.com/microsoft/dts-gen" target="_blank" rel="noopener">dts-gen</a>进行生成,放到项目的任意目录即可,但是还是无法使用,这时需要在最外面包裹一层 declare module ‘eosjs-ecc’{}即可,如果使用ts-node执行项目,需要在导入的时候添加ts-ignore,直接使用tsc编译则可以不用</p>
+ <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @ts-ignore</span></span><br><span class="line"><span class="keyword">import</span> ecc <span class="keyword">from</span> <span class="string">'eosjs-ecc'</span></span><br><span class="line">ecc.randomKey(<span class="number">0</span>).then(<span class="function">(<span class="params">privateKey:string</span>) =&gt;</span> &#123;</span><br><span class="line">   	<span class="built_in">console</span>.log(privateKey )</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>优化  </p>
+<ul>
+<li>细心的同学发现,里面的类型全是any,一点用处都没有啊?<br>但是这样可以有IDE的提示了,ts可以正常写代码了呢  </li>
+<li><p>由于一个lib我们不会完全用它的方法,那么我们只需要去修改一下我们需要使用的类型即可.比如randomKey这个方法,我们将它的declare中的按照如下更改即可,再次调用就达到了正常使用lib的目的啦</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// export function randomKey(cpuEntropyBits: number ): Promise&lt;string&gt;;</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">randomKey</span>(<span class="params">cpuEntropyBits?: number </span>): <span class="title">Promise</span>&lt;<span class="title">string</span>&gt;;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="优化-2020-02-21-15-14-56"><a href="#优化-2020-02-21-15-14-56" class="headerlink" title="优化(2020-02-21 15:14:56)"></a>优化(2020-02-21 15:14:56)</h4><ul>
+<li>上述第二点中,使用ts-node需要加上ts-ignore,而直接使用tsc编译为什么能过呢?</li>
+<li>原来在tsconfig.json中,我使用include属性将其声明文件包含到编译中了,故可使用.查看ts-node文档,只需要在执行ts-node 加上–files选项,这样将会加载tcconfig.json的include属性,这样就移除ts-ignore这个选项了</li>
+</ul>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>  最开始自己写*.d.ts,后续发现了居然还有dts-gen这样的工具.回头想想,利用这些工具,真香 ^0^,</p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#x75;&#110;&#110;&#121;&#x40;&#x31;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#110;&#110;&#121;&#x40;&#x31;&#x36;&#x33;&#x2e;&#x63;&#111;&#109;</a></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/07/electron开发记录/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -799,7 +1073,7 @@
 <li>还有一点,如果你使用eosiocpp编译wasm,abi文件,写合约的时候,有时候需要参考源码<a href="https://sourcegraph.com/github.com/EOSIO/eos" target="_blank" rel="noopener">eosio</a>,如果使用eosio.cdt编译的合约,<a href="https://github.com/EOSIO/eosio.cdt/tree/master/libraries/eosiolib" target="_blank" rel="noopener">eosio.cdt eoslib</a>要去这里找(ps:这个地方受过很多伤…)</li>
 <li>最后,祝大家学的开心</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#x6b;&#x75;&#110;&#x6e;&#x79;&#64;&#x31;&#54;&#51;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#x6e;&#x79;&#64;&#x31;&#54;&#51;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#107;&#x75;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#x75;&#110;&#x6e;&#121;&#64;&#x31;&#x36;&#x33;&#x2e;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -969,7 +1243,7 @@
 <li>有时候有新的业务需求,我们完全可以根据自己的需求来更改token内部的某些业务逻辑,毕竟它只是一份部署在你账号的一个智能合约而已,而且这个合约你完全有权限随时更改呢</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email <a href="mailto:&#115;&#x6b;&#x75;&#110;&#110;&#121;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#111;&#109;" target="_blank" rel="noopener">&#115;&#x6b;&#x75;&#110;&#110;&#121;&#64;&#x31;&#x36;&#51;&#x2e;&#99;&#111;&#109;</a></p>
+<p>email <a href="mailto:&#115;&#107;&#117;&#x6e;&#110;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#x63;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#107;&#117;&#x6e;&#110;&#x79;&#x40;&#x31;&#54;&#51;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
 
           
         
@@ -1156,7 +1430,7 @@ send_summary(user, &quot; successfully erased record from addressbook&quot;);
 <li>换个方向想,何尝不是又给了我们人生中多一次选择的机会呢?</li>
 <li>这应该是年前的最后一篇文章了,希望年后能够继续给大家分享一些dapp开发的知识,谢谢你的阅读</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#110;&#121;&#64;&#x31;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;</a></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#110;&#x79;&#64;&#49;&#54;&#x33;&#46;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#110;&#x79;&#64;&#49;&#54;&#x33;&#46;&#99;&#x6f;&#109;</a></p>
 
           
         
@@ -1335,7 +1609,7 @@ send_summary(user, &quot; successfully erased record from addressbook&quot;);
 <li>问题又来了?那我要怎么拿取转账的信息呢?</li>
 </ul>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;" target="_blank" rel="noopener">&#115;&#107;&#x75;&#x6e;&#x6e;&#121;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;</a></p>
+<p>email: <a href="mailto:&#x73;&#107;&#117;&#110;&#110;&#x79;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#107;&#117;&#110;&#110;&#x79;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;</a></p>
 
           
         
@@ -1605,557 +1879,7 @@ bool execute_action( T* obj, void (Q::*func)(Args...)  ) {
 <li>谢谢大家的浏览,希望有发现错误的同学可以加上我微信帮我指出来,再次感谢.</li>
 </ol>
 <h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#64;&#x31;&#x36;&#x33;&#46;&#99;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#64;&#x31;&#x36;&#x33;&#46;&#99;&#111;&#109;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/08/eos中inline action的理解3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/08/eos中inline action的理解3/" itemprop="url">eos中inline action的使用方式 (续)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-08T11:47:24+08:00">
-                2018-12-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="填坑"><a href="#填坑" class="headerlink" title="填坑"></a>填坑</h4><p> 这里填一个一直以来对于我来说的一个坑,也在之前的文章的文章误导了大家关于这个event.   </p>
-<ol>
-<li>之前我说以太坊区块链会主动通知我们当有数据发生变化,这是经过几天的琢磨发现使用了web3.js库造成的错觉.</li>
-<li>也正是由于这样,我没有在eos中找到类似的方法,所以去看看了web3.js的源码,发现它是才用轮询最新区块的内容而进行的事件的匹配然后产生的回调.  </li>
-<li><p><a href="https://github.com/ethereum/web3.js/blob/develop/lib/web3/requestmanager.js" target="_blank" rel="noopener">requestmanager.js</a>,如果你感兴趣,可以看看这个文件就大概知道了,更加进一步,你可以发现一些更有趣并且非常熟悉的东西,那就是在<a href="https://github.com/ethereum/web3.js/blob/develop/lib/web3/methods/eth.js" target="_blank" rel="noopener">methods.js</a>这个文件中 </p>
-</li>
-<li><p>这是web3提供的方法,既然这样,那我们是不是不调用web3的方法也可以得到同样的效果呢?答案肯定是可以的.通过以上的两个文件,那我们用node也来写一个监听最新块的方法</p>
-<pre><code>const axios = require(&apos;axios&apos;)
-const obj = { &quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;eth_getBlockByNumber&quot;, &quot;params&quot;: [&quot;latest&quot;, true], &quot;id&quot;: 1 }
-
-getBlockInfo()
-
-function getBlockInfo() {
-    axios.request(&apos;https://mainnet.infura.io/v3/e8947e207ac142519554d382200e663b&apos;, {
-        method: &apos;post&apos;,
-        header: {
-            &apos;Content-type&apos;: &apos;application/json&apos;
-        },
-        data: JSON.stringify(obj)
-    }).then(response =&gt; response.data).then(res =&gt; {
-            console.log(res)
-        })
-}
-</code></pre></li>
-<li>上面的方式可以监听到最新一个块的所有交易信息,然后根据条件筛选即可达到我们要的目的了.这里注意两点:一是json-rpc的请求格式,二是json-rpc提供的endpoint,我这里使用的是infrua提供的.其实metamask也是使用的这个端点,所以使用web3的时候会让你提供provider,其实就是提供的这个端点</li>
-</ol>
-<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote>
-<p>填完坑后,给出个结论   </p>
-</blockquote>
-<blockquote>
-<ul>
-<li>区块链从来不会主动推送消息给各位同学的</li>
-<li>所有的数据都是在区块里面的,只要在区块链发生的所有操作,均可以通过查询区块得到结果.</li>
-<li>至于web3或者是其他库提供的监听的功能,实际上是封装了这个轮询的过程</li>
-</ul>
-</blockquote>
-<blockquote>
-<p>本篇文章还是属于inline action的范畴.就是如何在合约中进行eos的交易</p>
-</blockquote>
-<h4 id="在合约中交易eos"><a href="#在合约中交易eos" class="headerlink" title="在合约中交易eos"></a>在合约中交易eos</h4><ol>
-<li><p>直接调用eosjs提供的api,这种方式比较简单,也不是我要说的重点(这里使用的是scatter官网提供的这个例子)</p>
-<pre><code>const transactionOptions = { authorization:[`${account.name}@${account.authority}`] };
-
-    eos.transfer(account.name, &apos;helloworld&apos;, &apos;1.0000 EOS&apos;, &apos;memo&apos;, transactionOptions).then(trx =&gt; {
-        // That&apos;s it!
-        console.log(`Transaction ID: ${trx.transaction_id}`);
-    }).catch(error =&gt; {
-        console.error(error);
-    });
-</code></pre></li>
-<li><p>这里有一种需求,就是在执行某个action的时候,需要预先支付一定费用的eos,当达到某种条件时候,再返回给调用者一定的量的eos.</p>
-</li>
-<li>根据需求我们写出了如下的代码,(注意asset这个类型,必须这样传入,关于它的更详细的用法得去看看api了哈;二是now()这个函数返回当前的时间戳,真实环境中这都是固定的,不能用来产生随机数).</li>
-<li>还记得之前的权限操作吗? 如果要在合约中转账,必须给合约添加eosio.code的权限,我这个合约现在部署在shaokun11113中的,那么就要给shaokun11113添加eosio.code权限.</li>
-<li>添加了权限之后,我们使用shaokun11112来调用这个合约,可以看到当shaokun11113向shaokun11112转账可以成功,但是shaokun11112向shaokun11113转账是没有权限的.</li>
-<li>那么,我们在shaokun11112中给shaokun11113添加eosio.code的权限</li>
-<li>添加权限后,可以看到一切转账成功了</li>
-<li>那么就实现了在合约中进行transfer eos的操作</li>
-</ol>
-<pre><code>#include &lt;eosiolib/eosio.hpp&gt;
-#include &lt;eosiolib/asset.hpp&gt;    
-using namespace eosio;
-
-class [[eosio::contract]] lucky : eosio::contract {
-
-public:
-    using contract::contract;
-    lucky(name r,name c, datastream&lt;const char*&gt; ds):contract(r,c,ds){}
-
-[[eosio::action]]
-void play(name player, const asset&amp; quantity) {
-    require_auth(player);
-    if(now() % 2 == 1){
-        action(
-    permission_level{get_self(),&quot;active&quot;_n},  //所需要的权限结构
-    &quot;eosio.token&quot;_n,                          // 调用的合约名称
-    &quot;transfer&quot;_n,                              // 合约的方法
-    std::make_tuple(get_self(),player, quantity, std::string(&quot;shao kun game&quot;)) // 传递的参数
-        ).send();
-    } else {
-        action(
-        permission_level{player,&quot;active&quot;_n},
-        &quot;eosio.token&quot;_n,
-        &quot;transfer&quot;_n,
-        std::make_tuple(player,get_self(), quantity, std::string(&quot;shao kun game&quot;))
-        ).send();
-    }
-};
-};
-EOSIO_DISPATCH(lucky,(play))
-</code></pre><p><img src="/eosinline/inline3.gif" alt="shaokun"></p>
-<h4 id="以太坊中eth使用合约进行交易"><a href="#以太坊中eth使用合约进行交易" class="headerlink" title="以太坊中eth使用合约进行交易"></a>以太坊中eth使用合约进行交易</h4><ul>
-<li>在以太坊中,如果某个方法要接收eth,必须给这个方法加上payable的关键字即可,合约中可以通过msg.value获取到交易的金额.如果此方法不加上payable而调用时传递了金额,那么调用此方法会失败  </li>
-<li><p>如果要在初始化的时候传入eth,必须给构造方法加上payable</p>
-<pre><code>contract Test4 {
-
-constructor() public payable {
-
-}
-
-function withPayable() public payable {
-    if(now % 2 == 0 ){
-        msg.sender.transfer(msg.value * 2);
-    }
-}
-
- function withoutPayable() public {
-
- }
-}
-</code></pre><p><img src="/eosinline/inline4.gif" alt="shaokun"></p>
-</li>
-</ul>
-<h4 id="源码与总结"><a href="#源码与总结" class="headerlink" title="源码与总结"></a>源码与总结</h4><ul>
-<li><a href="https://github.com/shaokun11/eosabout/tree/eos-transfer" target="_blank" rel="noopener">合约transfer</a></li>
-<li>相对于eth来说,个人觉得eos中在合约中转账过于麻烦,这需要用户手动去给合约设置转账权限</li>
-<li>如果哪位同学有更好的关于转账的方法,请告知一下,个人觉得在合约中进行转账还是很常见的需求</li>
-<li>官方的eos dice合约现在已经移除了,但是可以在历史中找到<a href="https://github.com/EOSIO/eos/blob/v1.0.0/contracts/dice/dice.cpp" target="_blank" rel="noopener">eos dice</a> 有兴趣的同学可以研究一下</li>
-</ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#x75;&#110;&#110;&#x79;&#64;&#49;&#54;&#51;&#46;&#x63;&#x6f;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#110;&#110;&#x79;&#64;&#49;&#54;&#51;&#46;&#x63;&#x6f;&#109;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/01/eos中inline action的理解2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/12/01/eos中inline action的理解2/" itemprop="url">eos中inline action的使用方式 (下)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-01T09:34:33+08:00">
-                2018-12-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><ul>
-<li>关于上一篇的inline action关于作为log的用法,我觉得这是其一,其二是可以action调用action,这样的话应该也算作action的第二种用法了吧  </li>
-<li>本篇文章介绍inline action的第三种用户,外部合约的调用  </li>
-<li>记住一点,这些调用都是在一个事务中进行的,所以可以放心大胆的使用</li>
-<li>由于eos的体系,需要你完全明白eos中 account 和permission level这两个东东的作用,不然理解起来会有点困难</li>
-</ul>
-<h4 id="据说"><a href="#据说" class="headerlink" title="据说"></a>据说</h4><ul>
-<li>听说BM又要离开eos了,我觉得无所谓了,毕竟eos是开源的,很多人维护的</li>
-<li>eos1.5发布了,是不是又得跟上步伐呢?感觉学不动了</li>
-<li><a href="https://mp.weixin.qq.com/s/IovpLgfvcWhu3L3tGbKiZg" target="_blank" rel="noopener">js4eos介绍</a>这工具可以简化一些工作,喜欢的同学可以试试<a href="https://github.com/itleaks/js4eos" target="_blank" rel="noopener">js4eos github</a> </li>
-</ul>
-<h4 id="eos中inline-action-结果展示与说明"><a href="#eos中inline-action-结果展示与说明" class="headerlink" title="eos中inline action 结果展示与说明"></a>eos中inline action 结果展示与说明</h4><ul>
-<li>这里官方的例子合约(cpp文件)和账户名字是一样的,让我困扰了一会,这里给大家一个结论就好:一个账户就只能部署一个合约,而这个合约的名字就是get_self(),当你部署合约的时候,就是账号的名字了.在写line action的时候不要弄混了</li>
-<li>使用shaokun11111部署合约 addressbook</li>
-<li>使用shaokun11112部署合约 adcounter</li>
-<li>在addressbook中使用inline action调用adcounter中的count方法</li>
-<li>这样设置后,多个合约就可以相互调用了</li>
-<li>关键点,如果要actor shaokun11111能够拥有调用其他合约的权限,必须给shaokun11111账号授予权限eosio.code,这是个系统的权限.</li>
-</ul>
-<pre><code>cleos -u https://api-kylin.eosasia.one:443 set account permission shaokun11111 active &apos;{&quot;threshold&quot;:1,&quot;keys&quot;:[{&quot;key&quot;:&quot;EOS5694dNS19CXwNMgQ3nd8eVG4gnqcihdstnmsChM8AdHNaDCC82&quot;,&quot;weight&quot;:1}],&quot;accounts&quot;:[{&quot;permission&quot;:{&quot;actor&quot;:&quot;shaokun11111&quot;,&quot;permission&quot;:&quot;eosio.code&quot;}}]}&apos; -p shaokun11111@owner
-</code></pre><ul>
-<li>关于permission的格式可以参考我以前的文章,注意这里使用的owner权限</li>
-<li><code>EOS5694dNS19CXwNMgQ3nd8eVG4gnqcihdstnmsChM8AdHNaDCC82</code> 这个是原来创建账号的权限的public key,当然按照上面的写法,这样其实可以更改原来账号的active的权限,建议保持原来权限创建的形式就好</li>
-<li>授权成功后,账号应该有如图中的显示</li>
-<li><img src="/eospermission/per1.png" alt="shaokun"></li>
-<li><img src="/eospermission/per3.gif" alt="shaokun"></li>
-</ul>
-<h4 id="eth中合约相互调用"><a href="#eth中合约相互调用" class="headerlink" title="eth中合约相互调用"></a>eth中合约相互调用</h4><blockquote>
-<p>如果你理解了eos合约的相互调用,那么接下来eth中的合约相互调用你应该很好理解了<br>个人看来两者的机制大同小异,因为eth中是以address中作为id的,而eos中是以account做为id的</p>
-</blockquote>
-<ul>
-<li>基于上篇文章的eth合约,我们稍加改造一下</li>
-<li>新添加了一个合约 Test3,其中我们将Test2的合约地址用来实例化了Service</li>
-<li>这个Service中需要包含Test2合约中你需要调用的方法的签名(这里关于是怎样找到的可以去看看官方文档,其实  <code>function notify(string _notification) external;</code> 就是这个函数的签名,包括方法名字和参数类型,返回值类型hash后 取了四个字节)</li>
-<li>部署Test3合约,部署成功后再Test3合约中的callNotify调用Test2合约中的notify方法,可以看到Test合约中的内容生效了</li>
-<li>这里有同学可能有疑问了,你这样的合约岂不是没有安全?拿到Test2合约地址,任何人新建一个合约就可以调用其合约的方法?是的,理论上是这样的.但是,凡事都有个但是哈.还记得我在之前的文章中关于eth中的权限如果验证吗?如果你看了那篇文章,那聪明的你一定知道该怎么做了哈  </li>
-<li><img src="/eospermission/per4.gif" alt="shaokun"></li>
-</ul>
-<h4 id="源码献上"><a href="#源码献上" class="headerlink" title="源码献上"></a>源码献上</h4><blockquote>
-<p><code>addressbook.cpp</code>,没什么说的,注意写法,变化的部分如果你认真阅读了应该知道变化在哪里</p>
-</blockquote>
-<pre><code>#include &lt;eosiolib/eosio.hpp&gt;
-#include &lt;eosiolib/print.hpp&gt;
-
-using namespace eosio;
-
-class [[eosio::contract]] addressbook : public eosio::contract {
-public:
-    using contract::contract;
-    addressbook(name reciever, name code, datastream&lt;const char*&gt; ds) : contract(reciever,code,ds){}
-
-    [[eosio::action]]
-    void upsert(name user, std::string first_name, uint64_t age){
-        require_auth(user);
-        address_index addresses(_code,_code.value);
-        auto itr = addresses.find(user.value);
-        if(itr == addresses.end()){
-            addresses.emplace(user,[&amp;](auto&amp; row){
-                row.key = user;
-                row.first_name = first_name;
-                row.age = age;
-            });
-            send_summary(user, &quot;emplace data&quot;);
-            counter(user,&quot;emplace&quot;);
-        } else {
-            addresses.modify(itr, user, [&amp;](auto&amp; row){
-                        row.first_name = first_name;
-                        row.age = age;
-            });
-            send_summary(user, &quot;modify data&quot;);
-            counter(user,&quot;modify&quot;);
-        }
-    }
-
-    [[eosio::action]]
-    void erase(name user){
-        require_auth(user);
-        address_index addresses(_self, _code.value);
-        auto itr = addresses.find(user.value);
-        eosio_assert(itr != addresses.end(),&quot;record not exist&quot;);
-        addresses.erase(itr);
-        // 调用inline action
-        send_summary(user, &quot; erase data&quot;);
-        counter(user,&quot;erase&quot;);
-    }
-
-    [[eosio::action]]
-    void notify(name user, std::string){
-        // inline action
-        require_auth(get_self());
-        require_recipient(user);
-    }
-
-private:
-    struct [[eosio::table]] person {
-        name key;
-        std::string first_name;
-        uint64_t age;
-
-        auto primary_key() const {
-            return key.value;
-        };
-    };
-    typedef multi_index&lt;&quot;person&quot;_n, person&gt; address_index;
-
-    // inline action的具体实现
-    void send_summary(name user, std::string msg){
-        action(
-            permission_level{get_self(),&quot;active&quot;_n},
-                get_self(),
-                &quot;notify&quot;_n,
-                std::make_tuple(user, name{user}.to_string() +msg)
-            ).send();
-    }
-    void counter(name user, std::string type){
-        action counter = action(
-            permission_level{get_self(),&quot;active&quot;_n},// 执行这个inline aciton所需要的权限,即本合约调用
-            &quot;shaokun11112&quot;_n,                       // 账号名称
-            &quot;count&quot;_n,                              // action 名称
-            std::make_tuple(user,type)              // 传递的参数
-            );
-        counter.send();
-    }
-};
-EOSIO_DISPATCH(addressbook,(upsert)(erase))
-</code></pre><blockquote>
-<p><code>adcounter.cpp</code> 注意其中的权限验证部分,其他没什么好说的</p>
-</blockquote>
-<pre><code>#include &lt;eosiolib/eosio.hpp&gt;
-
-using namespace eosio;
-
-class [[eosio::contract]] adcounter: public eosio::contract {
-public:
-    using contract::contract;
-    adcounter(name receiver, name code, datastream&lt;const char*&gt; ds):contract(receiver,code,ds),
-                                                                    counts(receiver,code.value){}
-
-    void count(name user, std::string type) {
-        // 设定这个方法的调用权限
-        // 只有 shaokun11111 这个账号部署的合约有这个权限更改这个合约的内容
-        require_auth(name(&quot;shaokun11111&quot;));
-        auto itr = counts.find(user.value);
-        if(itr == counts.end()){
-            counts.emplace(&quot;shaokun11111&quot;_n, [&amp;](auto&amp; row){
-                row.key = user;
-                row.emplaced = type == &quot;emplace&quot; ? 1 : 0;
-                row.modified = type == &quot;modify&quot; ? 1 : 0;
-                row.erased = type == &quot;erase&quot; ? 1 : 0;
-            });
-        } else {
-            counts.modify(itr,&quot;shaokun11111&quot;_n,[&amp;](auto&amp; row){
-                if (type == &quot;emplace&quot;)
-                {
-                    row.emplaced += 1;
-                }
-                if (type == &quot;modify&quot;)
-                {
-                    row.modified += 1;
-                }
-                if (type == &quot;erase&quot;)
-                {
-                    row.erased += 1;
-                }
-            });
-        }
-    }
-private:
-    struct [[eosio::table]] counter
-    {
-        name key;
-        uint64_t emplaced;
-        uint64_t modified;
-        uint64_t erased;
-
-        uint64_t primary_key() const {return key.value;}
-    };
-
-    typedef eosio::multi_index&lt;&quot;counter&quot;_n,counter&gt; counter_index;
-    counter_index counts;
-};
-EOSIO_DISPATCH(adcounter,(count));
-</code></pre><p>前端代码就不展示了,因为所有的操作都是在addressbook这个合约中进行操作的,adcounter只是展示了合约中的记录<br><a href="https://github.com/shaokun11/eosabout/tree/eos-inline-action2" target="_blank" rel="noopener">本课源码</a></p>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ul>
-<li>建议各位同学一定要仔细敲一遍,虽然例子简单,但是再复杂的内容也是由这些简单的例子所产生的</li>
-<li>eos inline action的作用已经说完了.这样掌握之后,就可以写很多合约,壮大你的dapp了.inline action很重要的一点 是可以回滚交易,好好利用,发挥意想不到的作用</li>
-<li>话说还有个deferred action,有时间再和大家分享一下这货是怎使用了</li>
-<li>dapp的开发不仅仅是写合约,目前主要应用还是在web上.所以建议各位同学还是得了解一下js,node,webpack,react,css这些基础的概念和用法吧.不要多熟练,大概了解一下怎么用就好了</li>
-<li>还有一点,哪位同学知道eos中有类似eth中的event的功能,即合约主动推送信息给我们,我觉得这很重要.我觉得eosjs应该提供类似的功能呢.知道的同学麻烦告知一声</li>
-</ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-<p>email: <a href="mailto:&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#111;&#x6d;" target="_blank" rel="noopener">&#x73;&#x6b;&#117;&#110;&#110;&#x79;&#64;&#49;&#x36;&#x33;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>email: <a href="mailto:&#115;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#x6d;" target="_blank" rel="noopener">&#115;&#x6b;&#117;&#110;&#x6e;&#121;&#64;&#x31;&#54;&#51;&#46;&#99;&#x6f;&#x6d;</a></p>
 
           
         
@@ -2241,7 +1965,7 @@ EOSIO_DISPATCH(adcounter,(count));
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

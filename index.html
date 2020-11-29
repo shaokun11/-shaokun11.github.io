@@ -233,6 +233,282 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/29/react中theme的实现2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/11/29/react中theme的实现2/" itemprop="url">antd实现theme的切换(2)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-29T15:51:05+08:00">
+                2020-11-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h4><ul>
+<li>如果只有一套可以按照官方的介绍的方式,配置在项目中即可达到目的</li>
+<li>本篇文章实现的是根据ui提供的less文件使用webpack导出自定义的css</li>
+</ul>
+<h4 id="实现流程"><a href="#实现流程" class="headerlink" title="实现流程"></a>实现流程</h4><ul>
+<li>目录结构</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">custom-less-theme</span><br><span class="line">package-lock.json	src</span><br><span class="line">package.json		webpack.config.js</span><br><span class="line"></span><br><span class="line">./src:</span><br><span class="line">main.js</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装依赖</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"scripts"</span>: &#123;</span><br><span class="line">   	<span class="string">"build"</span>: <span class="string">"webpack "</span></span><br><span class="line"> 	&#125;,</span><br><span class="line"> <span class="string">"dependencies"</span>: &#123;</span><br><span class="line">   <span class="string">"antd"</span>: <span class="string">"^4.8.6"</span>,</span><br><span class="line">   <span class="string">"css-loader"</span>: <span class="string">"^5.0.1"</span>,</span><br><span class="line">   <span class="string">"css-minimizer-webpack-plugin"</span>: <span class="string">"^1.1.5"</span>,</span><br><span class="line">   <span class="string">"less"</span>: <span class="string">"^3.12.2"</span>,</span><br><span class="line">   <span class="string">"less-loader"</span>: <span class="string">"^7.1.0"</span>,</span><br><span class="line">   <span class="string">"mini-css-extract-plugin"</span>: <span class="string">"^1.3.1"</span>,</span><br><span class="line">   <span class="string">"style-loader"</span>: <span class="string">"^2.0.0"</span>,</span><br><span class="line">   <span class="string">"webpack"</span>: <span class="string">"^5.8.0"</span>,</span><br><span class="line">   <span class="string">"webpack-cli"</span>: <span class="string">"^4.2.0"</span></span><br><span class="line"> 	&#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>导出less文件即main.js的内容</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"antd/dist/antd.less"</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>webpack.config.js的配置,固定写法,其中用到了两个插件,一个为将less转化成的css提取出来,一个为压缩提取出来的css.</li>
+<li>这里可以将要修改的变量采用一个json来配置,方便管理</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">	<span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">"path"</span>);</span><br><span class="line"><span class="keyword">const</span> MiniCssExtractPlugin = <span class="built_in">require</span>(<span class="string">"mini-css-extract-plugin"</span>);</span><br><span class="line"><span class="keyword">const</span> CssMinimizerPlugin = <span class="built_in">require</span>(<span class="string">'css-minimizer-webpack-plugin'</span>);</span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  mode: <span class="string">"production"</span>,</span><br><span class="line">  entry: <span class="string">"./src/main.js"</span>,			<span class="comment">//入口js</span></span><br><span class="line">  output: &#123;</span><br><span class="line">    filename: <span class="string">"main.js"</span>,			<span class="comment">// 输出的js,我们不需要,这里是个空文件</span></span><br><span class="line">    path: path.resolve(__dirname, <span class="string">"dist"</span>),</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> MiniCssExtractPlugin(&#123;</span><br><span class="line">      filename: <span class="string">"myant.min.css"</span>,		<span class="comment">// 输出的css文件名</span></span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">  optimization: &#123;</span><br><span class="line">    minimizer: [</span><br><span class="line">      <span class="keyword">new</span> CssMinimizerPlugin(),</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.less$/</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123; <span class="attr">loader</span>: MiniCssExtractPlugin.loader &#125;,</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">"css-loader"</span>,</span><br><span class="line">          &#125;,</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">"less-loader"</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              lessOptions: &#123;</span><br><span class="line">                javascriptEnabled: <span class="literal">true</span>,</span><br><span class="line">                modifyVars: &#123;</span><br><span class="line">                  <span class="string">"primary-color"</span>: <span class="string">"#1DA57A"</span>,	<span class="comment">// 要修改的less变量</span></span><br><span class="line">                &#125;,</span><br><span class="line">              &#125;,</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>执行打包, npm run build</li>
+</ul>
+<h5 id="结果演示"><a href="#结果演示" class="headerlink" title="结果演示"></a>结果演示</h5><ul>
+<li>实现的效果为从antd-&gt;antd dark -&gt; andt的primary颜色的三个主题来回变化,其中绿色的primary即是本次实现的自定义主题的效果啦  </li>
+</ul>
+<p><img src="/react/antdTheme2.gif" alt="graphql query demo"> </p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><blockquote>
+<p>熟悉各个工具的使用,细心跟着文档做就可以啦</p>
+</blockquote>
+<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>软件开发攻城狮一枚,熟悉dapp,web,android,node,go等软件的开发。<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong>  </p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/29/常用linux:vim命令/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="shaokun">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hello shaokun">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/11/29/常用linux:vim命令/" itemprop="url">常用linux/vim命令(不定时更新)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-29T13:08:53+08:00">
+                2020-11-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h4 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h4><ul>
+<li>常用操作的记录,不定时更新,方便查找</li>
+</ul>
+<h4 id="linux"><a href="#linux" class="headerlink" title="linux"></a>linux</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">- 查看末尾的的100行 tail 100 </span><br><span class="line">- 递归现实当前目录下的所有文件 ls -R</span><br><span class="line">- 不断输出查看末尾的的100行 tail 100 -f</span><br><span class="line">- 查看磁盘信息 df -h</span><br><span class="line">- 查看当前目录的信息 du -h -d 1</span><br><span class="line">- 移动到命令行首 ctrl + a</span><br><span class="line">- 移动到命令行尾 ctrl + e</span><br><span class="line">- 删除当前位置到行尾的数据 ctrl + k</span><br><span class="line">- 删除当前位置到行首的数据 ctrl + u</span><br><span class="line">- 清屏 ctrl + l</span><br><span class="line">- 改名 mv test.txt test1.txt</span><br><span class="line">- 复制 cp text.txt text1.txt (只能复制文件,可配合压缩来处理)</span><br><span class="line">- 压缩gizp tar zcvf test1.txt.tar.gz text.txt</span><br><span class="line">- 解压gizp tar zxvf test1.txt.tar.gz </span><br><span class="line">- 删除 rm -rf test.txt</span><br></pre></td></tr></table></figure>
+<h4 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- 跳转到页面顶部  gg</span><br><span class="line">- 跳转到页面底部  G</span><br><span class="line">- 向上半屏查看 ctrl + b</span><br><span class="line">- 向下半屏查看 ctrl + f</span><br><span class="line">- 显示行号 <span class="keyword">set</span> nu</span><br><span class="line">- 删除当前行 dd</span><br><span class="line">- 拷贝1,4行到5行开始 1,4 copy 5 </span><br><span class="line">- 移动1,4行到第5行开始 1,4 move 5</span><br></pre></td></tr></table></figure>
+<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/28/react中theme的实现/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1455,280 +1731,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/16/koa+graphql定义你的接口/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/08/16/koa+graphql定义你的接口/" itemprop="url">koa + graphql的使用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-16T13:13:14+08:00">
-                2020-08-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h4><blockquote>
-<p>完成http请求到graphql的请求改造</p>
-</blockquote>
-<h4 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h4><blockquote>
-<p>内容大部分来自己graphql与apollo-server官网, 内部加上自己的一些理解,至于改造嘛,就自己动手咯</p>
-</blockquote>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Koa = <span class="built_in">require</span>(<span class="string">"koa"</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; ApolloServer, gql &#125; = <span class="built_in">require</span>(<span class="string">"apollo-server-koa"</span>);</span><br><span class="line"><span class="keyword">const</span> GraphQLJSON = <span class="built_in">require</span>(<span class="string">"graphql-type-json"</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; GraphQLScalarType &#125; = <span class="built_in">require</span>(<span class="string">"graphql"</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; Kind &#125; = <span class="built_in">require</span>(<span class="string">"graphql/language"</span>);</span><br><span class="line"><span class="keyword">const</span> books = [</span><br><span class="line">  &#123;</span><br><span class="line">    title: <span class="string">"Harry Potter and the Chamber of Secrets"</span>,</span><br><span class="line">    author: <span class="string">"J.K. Rowling"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    title: <span class="string">"Jurassic Park"</span>,</span><br><span class="line">    author: <span class="string">"Michael Crichton"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> users = [</span><br><span class="line">  &#123;</span><br><span class="line">    id: <span class="string">"1"</span>,</span><br><span class="line">    name: <span class="string">"Elizabeth Bennet"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    id: <span class="string">"2"</span>,</span><br><span class="line">    name: <span class="string">"Fitzwilliam Darcy"</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> typeDefs = gql<span class="string">`</span></span><br><span class="line"><span class="string">  type Query &#123;</span></span><br><span class="line"><span class="string">    #   返回字符串</span></span><br><span class="line"><span class="string">    hello: String</span></span><br><span class="line"><span class="string">    # 返回数组</span></span><br><span class="line"><span class="string">    books: [Book]</span></span><br><span class="line"><span class="string">    # 通过参数查询</span></span><br><span class="line"><span class="string">    user(id: ID): User</span></span><br><span class="line"><span class="string">    info(date: Date): String</span></span><br><span class="line"><span class="string">    # 读取数据</span></span><br><span class="line"><span class="string">    foo: Foo</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string">  #使用第三方定义的标量 json类型</span></span><br><span class="line"><span class="string">  scalar JSON</span></span><br><span class="line"><span class="string">    # 使用自定义的date类型</span></span><br><span class="line"><span class="string">  scalar Date</span></span><br><span class="line"><span class="string">  type Foo &#123;</span></span><br><span class="line"><span class="string">    user: JSON</span></span><br><span class="line"><span class="string">    created: Date</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  type Book &#123;</span></span><br><span class="line"><span class="string">    title: String</span></span><br><span class="line"><span class="string">    author: String</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  type User &#123;</span></span><br><span class="line"><span class="string">    id: ID</span></span><br><span class="line"><span class="string">    name: String</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> resolvers = &#123;</span><br><span class="line">  <span class="built_in">JSON</span>: GraphQLJSON, <span class="comment">// 使用第三方的json标量</span></span><br><span class="line">  <span class="built_in">Date</span>: <span class="keyword">new</span> GraphQLScalarType(&#123;</span><br><span class="line">    <span class="comment">// 自定义标量</span></span><br><span class="line">    name: <span class="string">"Date"</span>,</span><br><span class="line">    description: <span class="string">"Date custom scalar type"</span>,</span><br><span class="line">    parseValue(value) &#123;</span><br><span class="line">      <span class="comment">// variables 参数解析路径</span></span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>(value);</span><br><span class="line">    &#125;,</span><br><span class="line">    serialize(value) &#123;</span><br><span class="line">      <span class="keyword">return</span> value.getTime();</span><br><span class="line">    &#125;,</span><br><span class="line">    parseLiteral(ast) &#123;</span><br><span class="line">      <span class="comment">// 字面量参数路径</span></span><br><span class="line">      <span class="keyword">if</span> (ast.kind === Kind.INT) &#123;</span><br><span class="line">        <span class="comment">// ast.value 永远是 字符串类型 所以需要转换</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>(+ast.value);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;),</span><br><span class="line">  Query: &#123;</span><br><span class="line">    hello: <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"Hello shaokun!"</span>;</span><br><span class="line">    &#125;,</span><br><span class="line">    books: <span class="function"><span class="params">()</span> =&gt;</span> books, <span class="comment">// 直接返回数据库中的books</span></span><br><span class="line">    user(parent, args, context) &#123;</span><br><span class="line">      <span class="comment">// parent 连续查询 中 上一次查询的结果</span></span><br><span class="line">      <span class="comment">// args 查询参数 如上面的id</span></span><br><span class="line">      <span class="comment">// context 全局数据的拿取</span></span><br><span class="line">      <span class="built_in">console</span>.log(parent, args, context.name, context.age);</span><br><span class="line">      <span class="keyword">return</span> users.find(<span class="function">(<span class="params">user</span>) =&gt;</span> user.id === args.id);</span><br><span class="line">    &#125;,</span><br><span class="line">    foo: <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        user: &#123; <span class="attr">name</span>: <span class="string">"shaokum"</span> &#125;,   <span class="comment">// 如果返回的不是json类型 则为null</span></span><br><span class="line">        created: <span class="keyword">new</span> <span class="built_in">Date</span>(),        <span class="comment">// Date类型 实际返回给前端的是 定义的scalar中的serialize方法</span></span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;,</span><br><span class="line">    info: <span class="function">(<span class="params">_, args</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 查询方式 字面常量方式查询</span></span><br><span class="line">      <span class="comment">// &#123;</span></span><br><span class="line">      <span class="comment">//     info(data:1597552212000)</span></span><br><span class="line">      <span class="comment">// &#125;</span></span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">"---info-"</span>, args); <span class="comment">// 通过Date.parseLiteral 方法拿到解析的数据</span></span><br><span class="line">      <span class="keyword">return</span> <span class="string">"this date is "</span> + args.date.toString();</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = <span class="keyword">new</span> ApolloServer(&#123;</span><br><span class="line">  typeDefs,</span><br><span class="line">  resolvers,</span><br><span class="line">  context: <span class="keyword">async</span> (request) =&gt; &#123;</span><br><span class="line">      <span class="comment">// 可获取到rquest请求</span></span><br><span class="line">    <span class="comment">// 可以全局挂载,如授权token db实例</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      name: <span class="string">"shaokun"</span>,</span><br><span class="line">      age: <span class="number">18</span>,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> Koa();</span><br><span class="line">server.applyMiddleware(&#123; app &#125;);</span><br><span class="line"></span><br><span class="line">app.listen(&#123; <span class="attr">port</span>: <span class="number">4000</span> &#125;, () =&gt;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`🚀 Server ready at http://localhost:4000<span class="subst">$&#123;server.graphqlPath&#125;</span>`</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-<h5 id="结果演示"><a href="#结果演示" class="headerlink" title="结果演示"></a>结果演示</h5><p><img src="/react/graphql.gif" alt="graphql query demo"> </p>
-<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  </p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/02/在typescript中使用eosjs-ecc/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="shaokun">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hello shaokun">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/02/02/在typescript中使用eosjs-ecc/" itemprop="url">在typescript中使用eosjs-ecc</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-02T16:19:14+08:00">
-                2020-02-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><ul>
-<li>ts开发后端项目,考虑到维护的需要,还是需要ts来支持.其中涉及到的lib都能找到对应的types,但是也有例外比如eosjs-ecc</li>
-</ul>
-<h4 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h4><ol>
-<li>简单快速,但是没有任何提示了,IDE基本的提示都没有了,对于直接将.js—&gt;.ts可以使用</li>
-</ol>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// tsconfig.json中将此字段设为false</span></span><br><span class="line">  <span class="string">"noImplicitAny"</span>: <span class="literal">false</span>,</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>自己写 **d.ts,喜欢的同学可以尝试一下</li>
-<li><p>工具自动生成,推荐方式<br> -这里使用微软提供的<a href="https://github.com/microsoft/dts-gen" target="_blank" rel="noopener">dts-gen</a>进行生成,放到项目的任意目录即可,但是还是无法使用,这时需要在最外面包裹一层 declare module ‘eosjs-ecc’{}即可,如果使用ts-node执行项目,需要在导入的时候添加ts-ignore,直接使用tsc编译则可以不用</p>
- <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @ts-ignore</span></span><br><span class="line"><span class="keyword">import</span> ecc <span class="keyword">from</span> <span class="string">'eosjs-ecc'</span></span><br><span class="line">ecc.randomKey(<span class="number">0</span>).then(<span class="function">(<span class="params">privateKey:string</span>) =&gt;</span> &#123;</span><br><span class="line">   	<span class="built_in">console</span>.log(privateKey )</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>优化  </p>
-<ul>
-<li>细心的同学发现,里面的类型全是any,一点用处都没有啊?<br>但是这样可以有IDE的提示了,ts可以正常写代码了呢  </li>
-<li><p>由于一个lib我们不会完全用它的方法,那么我们只需要去修改一下我们需要使用的类型即可.比如randomKey这个方法,我们将它的declare中的按照如下更改即可,再次调用就达到了正常使用lib的目的啦</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// export function randomKey(cpuEntropyBits: number ): Promise&lt;string&gt;;</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">randomKey</span>(<span class="params">cpuEntropyBits?: number </span>): <span class="title">Promise</span>&lt;<span class="title">string</span>&gt;;</span></span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ol>
-<h4 id="优化-2020-02-21-15-14-56"><a href="#优化-2020-02-21-15-14-56" class="headerlink" title="优化(2020-02-21 15:14:56)"></a>优化(2020-02-21 15:14:56)</h4><ul>
-<li>上述第二点中,使用ts-node需要加上ts-ignore,而直接使用tsc编译为什么能过呢?</li>
-<li>原来在tsconfig.json中,我使用include属性将其声明文件包含到编译中了,故可使用.查看ts-node文档,只需要在执行ts-node 加上–files选项,这样将会加载tcconfig.json的include属性,这样就移除ts-ignore这个选项了</li>
-</ul>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>  最开始自己写*.d.ts,后续发现了居然还有dts-gen这样的工具.回头想想,利用这些工具,真香 ^0^,</p>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。<br>email: <a href="mailto:&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#109;" target="_blank" rel="noopener">&#x73;&#x6b;&#x75;&#x6e;&#x6e;&#x79;&#64;&#x31;&#x36;&#51;&#x2e;&#x63;&#111;&#109;</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1779,7 +1781,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
