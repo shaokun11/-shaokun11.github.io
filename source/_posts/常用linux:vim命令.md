@@ -1,6 +1,6 @@
 ---
 title: 常用linux/vim命令(不定时更新)
-date: 2020-11-29 13:08:53
+date: 2021-01-31 00:09:09
 ---
 
 #### 目标
@@ -9,6 +9,8 @@ date: 2020-11-29 13:08:53
 #### linux
 ```bash
 - 查看末尾的的100行 tail 100 
+- 查看少量文本  cat
+- 查看大文件	less -mN text.txt (-mN显示进度与行号, 搜索 ? / ,从后往前查看 shif + G 移动到最后  space 向下翻页 b向上翻页),极力推荐
 - 递归现实当前目录下的所有文件 ls -R
 - 不断输出查看末尾的的100行 tail 100 -f
 - 查看磁盘信息 df -h
@@ -20,8 +22,8 @@ date: 2020-11-29 13:08:53
 - 清屏 ctrl + l
 - 改名 mv test.txt test1.txt
 - 复制 cp text.txt text1.txt (只能复制文件,可配合压缩来处理)
-- 压缩gizp tar zcvf test1.txt.tar.gz text.txt
-- 解压gizp tar zxvf test1.txt.tar.gz 
+- 压缩gizp tar -zcvf test1.txt.tar.gz text.txt
+- 解压gizp tar -zxvf test1.txt.tar.gz 
 - 删除 rm -rf test.txt
 ```
 
