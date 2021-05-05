@@ -112,7 +112,6 @@ module.exports = {
 
 ##### 关于我
 软件开发攻城狮一枚,熟悉dapp,web,android,node,go等软件的开发。  
-**email:skunny@163.com**  
 
 
 

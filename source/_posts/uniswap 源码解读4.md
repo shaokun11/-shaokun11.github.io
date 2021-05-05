@@ -219,4 +219,3 @@ contract AppleFactory {
 
 #### 关于我
 区块链程序猿一枚  
-**email:skunny@163.com**

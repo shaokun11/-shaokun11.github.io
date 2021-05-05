@@ -280,4 +280,3 @@ ScatterJS.connect('YourAppName', {network}).then(connected => {
 
 #### 关于我
 区块链技术痴迷的程序猿一枚，如果你喜欢我的文章，可以加上微信共同学习，共同进步。  
-email: <skunny@163.com>
