@@ -444,7 +444,7 @@
 <li>注意react的script标签的type为 <strong>text/babel</strong>,<a href="https://github.com/babel/babel-standalone" target="_blank" rel="noopener">具体玩法看这里</a></li>
 </ul>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf-8"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"root"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://unpkg.com/react@17/umd/react.development.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://unpkg.com/react-dom@17/umd/react-dom.development.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://unpkg.com/@babel/standalone/babel.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">	</span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/babel"</span>&gt;</span>	</span><br><span class="line"></span><br><span class="line"><span class="javascript">    <span class="function"><span class="keyword">function</span> <span class="title">Hello</span>(<span class="params">&#123; name &#125;</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">      <span class="keyword">const</span> savedCallback = React.useRef(<span class="literal">null</span>);</span></span><br><span class="line"><span class="javascript">      <span class="keyword">const</span> [count, updateCount] = React.useState(<span class="number">0</span>)</span></span><br><span class="line">      </span><br><span class="line"><span class="javascript">      React.useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">        savedCallback.current = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">          updateCount(<span class="function"><span class="params">c</span> =&gt;</span> c + <span class="number">1</span>)</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;, [])</span><br><span class="line"></span><br><span class="line"><span class="javascript">      React.useEffect(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">        <span class="keyword">const</span> interval = setInterval(<span class="function"><span class="params">()</span> =&gt;</span> savedCallback.current(), <span class="number">1000</span>);</span></span><br><span class="line"><span class="javascript">        <span class="keyword">return</span> <span class="function"><span class="params">()</span> =&gt;</span> clearInterval(interval);</span></span><br><span class="line">      &#125;, []);</span><br><span class="line"></span><br><span class="line"><span class="javascript">      <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span></span><br><span class="line">        hello &#123;name&#125; + &#123;count&#125;</span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="javascript">    ReactDOM.render(<span class="xml"><span class="tag">&lt;<span class="name">Hello</span> <span class="attr">name</span>=<span class="string">"World"</span> /&gt;</span>, document.getElementById("root"));</span></span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>软件开发攻城狮一枚,熟悉dapp,web,android,node,go等软件的开发。<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong>  </p>
+<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>软件开发攻城狮一枚,熟悉dapp,web,android,node,go等软件的开发。  </p>
 
           
         
@@ -595,7 +595,7 @@
 <h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><blockquote>
 <p>熟悉各个工具的使用,细心跟着文档做就可以啦</p>
 </blockquote>
-<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>软件开发攻城狮一枚,熟悉dapp,web,android,node,go等软件的开发。<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong>  </p>
+<h5 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h5><p>软件开发攻城狮一枚,熟悉dapp,web,android,node,go等软件的开发。  </p>
 
           
         
@@ -1031,7 +1031,7 @@
 <li>个人觉得uniswap的精髓在其整个的设计与其创新,理论上来讲,是真正实现了一个去中心化的交易所的功能</li>
 <li>目前前端页面只提供了tokenA,与tokenB的操作,且只适用于rinkeby网络,如果各位同学想要进一步发挥,可以完全参考uniswap的实现<a href="https://github.com/Uniswap/uniswap-v2-periphery" target="_blank" rel="noopener">uniswap-peripher</a>,<a href="https://github.com/Uniswap/uniswap-interface" target="_blank" rel="noopener">uniswap前端页面</a>自己实现一套属于自己的swap吧</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚  </p>
 
           
         
@@ -1186,7 +1186,7 @@
 <li>此合约部署只需要<a href="https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2Factory.sol" target="_blank" rel="noopener">UniswapV2Factory.sol</a>这一个合约即可,这里我flatten一下这个合约,各位同学可以直接使用<a href="https://github.com/shaokun11/solidity-env-hardhat/blob/v4/contracts/XSwapFactory.sol" target="_blank" rel="noopener">faltten UniswapV2Factory.sol</a></li>
 <li>看完pari这个合约,合约代码方面的技术难题了,本篇文章只实现了add的功能,下一篇实现其最后一个功能swap</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚  </p>
 
           
         
@@ -1343,7 +1343,7 @@
 <li>接下来就可以进入到在第一篇文章中所提到的三个合约中的<strong>UniswapV2Pair</strong>,也即使最后一个合约</li>
 <li>其实到这里来说,合约知识中的难点已经讲解的差不多了,剩下的其实是关于uniswap中的创新思想的复习咯</li>
 </ol>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚  </p>
 
           
         
@@ -1514,7 +1514,7 @@
 <li>UniswapV2ERC20 基础合约就没有什么难点了,其余的方法为标准的erc20 token的方法</li>
 <li>接下来讲解<em>UniswapV2Factory</em>,又是一个开发智能合约很重要的一个知识点呢</li>
 </ul>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚  </p>
 
           
         
@@ -1676,7 +1676,7 @@
 <li><p>其中有些细节我觉得通过文字来描述就有点啰嗦了,然后就跳过了,如果你感觉到其中哪些地方迷糊,可以给我发邮件</p>
 </li>
 </ol>
-<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚<br><strong>email:<a href="mailto:skunny@163.com" target="_blank" rel="noopener">skunny@163.com</a></strong></p>
+<h4 id="关于我"><a href="#关于我" class="headerlink" title="关于我"></a>关于我</h4><p>区块链程序猿一枚  </p>
 
           
         
